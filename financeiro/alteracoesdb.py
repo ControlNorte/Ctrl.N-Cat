@@ -19,7 +19,7 @@ def saldodiario(banco, cliente, data):
         data = datetime.fromordinal(data_ord).date()
         data_anterior = datetime.fromordinal(data_ord - 1).date()
         
-        with sqlite3.connect(r"C:\Users\Dell\PycharmProjects\ProjetoDjango\db.sqlite3") as conexao:
+        with sqlite3.connect(r"monorail.proxy.rlwy.net") as conexao:
             tabela_saldo = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
             tabela_mov = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
 
