@@ -1,1 +1,1 @@
-web: python manage.py migrate && gunicorn ControlNorte.wsgi --logo-file -
+web: python manage.py migrate && gunicorn ControlNorte.wsgi --log-file -
