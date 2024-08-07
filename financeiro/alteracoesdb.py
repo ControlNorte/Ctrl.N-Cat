@@ -9,6 +9,8 @@ from sqlalchemy.orm import sessionmaker
 import dask.dataframe as dd
 from datetime import datetime, timedelta
 from django.db import transaction
+import psycopg2
+
 
 def saldodiario(banco, cliente, data):
     datainicial = datetime.strptime(data, '%Y-%m-%d').date()
@@ -18,22 +20,29 @@ def saldodiario(banco, cliente, data):
     for data_ord in range(datainicialord, datafinal):
         data = datetime.fromordinal(data_ord).date()
         data_anterior = datetime.fromordinal(data_ord - 1).date()
-        
-        with sqlite3.connect(r"monorail.proxy.rlwy.net") as conexao:
+
+        # Conectar ao banco de dados PostgreSQL
+        with psycopg2.connect(
+                dbname='railway',
+                user='postgres',
+                password='rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg',
+                host='postgres.railway.internal',
+                port='5432'
+        ) as conexao:
             tabela_saldo = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
             tabela_mov = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
 
         saldoinicial = tabela_saldo[
-            (tabela_saldo['cliente_id'] == cliente.id) & 
-            (tabela_saldo['banco_id'] == banco) & 
+            (tabela_saldo['cliente_id'] == cliente.id) &
+            (tabela_saldo['banco_id'] == banco) &
             (tabela_saldo['data'] == str(data_anterior))
-        ]['saldofinal'].sum() if not tabela_saldo.empty else 0
+            ]['saldofinal'].sum() if not tabela_saldo.empty else 0
 
         saldodia = tabela_mov[
-            (tabela_mov['cliente_id'] == cliente.id) & 
-            (tabela_mov['banco_id'] == banco) & 
+            (tabela_mov['cliente_id'] == cliente.id) &
+            (tabela_mov['banco_id'] == banco) &
             (tabela_mov['data'] == str(data))
-        ]['valor'].sum() if not tabela_mov.empty else 0
+            ]['valor'].sum() if not tabela_mov.empty else 0
 
         saldofinal = saldoinicial + saldodia
 
