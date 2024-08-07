@@ -28,7 +28,6 @@ if TOKEN_CSRF:
     CSRF_TRUSTED_ORIGINS = ['https://controlnorte-production.up.railway.app']
 else:
     SECRET_KEY = 'django-insecure-1aof%_lm8&%gqcvbefus9us4p^fppotzpaadx+tffm*a_m42wx'
-    CSRF_TRUSTED_ORIGINS = ['https://controlnorte-production.up.railway.app']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
