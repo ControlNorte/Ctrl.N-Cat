@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Financeiro | {{ dadoscliente }}
+{% endblock %}
+
+{% block content %}
+<main class="py-20 px-10">
+
+        <div class="flex felx-nowrap justify-between items-center pt-4 pb-3 px-4">
+        <div class="text-3xl text-violet-900 flex justify-between">{{ dadoscliente }}</div>
+            <a href="{% url 'financeiro:maisopicoes' %}">
+                <div class="text-lg text-violet-900 flex justify-between items-center">
+                    <ion-icon name="ellipsis-vertical-sharp"></ion-icon> Mais opções
+                </div>
+            </a>
+        </div>
+
+        <section id="dadoscliente">
+        <div class=" container pt-2 px-20 flex justify-between">
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:financeirocliente' dadoscliente.pk %}"><ion-icon name="arrow-back-outline"></ion-icon></a></div>
+            <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2"><a href="{% url 'financeiro:maisopicoes' %}">Dados</a></div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:banco' %}">Bancos</a></div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:categoria' %}">Categorias</a></div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:subcategoria' %}">Sub-Categorias</a></div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:centrocusto' %}">Centro de Custo</a></div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:regra' %}">Regras</a></div>
+        </div>
+        <hr>
+        <div class="py-20 px-20">
+            <div class="flex felx-nowrap justify-end">
+                <div class="content-center">
+                    <a href="{% url 'cliente:editarcliente' dadoscliente.pk %}">
+                        <button class="bg-transparent text-violet-700 hover:text-black flex flex-nowrap">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+                            </svg>
+                        </button>
+                    </a>
+                </div>
+            </div>
+            <div class="grid grid-cols-5">
+                <div class="col-start-1 col-span-3">
+                    <div class="flex flex-nowrap grid grid-cols-2">
+                        <div class="flex flex-nowrap">
+                            <div class="content-start py-2 px-2 text-violet-900 text-xl">CNPJ: </div>
+                            <div class="content-start  text-gray-700 py-2 text-xl">{{ dadoscliente.cnpj }}</div>
+                        </div>
+                        <div class="flex flex-nowrap">
+                            <div class="content-start py-2 px-2 text-violet-900 text-xl">Ramo: </div>
+                            <div class="content-start text-gray-700 py-2 text-xl">{{ dadoscliente.ramo }}</div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="flex flex-nowrap justify-between">
+                         <div class="flex flex-nowrap">
+                            <div class="content-start py-2 px-2 text-violet-900">Endereço: </div>
+                            <div class="content-start text-gray-700 py-2">{{ dadoscliente.logadouro }}</div>
+                         </div>
+                    </div>
+                    <div class="flex flex-nowrap justify-between">
+                         <div class="flex flex-nowrap">
+                            <div class="content-start py-2 px-2 text-violet-900">Número: </div>
+                            <div class="content-start text-gray-700 py-2">{{ dadoscliente.número }}</div>
+                         </div>
+                         <div class="flex flex-nowrap">
+                             <div class="content-start  py-2 px-2 text-violet-900">Bairro: </div>
+                             <div class="content-start  text-gray-700 py-2">{{ dadoscliente.bairro }}</div>
+                         </div>
+                         <div class="flex flex-nowrap">
+                             <div class="content-start  py-2 px-2 text-violet-900">Cidade: </div>
+                             <div class="content-start  text-gray-700 py-2">{{ dadoscliente.cidade }}</div>
+                         </div>
+                         <div class="flex flex-nowrap">
+                            <div class="content-start  py-2 px-2 text-violet-900">Estado: </div>
+                            <div class="content-start  text-gray-700 py-2">{{ dadoscliente.estado }}</div>
+                         </div>
+                    </div>
+                    <hr>
+                    <div class="flex flex-nowrap justify-between">
+                        <div class="flex flex-nowrap">
+                            <div class="content-start  py-2 px-2 text-violet-900">Pessoa de Contato: </div>
+                            <div class="content-start  text-gray-700 py-2">{{ dadoscliente.pessoa_de_contato }}</div>
+                        </div>
+                        <div class="flex flex-nowrap">
+                            <div class="content-start  py-2 px-2 text-violet-900">Telefone: </div>
+                            <div class="content-start  text-gray-700 py-2">{{ dadoscliente.telefone }}</div>
+                        </div>
+                        <div class="flex flex-nowrap">
+                            <div class="content-start  py-2 px-2 text-violet-900">Email: </div>
+                            <div class="content-start  text-gray-700 py-2">{{ dadoscliente.email_contato }}</div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="flex flex-nowrap grid grid-cols-4">
+                        <div class="flex flex-nowrap">
+                            <div class="content-start  py-2 px-2 text-violet-900">Bancos: </div>
+                            <div class="content-start  text-gray-700 py-2">{{ dadoscliente.bancos_utilizados }}</div>
+                        </div>
+                        <div class="flex flex-nowrap ">
+                            <div class="content-start  py-2 px-2 text-violet-900">Serviços: </div>
+                            <div class="content-start  text-gray-700 py-2">{{ dadoscliente.servicos_contratados }}</div>
+                        </div>
+                        <div class="flex flex-nowrap ">
+                            <div class="content-start  py-2 px-2 text-violet-900">Conciliação: </div>
+                            <div class="content-start  text-gray-700 py-2">{{ dadoscliente.responsavel_conciliacao }}</div>
+                        </div>
+                        <div class="flex flex-nowrap">
+                            <div class="content-start  py-2 px-2 text-violet-900">Reuniões: </div>
+                            <div class="content-start  text-gray-700 py-2">{{ dadoscliente.responsavel_apresentacao }}</div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="flex flex-nowrap justify-between grid grid-cols-2">
+                        <div class="flex flex-nowrap">
+                            <div class="content-start  py-2 px-2 text-violet-900">Funcionáros: </div>
+                            <div class="content-start  text-gray-700 py-2">{{ dadoscliente.funcionarios }}</div>
+                        </div>
+                        <div class="flex flex-nowrap">
+                            <div class="content-start  py-2 px-2 text-violet-900">Contas Fixas: </div>
+                            <div class="content-start  text-gray-700 py-2">{{ dadoscliente.contas_fixas }}</div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="flex flex-nowrap justify-between grid grid-cols-2">
+                        <div class="flex flex-nowrap">
+                            <div class="content-start  py-2 px-2 text-violet-900">Classificações: </div>
+                            <div class="content-start  text-gray-700 py-2">{{ dadoscliente.classificacoes }}</div>
+                        </div>
+                        <div class="flex flex-nowrap">
+                            <div class="content-start  py-2 px-2 text-violet-900">Principais Fornecedores: </div>
+                            <div class="content-start  text-gray-700 py-2">{{ dadoscliente.principais_fornecedores }}</div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="flex flex-nowrap justify-between grid grid-cols-2">
+                        <div class="flex flex-nowrap">
+                            <div class="content-start  py-2 px-2 text-violet-900">Observações: </div>
+                            <div class="content-start  text-gray-700 py-2">{{ dadoscliente.observacoes }}</div>
+                        </div>
+                        <div class="flex flex-nowrap">
+                            <div class="content-start  py-2 px-2 text-violet-900">Sugestões: </div>
+                            <div class="content-start  text-gray-700 py-2">{{ dadoscliente.sugestoes }}</div>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+                <div class="px-4 col-start-4 col-span-2">
+                    <div class="content-start py-2 px-2 text-violet-900 text-xl">Histórico:</div>
+                    <hr>
+                    <div class="content-start px-4  text-gray-700 py-2">{{ dadoscliente.historico }}</div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% endblock %}

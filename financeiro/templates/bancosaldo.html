@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Financeiro | {{ dadoscliente }}
+{% endblock %}
+
+{% block content %}
+<main class="py-20 px-10">
+
+        <div class="flex felx-nowrap justify-between items-center pt-4 pb-3 px-4">
+        <div class="text-3xl text-violet-900 flex justify-between">{{ dadoscliente }}</div>
+            <a href="{% url 'financeiro:maisopicoes' %}">
+                <div class="text-lg text-violet-900 flex justify-between items-center">
+                    <ion-icon name="ellipsis-vertical-sharp"></ion-icon> Mais opções
+                </div>
+            </a>
+        </div>
+
+    <div>
+            <div class=" container pt-2 px-20 flex justify-between">
+                <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:financeirocliente' dadoscliente.pk %}"><ion-icon name="arrow-back-outline"></ion-icon></a></div>
+                <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:maisopicoes' %}">Dados</a></div>
+                <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2"><a href="{% url 'financeiro:banco' %}">Bancos</a></div>
+                <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:categoria' %}">Categorias</a></div>
+                <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:subcategoria' %}">Sub-Categorias</a></div>
+                <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:centrocusto' %}">Centro de Custo</a></div>
+                <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:regra' %}">Api</a></div>
+            </div>
+            <hr>
+            <div class="p-4">
+                <div class="container w-2/5 p-4 bg-violet-100 rounded">
+                    <div>
+                        <div class="py-2 px-4 text-2xl text-violet-900">Cadastrar Saldo</div>
+                    </div>
+                        <div class="flex flex-nowrap p-2">
+                        <div class="content-start  py-2 px-2 text-lg text-violet-900">Banco: </div>
+                        <div class="content-start  text-gray- 700 text-lg py-2">{{ banco.banco }}</div>
+                        <div class="content-start  py-2 px-2 text-lg text-violet-900"> | Agência: </div>
+                        <div class="content-start  text-gray-700 text-lg py-2">{{ banco.agencia }}</div>
+                        <div class="content-start  py-2 px-2 text-lg text-violet-900"> | Conta: </div>
+                        <div class="content-start  text-gray-700 text-lg py-2">{{ banco.conta }} - {{ banco.digito }}</div>
+                        </div>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="text-violet-800">
+                            <div>
+                                <label for="data">Data: </label>
+                                <input type="date" id="data" name="data" class="form-control" required>
+                                <br>
+                                <label for="saldofinal">Saldo Inicial: </label>
+                                <input type="number" step="0.010" id="saldofinal" name="saldofinal" class="form-control" placeholder="Saldo Inicial" required>
+                            </div>
+                            <div class="col-start-3 flex justify-end p-2">
+                                <button class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md" type="submit">
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                </div>
+    </div>
+</main>
+
+{% endblock %}

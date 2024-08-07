@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block head %}
+<style>
+    .container {
+        background-color: #ede9fe;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        width: 100%;
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #555;
+    }
+    .row {
+        display: flex;
+        gap: 10px;
+    }
+    .row .form-group {
+        flex: 1;
+    }
+    input {
+        padding-left: 12px;
+        margin: 8px;
+    }
+    input, select, textarea {
+        width: 100%;
+        padding-left: 12px;
+        margin: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        height: 30px
+    }
+    input:focus, select:focus, textarea:focus {
+        border-color: #5a2d9b;
+        outline: none;
+    }
+</style>
+{% endblock %}
+
+{% block titulo %}
+Cadastrar Cliente
+{% endblock %}
+
+{% block content %}
+<main>
+    <section class="p-20">
+        <div class="container w-10/12">
+            <div class="flex flex-nowrap justify-between">
+                <div class="text-3xl text-violet-900">Cadastro de Cliente</div>
+            </div>
+            <br>
+            <form method="POST">
+            {% csrf_token %}
+            <div class="text-xl text-violet-900">Dados cadastrais</div>
+            <div class="form-group">
+                <label for="razao">Razão Social:</label>
+                <input type="text" id="razao" name="razao"/>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="cnpj">CNPJ:</label>
+                    <input type="text" id="cnpj" name="cnpj"/>
+                </div>
+                <div class="form-group">
+                    <label>Ramo:</label>
+                    <select name="ramo">
+                        {% for ramo in ramos %}
+                            <option value="{{ ramo.id }}">{{ ramo.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="endereco">Endereço:</label>
+                <input type="text" id="endereco" name="logadouro"/>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="numero">Número:</label>
+                    <input type="text" id="numero" name="número"/>
+                </div>
+                <div class="form-group">
+                    <label for="bairro">Bairro:</label>
+                    <input type="text" id="bairro" name="bairro"/>
+                </div>
+                <div class="form-group">
+                    <label for="cidade">Cidade:</label>
+                    <input type="text" id="cidade" name="cidade"/>
+                </div>
+                <div class="form-group">
+                    <label for="estado">Estado:</label>
+                    <input type="text" id="estado" name="estado"/>
+                </div>
+            </div>
+            <br>
+            <div class="text-xl text-violet-900">Contato</div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="pessoa_contato">Pessoa de Contato:</label>
+                    <input type="text" id="pessoa_contato" name="pessoa"/>
+                </div>
+                <div class="form-group">
+                    <label for="telefone">Telefone:</label>
+                    <input type="text" id="telefone" name="telefone"/>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email"/>
+                </div>
+            </div>
+            <br>
+            <div class="text-xl text-violet-900">Outras informações</div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="bancos">Bancos:</label>
+                    <input type="text" id="bancos" name="bancos"/>
+                </div>
+                <div class="form-group">
+                    <label for="servicos">Serviços:</label>
+                    <input type="text" id="servicos" name="servicos"/>
+                </div>
+                <div class="form-group">
+                    <label for="conciliacao">Conciliação:</label>
+                    <input type="text" id="conciliacao" name="conciliacao"/>
+                </div>
+                <div class="form-group">
+                    <label for="reunioes">Reuniões:</label>
+                    <input type="text" id="reunioes" name="apresentacao"/>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="form-group">
+                    <label for="funcionarios">Funcionários:</label>
+                    <input type="text" id="funcionarios" name="funcionarios"/>
+                </div>
+                <div class="form-group">
+                    <label for="contas_fixas">Contas Fixas:</label>
+                    <input type="text" id="contas_fixas" name="fixas"/>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="form-group">
+                    <label for="classificacoes">Classificações:</label>
+                    <input type="text" id="classificacoes" name="classificacoes"/>
+                </div>
+                <div class="form-group">
+                    <label for="fornecedores">Principais Fornecedores:</label>
+                    <input type="text" id="fornecedores" name="fornecedores"/>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="form-group">
+                    <label for="observacoes">Observações:</label>
+                    <input type="text" id="observacoes" name="observacoes"/>
+                </div>
+                <div class="form-group">
+                    <label for="sugestoes">Sugestões:</label>
+                    <input type="text" id="sugestoes" name="sugestoes"/>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="historico">Histórico:</label>
+                <textarea id="historico" rows="4" name="historico"></textarea>
+            </div>
+            <div class="flex flex-nowrap justify-between">
+                <div class="flex flex-nowrap">
+                    <label class="pr-2" for="ativobanco">Ativo:</label>
+                    <input type="checkbox" id="ativobanco" name="ativo" value="True">
+                </div>
+                <button class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md" type="submit">Enviar</button>
+            </div>
+            </form>
+        </div>
+    </section>
+</main>
+{% endblock %}

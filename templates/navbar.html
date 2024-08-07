@@ -1,0 +1,21 @@
+{% load static %}
+<nav class="w-full flex bg-violet-200 items-center py-2 px-4 fixed z-50">
+    <div class="w-1/12 py-2">
+        <a href="{% url 'financeiro:financeiro' %}">
+            <img src="{% static 'images/norte.png' %}">
+        </a>
+    </div>
+    {% if user.is_authenticated %}
+        <div class="w-10/12 flex flex-nowrap justify-center py-2 mr-2 content-center">
+            <div class="px-4 text-violet-700 font-semibold hover:text-black"><a href="{% url 'cliente:cliente' %}"><button><ion-icon name="people-circle-outline"></ion-icon> Clientes</button></a></div>
+            <div class="px-4 text-violet-700 font-semibold hover:text-black"><a href="{% url 'financeiro:financeiro' %}"><button><ion-icon name="cash-outline"></ion-icon> Financeiro</button></a></div>
+        </div>
+        <div class="w-1/12 flex flex-nowrap justify-end py-2 mr-2 content-center">
+            <a href="{% url 'homepageinicial:perfil' request.user.pk %}">
+                <button class="bg-transparent flex flex-nowrap text-violet-700 font-semibold hover:text-black py- px-4 rounded">
+                    <ion-icon name="person" class="px-1"></ion-icon> {{ user.first_name }}
+                </button>
+            </a>
+        </div>
+    {% endif %}
+</nav>

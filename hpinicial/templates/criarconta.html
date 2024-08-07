@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block titulo %}
+Criar Conta
+{% endblock %}
+
+{% block content %}
+
+    <header class="py-36 flex justify-between items-center">
+        <div class="w-3/5 text-violet-900 text-center flex items-center flex-col">
+            <a href="https://www.instagram.com/sigarumoaonorte?igsh=NjJrYTJieXRhN3Nl" target="_blank"><div class="text-center flex items-center"><ion-icon name="logo-instagram"></ion-icon>Siga-nos no Instagram</div></a>
+            <br>
+            <a href="https://rumoaonorte.com.br/" target="_blank"><div class="text-center flex items-center"><ion-icon name="globe-outline"></ion-icon>Visite nosso site</div></a>
+            <br>
+            <a href=""><div class="text-center flex items-center"><ion-icon name="logo-whatsapp"></ion-icon>Alguma dúvida? Fale conosco</div></a>
+        </div>
+        <div class="w-2/5 text-gray-700 text-center text-xs flex items-center flex-col">
+            <form method="post">
+               {% csrf_token %}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4 text-xl">Crie uma conta para continuar</legend>
+                   {{ form|crispy }}
+                </fieldset>
+                <button class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 w-full md:text-lg rounded-md" type="submit">Criar Conta</button>
+            </form>
+        </div>
+    </header>
+    <footer class="w-full px-5 py-4 bg-violet-200">
+        <ul class="flex justify-between items-center">
+            <li>&copy; 2024 </li>
+            <li> <ion-icon name="telescope-outline"></ion-icon> Te ajudando a chegar no seu norte <ion-icon name="sparkles-outline"></ion-icon></li>
+            <li>Control Norte</li>
+        </ul>
+    </footer>
+{% endblock %}

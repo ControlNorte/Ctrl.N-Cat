@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Control Norte | Financeiro
+{% endblock %}
+
+{% block content %}
+<div class="container w-4/5 py-20">
+         <div class="flex flex-nowrap grid grid-cols-4 gap-2 pt-2">
+            {% for cliente in object_list %}
+                <div class="px-2 py-2 bg-violet-200 hover:bg-violet-300 text-center text-violet-800">
+                    <a href="{% url 'financeiro:financeirocliente' cliente.pk %}">{{ cliente.razao_social }}<br>
+                    {{ cliente.cnpj }}</a>
+                </div>
+            {% endfor %}
+        </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+.wrapper {
+  display: grid;
+  grid-template-columns: repeat(7,100%);
+  overflow:hidden;
+  scroll-behavior: auto;
+    }
+
+.wrapper2 {
+    display: grid;
+    grid-template-columns: repeat(2,100%);
+    overflow:hidden;
+    scroll-behavior: auto;
+    }
+
+.chave {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: smaller;
+    line-height: 1;
+    color: rgb(55 65 81);
+    text-align: left;
+    padding: 0%;
+}
+
+.valor {
+    text-align: right;
+    font-size: smaller;
+    color: rgb(55 65 81);
+    padding: 0%;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: small;
+
+}
+
+table td, table th {
+    padding: 5px;
+    text-align: center;
+}
+
+table th {
+    text-transform: capitalize;
+    width: auto
+}
+
+.drecompleta-cabeçalho{
+    background-color: #6f30a0;
+    color: white;
+}
+
+.drecompleta-categorias{
+    text-align: left;
+}
+
+.drecompleta-mes{
+    border-left: 1px solid #ccc
+}
+
+.hidden {
+    display: none;
+}
+
+tr:hover {border-bottom: 1px solid #ccc}
+
+.link_descrição {
+    color: #6939b5; /* Cor do link */
+    text-decoration: none; /* Remove o sublinhado padrão */
+    font-weight: bold; /* Negrito */
+}
+
+.link_descrição:hover {
+    color: #501DA1; /* Cor do link ao passar o mouse */
+}
+
+.link_descrição:active {
+    color: #5A0564; /* Cor do link quando clicado */
+}
+

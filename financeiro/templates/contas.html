@@ -1,0 +1,365 @@
+{% extends 'base.html' %}
+
+{% load custom_filters %}
+
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/datatables.css' %}">
+
+<!-- jQuery -->
+<script type="text/javascript" src="{% static 'js/datatables1.js' %}"></script>
+
+<!-- DataTables JS -->
+<script type="text/javascript" src="{% static 'js/datatables.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'js/barralat.js' %}"></script>
+
+<style>
+    /* Estilo para a barra lateral */
+    .sidebar {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        right: 0;
+        background-color: #ede9fe;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+    }
+
+    .sidebar a {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #818181;
+        display: block;
+        transition: 0.3s;
+    }
+
+    .sidebar .closebtn {
+        position: absolute;
+        top: 40px;
+        right: 25px;
+        font-size: 36px;
+        margin-left: 50px;
+        cursor: pointer;
+    }
+
+    .sidebar form {
+        padding: 20px;
+    }
+
+    #main {
+        transition: margin-right .5s;
+    }
+
+    /* Estilo para o overlay */
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 2;
+        display: none; /* Oculto por padrão */
+    }
+
+    /* Desfoque para o conteúdo principal */
+    .blur {
+        filter: blur(10%);
+    }
+
+    /* Estilo dos containers dos campos do formulário */
+    .sidebar div {
+        margin-bottom: 20px;
+        padding: 0 15px;
+    }
+
+    /* Estilo dos labels do formulário */
+    .sidebar label {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 18px;
+        color: #4c1d95;
+    }
+
+    /* Estilo dos inputs do formulário */
+    .sidebar input[type="text"],
+    .sidebar input[type="date"],
+    .sidebar select {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0 20px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: #fff;
+        font-size: 16px;
+    }
+
+    /* Estilo dos botões */
+    .sidebar button[type="submit"],
+    .sidebar button[type="button"] {
+        background-color: #7c3aed;
+        color: white;
+        padding: 10px 15px;
+        margin: 10px 5px 0 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .sidebar button[type="button"] {
+        background-color: #f44336;
+    }
+
+    .sidebar button[type="submit"]:hover,
+    .sidebar button[type="button"]:hover {
+        opacity: 0.8;
+    }
+</style>
+{% endblock %}
+
+{% block titulo %}
+Financeiro | {{ dadoscliente }}
+{% endblock %}
+
+{% block content %}
+<main class="py-20 px-10">
+
+    <div class="flex flex-nowrap justify-between items-center pt-4 pb-3 px-4">
+        <div class="text-3xl text-violet-900 flex justify-between">{{ dadoscliente }}</div>
+        <a href="{% url 'financeiro:maisopicoes' %}">
+            <div class="text-lg text-violet-900 flex justify-between items-center">
+                <ion-icon name="ellipsis-vertical-sharp"></ion-icon> Mais opções
+            </div>
+        </a>
+    </div>
+    <section id="dresection">
+        <div class="container pt-2 px-20 flex justify-between">
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2">
+                <a href="{% url 'financeiro:financeirocliente' dadoscliente.pk %}">Resumo</a>
+            </div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2">
+                <a href="{% url 'financeiro:caixa' %}">Caixa</a>
+            </div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2">
+                <a href="{% url 'financeiro:dre' %}">DRE</a>
+            </div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2">
+                <a href="{% url 'financeiro:dashboard' %}">Dashboard</a>
+            </div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2">
+                <a href="{% url 'financeiro:orcamento' %}">Orçamento</a>
+            </div>
+            <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2">
+                <a href="{% url 'financeiro:contas' %}">Pagos e Recebido</a>
+            </div>
+        </div>
+        <hr>
+        <br>
+        <div id="main">
+            <table id="movimentacoesTable">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Data</th>
+                        <th>Descrição</th>
+                        <th>Detalhe</th>
+                        <th>Banco</th>
+                        <th>Centro de Custos</th>
+                        <th>Categoria</th>
+                        <th>Sub-Categoria</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for movimentacao in movimentacoes %}
+                    <tr>
+                        <td>{{ movimentacao.id }}</td>
+                        <td>{{ movimentacao.data|format_date }}</td>
+                        <td><a class="link_descricao" href="#" data-id="{{ movimentacao.id }}">{{ movimentacao.descricao }}</a></td>
+                        <td>{{ movimentacao.detalhe }}</td>
+                        <td>{{ movimentacao.banco.banco }}</td>
+                        <td>{{ movimentacao.centrodecusto.nome }}</td>
+                        <td>{{ movimentacao.categoria.nome }}</td>
+                        <td>{{ movimentacao.subcategoria.nome }}</td>
+                        <td>{{ movimentacao.valor|format_currency }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <form id="editForm" method="post" action="{% url 'financeiro:edit_movimentacao' %}">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="movimentacaoId">
+            
+            <div id="descricaoContainer">
+                <label for="descricao">Descrição:</label>
+                <input type="text" name="descricao" id="descricao"><br>
+            </div>
+
+            <div id="dataContainer">
+                <label for="data">Data:</label>
+                <input type="date" name="data" id="data"><br>
+            </div>
+        
+            <div id="detalheContainer">
+                <label for="detalhe">Detalhe:</label>
+                <input type="text" name="detalhe" id="detalhe"><br>
+            </div>
+        
+            <div id="bancoContainer">
+                <label for="banco">Banco:</label>
+                <select name="banco" class="selectconci">
+                    <option selected></option>
+                    {% for banco in bancos %}
+                        <option value="{{ banco.id }}">{{ banco.banco }}</option>
+                    {% endfor %}
+                </select><br>
+            </div>
+        
+            <div id="centrodecustoContainer">
+                <label for="centrodecusto">Centro de Custos:</label>
+                <select name="centrocusto" class="selectconci">
+                    <option selected></option>
+                    {% for centrodecusto in centrodecustos %}
+                        <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
+                    {% endfor %}
+                </select><br>
+            </div>
+        
+            <div id="categoriaContainer">
+                <label for="categoria">Categoria:</label>
+                <select name="categoria" class="selectconci">
+                    <option selected></option>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                {% endfor %}
+            </select><br>
+            </div>
+        
+            <div id="subcategoriaContainer">
+                <label for="subcategoria">Sub-Categoria:</label>
+                <select name="subcategoria" class="selectconci">
+                    <option selected></option>
+                    {% for subcategoria in subcategorias %}
+                        <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
+                    {% endfor %}
+                </select><br>
+            </div>
+        
+            <div id="valorContainer">
+                <label for="valor">Valor:</label>
+                <input type="text" name="valor" id="valor"><br>
+            </div>
+        
+            <button type="submit">Salvar</button>
+            <button type="button" onclick="deleteMovimentacao()">Deletar</button>
+        </form>
+    </div>
+</main>
+
+<script>
+     $('.link_descricao').click(function(event) {
+        event.preventDefault();
+        var id = $(this).data('id');
+        if (id) {
+            openNav(id);
+        } else {
+            console.error('ID da movimentação está vazio.');
+        }
+    });
+
+    $(document).ready(function() {
+        $('#movimentacoesTable').DataTable();
+
+        $('.link_descricao').click(function(event) {
+            event.preventDefault();
+            var id = $(this).data('id');
+            openNav(id);
+        });
+    });
+
+    function openNav(id) {
+        if (!id) {
+            console.error('ID da movimentação não fornecido.');
+            return;
+        }
+
+        $.ajax({
+            url: '{% url "financeiro:get_movimentacao" 0 %}'.replace('0', id),
+            method: 'GET',
+            success: function(data) {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                $('#movimentacaoId').val(data.id);
+                $('#data').val(data.data);
+                $('#descricao').val(data.descricao);
+                $('#detalhe').val(data.detalhe);
+                $('#banco').val(data.banco || '');
+                $('#centrodecusto').val(data.centrodecusto || '');
+                $('#categoria').val(data.categoria || '');
+                $('#subcategoria').val(data.subcategoria || '');
+                $('#valor').val(data.valor);
+
+                document.getElementById("mySidebar").style.width = "50%";
+                document.getElementById("main").style.marginRight = "50%";
+                document.getElementById("overlay").style.display = "block";
+                document.getElementById("main").classList.add("blur");
+            },
+            error: function() {
+                alert('Erro ao carregar dados da movimentação.');
+            }
+        });
+    }
+
+    function closeNav() {
+        document.getElementById("mySidebar").style.width = "0";
+        document.getElementById("main").style.marginRight= "0";
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("main").classList.remove("blur");
+    }
+
+    function deleteMovimentacao() {
+        var id = $('#movimentacaoId').val();
+        if (!id) {
+            console.error('ID da movimentação não fornecido.');
+            return;
+        }
+
+        $.ajax({
+            url: '{% url "financeiro:delete_movimentacao" 0 %}'.replace('0', id),
+            method: 'POST',
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+                if (data.success) {
+                    location.reload(); // Recarrega a página para refletir as mudanças
+                } else {
+                    alert(data.error || 'Erro ao deletar movimentação');
+                }
+            },
+            error: function() {
+                alert('Erro ao tentar deletar movimentação.');
+            }
+        });
+    }
+</script>
+
+{% endblock %}

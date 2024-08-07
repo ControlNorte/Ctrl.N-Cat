@@ -1,0 +1,601 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block titulo %}
+Financeiro | {{ dadoscliente }}
+{% endblock %}
+
+{% block head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<style>
+    .wrapper2 section {
+        display: none;
+    }
+    .wrapper2 section:first-child {
+        display: block;
+    }
+    .selectconci {
+    color: #4f4f4f !important;  /* Certifique-se de que este seja o estilo desejado */
+    width: 150px;
+    height: 40px;
+    border-radius: 6px;
+    display: inline-block;    /* Se for um elemento de linha, certifique-se de que se comporta como esperado */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="py-20 px-10">
+
+    <div class="flex felx-nowrap justify-between items-center pt-4 pb-3 px-4">
+        <div class="text-3xl text-violet-900 flex justify-between">{{ dadoscliente }}</div>
+        <a href="{% url 'financeiro:maisopicoes' %}">
+            <div class="text-lg text-violet-900 flex justify-between items-center">
+                <ion-icon name="ellipsis-vertical-sharp"></ion-icon> Mais opções
+            </div>
+        </a>
+    </div>
+
+    <div id="movimentacaosection">
+
+        <div class=" container pt-2 px-20 flex justify-between">
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a
+                    href="{% url 'financeiro:financeirocliente' dadoscliente.pk %}">Resumo</a></div>
+            <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2"><a
+                    href="{% url 'financeiro:caixa' %}">Caixa</a></div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a
+                    href="{% url 'financeiro:dre' %}">DRE</a></div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a
+                    href="{% url 'financeiro:dashboard' %}">Dashboard</a></div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a
+                    href="{% url 'financeiro:orcamento' %}">Orçamento</a></div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a
+                    href="{% url 'financeiro:contas' %}">Pagos e Recebido</a></div>
+        </div>
+
+        <hr>
+
+        <div class="container flex flex-nowrap pt-4 px-2 gap-2">
+            <div class="h-96 w-10/12 bg-violet-100 font-semibold text-lg text-violet-700 text-center">
+                <div class="flex flex-nowrap justify-between p-2">
+                    <div>Fluxo de Caixa</div>
+                    <div>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" value="mes" name='tipo'>
+                            <select class="bg-violet-100 hover:bg-violet-300" name="mesfiltro">
+                                <option>{{ mesatual }}</option>
+                                <option>Jan</option>
+                                <option>Fev</option>
+                                <option>Mar</option>
+                                <option>Abr</option>
+                                <option>Mai</option>
+                                <option>Jun</option>
+                                <option>Jul</option>
+                                <option>Ago</option>
+                                <option>Set</option>
+                                <option>Out</option>
+                                <option>Nov</option>
+                                <option>Dez</option>
+                            </select>
+                            <button type="submit"> > </button>
+                        </form>
+                    </div>
+                </div>
+                {% if grafico %}
+                {{ grafico|safe }}
+                {% else %}
+                <p>Não há dados para exibir o gráfico.</p>
+                {% endif %}
+            </div>
+
+            <div class=" w-2/12">
+                <div class="h-96 bg-violet-100 hover:bg-violet-300">
+
+                    <div class="font-semibold text-lg text-violet-700 text-center"><a
+                            href="{% url 'financeiro:banco' %}">
+                            Bancos
+                        </a></div>
+
+                    {% for banco in bancos %}
+                    <p class="text-lg text-violet-700 px-2">
+                        <a href="{% url 'financeiro:movimentacao' banco.banco %}">{{ banco.banco }}</a>
+                    </p>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+
+        <div class="container w-9/10 p-4">
+
+            <div class="text-2xl text-violet-900 font-semibold pb-4 pt-2">Gerenciar - {{ banco.banco }}</div>
+
+            <div class="flex justify-between">
+                <div>
+                    <a href="#extrato"
+                        class="bg-transparent text-violet-700 font-semibold hover:text-black px-4 pt-1 rounded">
+                        Extrato
+                    </a>
+                    <a href="#conciliar"
+                        class="bg-transparent text-violet-700 font-semibold hover:text-black px-4 pt-1 rounded">
+                        Conciliar
+                    </a>
+                </div>
+                <div class="flex felx-nowrap">
+                    <a href="#novaentrada"
+                        class="bg-transparent text-violet-700 font-semibold hover:text-black px-4 pt-1 rounded">
+                        Nova Entrada
+                    </a>
+                    <a href="#novasaida"
+                        class="bg-transparent text-violet-700 font-semibold hover:text-black px-4 pt-1 rounded">
+                        Nova Saída
+                    </a>
+                    <a href="#novatransf"
+                        class="bg-transparent text-violet-700 font-semibold hover:text-black px-4 pt-1 rounded">
+                        Nova Trasferência
+                    </a>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="wrapper">
+
+                <section id="extrato">
+                    {% autoescape off %}{{ exbextrato }}{% endautoescape %}
+                </section>
+                
+                <section id="conciliar">
+                    <div class="p-4">
+                        <div class="text-xl text-violet-900 p-2">Conciliação</div>
+                        <br>
+                        <form method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="tipo" value="import">
+                            {% csrf_token %}
+                            <div class="flex flex-nowrap justify-between items-center">
+                                {{ form.as_p }}
+                                <button class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md" type="submit">
+                                    Importar
+                                </button>
+                            </div>
+                        </form>
+                        <hr>
+                        <br>
+                        {% if transicoes %}
+                            {% for transicao in transicoes %}
+                                <form method="POST" class="dataForm">
+                                    <div class="wrapper2">
+                                        <section id="movi-{{ transicao.id }}">
+                                            <div class="flex flex-nowrap pb-2">
+                                                {% if transicao.valor < 0 %} 
+                                                    <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2">
+                                                        <a href="#movi" data-form-id="{{ transicao.id }}">Saída</a>
+                                                    </div>
+                                                    <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2">
+                                                        <a href="#transf" data-form-id="{{ transicao.id }}">Transferência</a>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2">
+                                                        <a href="#movi" data-form-id="{{ transicao.id }}">Entrada</a>
+                                                    </div>
+                                                    <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2">
+                                                        <a href="#transf" data-form-id="{{ transicao.id }}">Transferência</a>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="flex flex-nowrap gap-2">
+                                                <div class="border col-md-4 bg-violet-100 text-violet-900 p-2">
+                                                    <div class="flex flex-nowrap justify-between pt-2">
+                                                        <div class="flex flex-nowrap">
+                                                            Data:
+                                                            <div class="text-gray-700 pl-1">{{ transicao.data|format_date }}</div>
+                                                        </div>
+                                                        <div class="flex flex-nowrap">
+                                                            Valor:
+                                                            {% if transicao.valor >= 0 %}
+                                                                <div class="text-green-700 pl-1">{{ transicao.valor|format_currency }}</div>
+                                                            {% else %}
+                                                                <div class="text-red-700 pl-1">{{ transicao.valor|format_currency }}</div>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="flex flex-nowrap pt-2">
+                                                            Descrição:
+                                                            <div class="text-gray-700">{{ transicao.descricao }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                
+                                                <div class="flex flex-nowrap justify-between border col-md-6 bg-violet-100 text-violet-900">
+                                                    <div class="content-start p-2">
+                                                        <div class="flex flex-nowrap">
+                                                            <label class="p-2">Categoria:</label>
+                                                            <select name="categoria" class="selectconci">
+                                                                    <option selected></option>
+                                                                {% for categoria in categorias %}
+                                                                    <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="flex flex-nowrap pt-2">
+                                                            <label class="p-2">Descrição:</label>
+                                                            <input type="text" name="descricao" class="text-gray-700 " value="{{ transicao.descricao }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="w-5/5 grid justify-items-end p-2">
+                                                        <div class="flex flex-nowrap">
+                                                            <label class="p-2">Sub-Categoria:</label>
+                                                            <select name="subcategoria" class="selectconci">
+                                                                <option selected></option>
+                                                                {% for subcategoria in subcategorias %}
+                                                                    <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="flex flex-nowrap pt-2">
+                                                            <label class="p-2">Centro de Custo:</label>
+                                                            <select name="centrocusto" class="selectconci">
+                                                                <option selected></option>
+                                                                {% for centrodecusto in centrodecustos %}
+                                                                    <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex flex-nowrap gap-3 col-md-1">
+                                                    <button class="text-violet-600 hover:text-violet-800 text-2xl saveBtn" type="button" name="action" value="save">
+                                                        <ion-icon name="checkmark-circle-outline"></ion-icon>
+                                                    </button>
+                                                    <button class="text-red-600 hover:text-red-800 text-2xl deleteBtn" type="button" name="action" value="delete">
+                                                        <ion-icon name="trash-outline"></ion-icon>
+                                                    </button>
+                                                    <button class="text-yellow-600 hover:text-yellow-800 text-2xl ruleBtn" type="button" name="action" value="star">
+                                                        <ion-icon name="star"></ion-icon>
+                                                    </button>
+                                                </div>
+                                                <input type="hidden" name="data" value="{{ transicao.data|format_date }}">
+                                                <input type="hidden" name="id" value="{{ transicao.id }}">
+                                                <input type="hidden" name="detalhe" value="Sem Detalhe">
+                                                <input type="hidden" name="tipo" value="import">
+                                                <input type="hidden" name="valor" value="{{ transicao.valor }}">
+                                                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                                            </div>
+                                        </section>
+                
+                                        <section id="transf-{{ transicao.id }}">
+                                            <div class="flex flex-nowrap pb-2">
+                                                {% if transicao.valor < 0 %} 
+                                                    <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2">
+                                                        <a href="#movi" data-form-id="{{ transicao.id }}">Saída</a>
+                                                    </div>
+                                                    <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2">
+                                                        <a href="#transf" data-form-id="{{ transicao.id }}">Transferência</a>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2">
+                                                        <a href="#movi" data-form-id="{{ transicao.id }}">Entrada</a>
+                                                    </div>
+                                                    <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2">
+                                                        <a href="#transf" data-form-id="{{ transicao.id }}">Transferência</a>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="flex flex-nowrap gap-2">
+                                                <div class="border col-md-4 bg-violet-100 text-violet-900 p-2">
+                                                    <div class="flex flex-nowrap justify-between pt-2">
+                                                        <div class="flex flex-nowrap">
+                                                            Data:
+                                                            <div class="text-gray-700 pl-1">{{ transicao.data|format_date }}</div>
+                                                        </div>
+                                                        <div class="flex flex-nowrap">
+                                                            Valor:
+                                                            {% if transicao.valor >= 0 %}
+                                                                <div class="text-green-700 pl-1">{{ transicao.valor|format_currency }}</div>
+                                                            {% else %}
+                                                                <div class="text-red-700 pl-1">{{ transicao.valor|format_currency }}</div>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="flex flex-nowrap pt-2">
+                                                            Descrição:
+                                                            <div class="text-gray-700">{{ transicao.descricao }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                
+                                                <div class="flex flex-nowrap justify-between border col-md-6 bg-violet-100 text-violet-900">
+                                                    <div class="content-start p-2">
+                                                        <div class="flex flex-nowrap">
+                                                            <label class="p-2">Banco Destino:</label>
+                                                            <select name="bancodestino" class="selectconci">
+                                                                <option selected></option>
+                                                                {% for bancodestino in bancodestinos %}
+                                                                    <option value="{{ bancodestino.id }}">{{ bancodestino.banco }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="flex flex-nowrap pt-2">
+                                                            <label class="p-2">Descrição:</label>
+                                                            <input type="text" name="descricao" class="text-gray-700 " value="{{ transicao.descricao }}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex flex-nowrap gap-3 col-md-1">
+                                                    <button class="text-violet-600 hover:text-violet-800 text-2xl transfBtn" type="button" name="action" value="save">
+                                                        <ion-icon name="checkmark-circle-outline"></ion-icon>
+                                                    </button>
+                                                    <button class="text-red-600 hover:text-red-800 text-2xl deleteBtn" type="button" name="action" value="delete">
+                                                        <ion-icon name="trash-outline"></ion-icon>
+                                                    </button>
+                                                    <button class="text-yellow-600 hover:text-yellow-800 text-2xl ruleBtn" type="button" name="action" value="star">
+                                                        <ion-icon name="star"></ion-icon>
+                                                    </button>
+                                                </div>
+                                                <input type="hidden" name="data" value="{{ transicao.data|format_date }}">
+                                                <input type="hidden" name="id" value="{{ transicao.id }}">
+                                                <input type="hidden" name="detalhe" value="Sem Detalhe">
+                                                <input type="hidden" name="tipo" value="import">
+                                                <input type="hidden" name="valor" value="{{ transicao.valor }}">
+                                                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                                            </div>
+                                        </section>
+                                    </div>
+                                </form>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </section>
+
+                <section id="novaentrada">
+                    <div class="p-4">
+                        <div class="container w-4/5 p-4 bg-violet-100 rounded">
+                            <div class="py-2 px-4 text-2xl text-violet-900 text-center">Nova Entrada - {{ banco.banco }}</div>
+                            {% if erroentrada %}{{ erroentrada }}{% endif %}
+                            <form method="POST">
+                                <input type="hidden" name='tipo' value="entrada">
+                                {% csrf_token %}
+                                <div class="text-violet-800">
+                                    <div class="col-md-3 pb-2">
+                                        <label class="p-2">Data:</label>
+                                        <input type="date" name="data" class="form-control">
+                                    </div>
+                                    <div class="row g-3 grid grid-cols-3">
+                                        <div>
+                                            <label class="p-2">Descrição:</label>
+                                            <input type="text" name="descricao" placeholder="Descrição" class="form-control">
+                                            <label class="p-2">Detalhes:</label>
+                                            <input type="text" name="detalhe" placeholder="Detalhes" class="form-control">
+                                        </div>
+                                        <div>
+                                            <label class="p-2">Categoria:</label>
+                                            <select name="categoria" class="form-control">
+                                                {% for categoria in categorias %}
+                                                <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <label class="p-2">Sub-Categoria:</label>
+                                            <select name="subcategoria" class="form-control">
+                                                {% for subcategoria in subcategorias %}
+                                                <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="p-2">Centro de Custo:</label>
+                                            <select name="centrocusto" class="form-control">
+                                                {% for centrodecusto in centrodecustos %}
+                                                <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <label class="p-2">Valor:</label>
+                                            <input type="number" step="0.010" name="valor" placeholder="Valor" class="form-control">
+                                        </div>
+                                        <div class="col-start-3 flex justify-end">
+                                            <button
+                                                class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md"
+                                                type="submit">Salvar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="novasaida">
+                    <div class="p-4">
+                        <div class="container w-4/5 p-4 bg-violet-100 rounded">
+                            <div class="py-2 px-4 text-2xl text-violet-900 text-center">Nova Saída - {{ banco.banco }}</div>
+                            <form method="POST">
+                                <input type="hidden" name='tipo' value="saida">
+                                {% csrf_token %}
+                                <div class="text-violet-800">
+                                    <div class="col-md-3 pb-2">
+                                        <label class="p-2">Data:</label>
+                                        <input type="date" name="data" class="form-control">
+                                    </div>
+                                    <div class="row g-3 grid grid-cols-3">
+                                        <div>
+                                            <label class="p-2">Descrição:</label>
+                                            <input type="text" name="descricao" placeholder="Descrição" class="form-control">
+                                            <label class="p-2">Detalhes:</label>
+                                            <input type="text" name="detalhe" placeholder="Detalhes" class="form-control">
+                                        </div>
+                                        <div>
+                                            <label class="p-2">Categoria:</label>
+                                            <select name="categoria" class="form-control">
+                                                {% for categoria in categorias %}
+                                                <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <label class="p-2">Sub-Categoria:</label>
+                                            <select name="subcategoria" class="form-control">
+                                                {% for subcategoria in subcategorias %}
+                                                <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="p-2">Centro de Custo:</label>
+                                            <select name="centrocusto" class="form-control">
+                                                {% for centrodecusto in centrodecustos %}
+                                                <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <label class="p-2">Valor:</label>
+                                            <input type="number" name="valor" step="0.010" placeholder="Valor" class="form-control">
+                                        </div>
+                                        <div class="col-start-3 flex justify-end">
+                                            <button
+                                                class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md"
+                                                type="submit">Salvar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="novatransf">
+                    <div class="p-4">
+                        <div class="container w-4/5 p-4 bg-violet-100 rounded">
+                            <div class="py-2 px-4 text-2xl text-violet-900 text-center">Nova Transferência - {{ banco.banco }}</div>
+                            <form method="POST">
+                                <input type="hidden" name='tipo' value="transf">
+                                {% csrf_token %}
+                                <div class="text-violet-800">
+                                    <div class="col-md-3 pb-2">
+                                        <label class="p-2">Data:</label>
+                                        <input type="date" name="data" class="form-control">
+                                        <label class="p-2">Banco Destino:</label>
+                                        <select name="bancoentrada" class="form-control">
+                                            {% for item in bancos %}
+                                            <option value="{{ item.id }}">{{ item.banco }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="flex flex-nowrap gap-2">
+                                        <div>
+                                            <label class="p-2">Descrição:</label>
+                                            <input type="text" name="descricao" placeholder="Descrição" class="form-control">
+                                        </div>
+                                        <div>
+                                            <label class="p-2">Valor:</label>
+                                            <input type="number" name="valor" placeholder="Valor" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-start-3 flex justify-end">
+                                        <button
+                                            class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md"
+                                            type="submit">Salvar</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+    </div>
+
+    </div>
+
+    </div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        function showSection(form, sectionId) {
+            form.querySelectorAll('section').forEach((section) => {
+                section.style.display = section.id === sectionId ? 'block' : 'none';
+            });
+        }
+
+        document.querySelectorAll('.dataForm').forEach((form) => {
+            form.querySelectorAll('a[href="#movi"]').forEach((link) => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const formId = link.getAttribute('data-form-id');
+                    showSection(form, 'movi-' + formId);
+                });
+            });
+
+            form.querySelectorAll('a[href="#transf"]').forEach((link) => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const formId = link.getAttribute('data-form-id');
+                    showSection(form, 'transf-' + formId);
+                });
+            });
+        });
+    });
+    function handleFormSubmission(button, url) {
+        const form = button.closest('form');
+        form.style.display = 'none'; // Hide the form immediately
+
+        const formData = new FormData(form);
+        const csrftoken = formData.get('csrfmiddlewaretoken');
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+            },
+            body: formData,
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const savedDataDiv = document.createElement('div');
+                    savedDataDiv.classList.add('savedData');
+                    savedDataDiv.innerHTML = `
+                        <p>Data: ${formData.get('data')}</p>
+                        <p>Descrição: ${formData.get('descricao')}</p>
+                        <p>Categoria: ${formData.get('categoria')}</p>
+                        <p>Sub-Categoria: ${formData.get('subcategoria')}</p>
+                        <p>Detalhes: ${formData.get('detalhe')}</p>
+                        <p>Centro de Custo: ${formData.get('centrocusto')}</p>
+                        <p>Valor: ${formData.get('valor')}</p>
+                        ${url.includes('transf') ? `<p>Banco Destino: ${formData.get('bancodestino')}</p>` : ''}
+                    `;
+
+                    if (url.includes('transf') || url.includes('save_data_url_rule')) {
+                        document.getElementById('savedDataContainer').appendChild(savedDataDiv);
+                    } else {
+                        form.parentElement.appendChild(savedDataDiv); // Append to the same parent as the form
+                    }
+                } else {
+                    alert('Erro ao salvar os dados');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    document.querySelectorAll('.saveBtn').forEach(button => {
+        button.addEventListener('click', () => handleFormSubmission(button, "{% url 'financeiro:save_data_url' %}"));
+    });
+
+    document.querySelectorAll('.ruleBtn').forEach(button => {
+        button.addEventListener('click', () => handleFormSubmission(button, "{% url 'financeiro:save_data_url_rule' %}"));
+    });
+
+    document.querySelectorAll('.transfBtn').forEach(button => {
+        button.addEventListener('click', () => handleFormSubmission(button, "{% url 'financeiro:transf' %}"));
+    });
+
+    document.querySelectorAll('.deleteBtn').forEach(button => {
+        button.addEventListener('click', function () {
+            const form = button.closest('form');
+            form.style.display = 'none';
+        });
+    });
+</script>
+</main>
+{% endblock %}

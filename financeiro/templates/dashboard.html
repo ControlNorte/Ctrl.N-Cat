@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Financeiro | {{ dadoscliente }}
+{% endblock %}
+
+{% block content %}
+<main class="py-20 px-10">
+
+        <div class="flex felx-nowrap justify-between items-center pt-4 pb-3 px-4">
+        <div class="text-3xl text-violet-900 flex justify-between">{{ dadoscliente }}</div>
+            <a href="{% url 'financeiro:maisopicoes' %}">
+                <div class="text-lg text-violet-900 flex justify-between items-center">
+                    <ion-icon name="ellipsis-vertical-sharp"></ion-icon> Mais opções
+                </div>
+            </a>
+        </div>
+        <section id="dashboardsection">
+            <div class=" container pt-2 px-20 flex justify-between">
+                <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:financeirocliente' dadoscliente.pk %}">Resumo</a></div>
+                <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:caixa' %}">Caixa</a></div>
+                <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:dre' %}">DRE</a></div>
+                <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2"><a href="{% url 'financeiro:dashboard' %}">Dashboard</a></div>
+                <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:orcamento' %}">Orçamento</a></div>
+                <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:contas' %}">Pagos e Recebido</a></div>
+            </div>
+            <hr>
+            <div class="container w-4/5">
+                 Calculadora para Ponto de Equilibrio
+                (D.O + A.I + A.F)/(1 - CMV% - inputAliquota% - inputLucro%)
+                Grafico do Receitas $ por tempo
+                Grafico do CMV em %(RECEITA) por tempo
+                Grafico do D.O em $ por tempo
+                Grafico do D. Com Pessoas em %(RECEITA) por tempo
+                Grafico do D. Com Pessoas + CMV em %(RECEITA) por tempo (termometro) Prime Cost
+                Grafico do Lucro Bruto(Margem) $ por tempo
+                Grafico do Lucro Liquido $ por tempo
+                Grafico do Pró-Labore $ por tempo
+                Grafico do Benfeitorias $ por tempo
+                Grafico do Investimento $ por tempo
+                Grafico do Top 5 Custos $ por tempo
+                Grafico do Top 5 Despesas $ por tempo
+            </div>
+        </section>
+ </main>
+{% endblock %}

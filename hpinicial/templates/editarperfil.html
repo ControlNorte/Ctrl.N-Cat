@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block titulo %}
+Editar Perfil
+{% endblock %}
+
+{% block content %}
+<main class="py-20 px-10">
+    <div class="py-2 px-4 text-2xl text-violet-900 text-center">Editar Perfil</div>
+    <div class="flex felx-nowrap">
+        <div class="container w-4/5 bg-violet-100 p-8 rounded text-violet-800 ">
+                <div><h1 class="text-xl py-2 text-violet-900">{{ object.first_name }} {{ object.last_name }}</h1></div>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <a href="homepageinicial:perfil">
+                        <button class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md" type="submit">Salvar</button>
+                    </a>
+                </form>
+                <small><a href="{% url 'homepageinicial:mudarsenha' %}">Quer mudar sua senha?</a></small>
+        </div>
+    </div>
+</main>
+{% endblock %}

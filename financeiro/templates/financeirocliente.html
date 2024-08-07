@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Financeiro | {{ dadoscliente }}
+{% endblock %}
+
+{% block content %}
+<main class="py-20 px-10">
+
+        <div class="flex felx-nowrap justify-between items-center pt-4 pb-3 px-4">
+            <div class="text-3xl text-violet-900 flex justify-between">{{ dadoscliente }}</div>
+            <a href="{% url 'financeiro:maisopicoes' %}">
+                    <div class="text-lg text-violet-900 flex justify-between items-center">
+                        <ion-icon name="ellipsis-vertical-sharp"></ion-icon> Mais opções
+                    </div>
+                </a>
+        </div>
+
+    <div class="wrapper">
+
+        <section id="resumosection">
+            <div class=" container pt-2 px-20 flex justify-between">
+            <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2"><a href="{% url 'financeiro:financeirocliente' dadoscliente.pk %}">Resumo</a></div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:caixa' %}">Caixa</a></div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:dre' %}">DRE</a></div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:dashboard' %}">Dashboard</a></div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:orcamento' %}">Orçamento</a></div>
+            <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:contas' %}">Pagos e Recebidos</a></div>
+        </div>
+            <hr>
+            <div class="flex flex-nowrap pt-4">
+                <div class="container px-2">
+                    <div class="flex flex-nowrap justify-center gap-2">
+                            <div class="h-64 w-2/5 bg-violet-100 hover:bg-violet-300 font-semibold text-lg text-violet-700 text-center">
+                                <a href="{% url 'financeiro:dre' %}">DRE Resumida</a>
+                                <table class="w-11/12">
+                                    {% for key,values in dreresumo.items %}
+                                    <tr>
+                                       <td class="chave">{{ key }}</td>
+                                        <td class="valor">R$</td>
+                                       <td class="valor"> {{ values }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                            <div class="h-64 w-3/5 bg-violet-100 hover:bg-violet-300 font-semibold text-lg text-violet-700 text-center">
+                                <a href="{% url 'financeiro:dashboard' %}"><div>Dashboard Financeiro</div></a>
+                            </div>
+                    </div>
+                    <div class="flex flex-nowrap justify-center gap-2 pt-2 ">
+                             <div class="h-64 w-3/5 bg-violet-100 hover:bg-violet-300 font-semibold text-lg text-violet-700 text-center">
+                                <a href="{% url 'financeiro:orcamento' %}"><div>Orçamento</div></a>
+                            </div>
+                             <div class="h-64 w-2/5 bg-violet-100 hover:bg-violet-300 font-semibold text-lg text-violet-700 text-center">
+                                <a href="{% url 'financeiro:contas' %}"><div>Contas Pagas e Recebidas</div></a>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+</main>
+{% endblock %}

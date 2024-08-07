@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %}
+Financeiro | {{ dadoscliente }}
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+
+{% block content %}
+<main class="py-20 px-10" xmlns="http://www.w3.org/1999/html">
+
+        <div class="flex felx-nowrap justify-between items-center pt-4 pb-3 px-4">
+        <div class="text-3xl text-violet-900 flex justify-between">{{ dadoscliente }}</div>
+            <a href="{% url 'financeiro:maisopicoes' %}">
+                <div class="text-lg text-violet-900 flex justify-between items-center">
+                    <ion-icon name="ellipsis-vertical-sharp"></ion-icon> Mais opções
+                </div>
+            </a>
+        </div>
+        <section id="dresection">
+            <div class=" container pt-2 px-20 flex justify-between">
+                <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:financeirocliente' dadoscliente.pk %}">Resumo</a></div>
+                <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:caixa' %}">Caixa</a></div>
+                <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2"><a href="{% url 'financeiro:dre' %}">DRE</a></div>
+                <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:dashboard' %}">Dashboard</a></div>
+                <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:orcamento' %}">Orçamento</a></div>
+                <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2"><a href="{% url 'financeiro:contas' %}">Pagos e Recebido</a></div>
+            </div>
+            <hr>
+
+
+            <div class="wrapper">
+
+            <section id="completa">
+                <div class="flex flex-nowrap">
+                    <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2">
+                        <a href="#completa">Completa</a>
+                    </div>
+                    <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2">
+                        <a href="#comparacao">Comparação</a>
+                    </div>
+                </div>
+                <br>
+                <form method="post" class="w-full">
+                    {% csrf_token %}
+                    <input type="hidden" name="tipo" value="completa">
+                    <div class="flex flex-nowrap justify-between">
+                        <div> Ano:
+                            <select class="bg-violet-100 hover:bg-violet-300" name="ano">
+                                <option selected> {{ ano2 }} </option>
+                                {% for ano in anos %}
+                                    <option value="{{ ano }}">{{ ano }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div> Centro de Custo:
+                            <select class="bg-violet-100 hover:bg-violet-300" name="centrodecusto">
+                                {% if cdcseleted != '' %}
+                                <option selected value="{{ cdcseleted.id }}">{{ cdcseleted }}</option>
+                                <option value="None">Todos</option>
+                                {% else %}
+                                <option selected value="None">Todos</option>
+                                {% endif %}
+                                {% for centrodecusto in centrodecustos %}
+                                    <option value="{{ centrodecusto.id }}">{{ centrodecusto }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <button class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md" type="submit">
+                            Gerar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <br>
+                <div>
+                <table class="accordion">
+                    {{ dreexb | safe }}
+                </table>
+            </div>
+            </section>
+
+            <section id="comparacao">
+                <div class="flex flex-nowrap">
+                    <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2">
+                        <a href="#completa">Completa</a>
+                    </div>
+                    <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2">
+                        <a href="#comparacao">Comparação</a>
+                    </div>
+                </div>
+                <br>
+                <form method="post" class="w-full">
+                    {% csrf_token %}
+                    <input type="hidden" name="tipo" value="comparacao">
+                    <div class="flex flex-nowrap justify-between">
+                        <div>
+                            <div>Mês 1:
+                                <select class="bg-violet-100 hover:bg-violet-300" name="mes1">
+                                    <option selected> {{ mes1 }} </option>
+                                    <option>Jan</option>
+                                    <option>Fev</option>
+                                    <option>Mar</option>
+                                    <option>Abr</option>
+                                    <option>Mai</option>
+                                    <option>Jun</option>
+                                    <option>Jul</option>
+                                    <option>Ago</option>
+                                    <option>Set</option>
+                                    <option>Out</option>
+                                    <option>Nov</option>
+                                    <option>Dez</option>
+                                </select>
+                                /
+                                <select class="bg-violet-100 hover:bg-violet-300" name="ano1">
+                                    <option selected> {{ ano1 }} </option>
+                                    {% for ano in anos %}
+                                    <option value="{{ ano }}">{{ ano }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>Mês 2:
+                                <select class="bg-violet-100 hover:bg-violet-300" name="mes2">
+                                    <option selected> {{ mes2 }} </option>
+                                    <option>Jan</option>
+                                    <option>Fev</option>
+                                    <option>Mar</option>
+                                    <option>Abr</option>
+                                    <option>Mai</option>
+                                    <option>Jun</option>
+                                    <option>Jul</option>
+                                    <option>Ago</option>
+                                    <option>Set</option>
+                                    <option>Out</option>
+                                    <option>Nov</option>
+                                    <option>Dez</option>
+                                </select>
+                                /
+                                <select class="bg-violet-100 hover:bg-violet-300" name="ano2">
+                                    <option selected> {{ ano2 }} </option>
+                                    {% for ano in anos %}
+                                    <option>{{ ano }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <br>
+                            <div>Centro de Custo
+                                <select class="bg-violet-100 hover:bg-violet-300" name="centrodecusto">
+                                    {% if cdcseleted2 != '' %}
+                                    <option selected value="{{ cdcseleted2.id }}">{{ cdcseleted2 }}</option>
+                                    <option value="None">Todos</option>
+                                    {% else %}
+                                    <option selected value="None">Todos</option>
+                                    {% endif %}
+                                    {% for centrodecusto in centrodecustos %}
+                                        <option value="{{ centrodecusto.id }}">{{ centrodecusto }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md" type="submit">
+                                Gerar
+                            </button>
+                        </div>
+                    </div>
+            </form>
+                <br>
+                <div>
+                <table class="accordion">
+                    {{ totcatmaeexb | safe }}
+                </table>
+            </div>
+            </section>
+
+            </div>
+        </section>
+</main>
+{% endblock %}
