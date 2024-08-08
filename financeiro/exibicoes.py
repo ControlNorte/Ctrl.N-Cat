@@ -23,6 +23,7 @@ def extrato(cliente, banco, mes):
         db_url = "postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
         engine = create_engine(db_url)
 
+        # Ler tabelas do banco de dados
         with engine.connect() as conexao:
             tabela = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
             tabela0 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
@@ -71,7 +72,6 @@ def extrato(cliente, banco, mes):
             descricao.append('SALDO')
             data1 = str(data.date())
             datas.append(data.date())
-            tabela1 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
             tabela1_filtered = tabela1[(tabela1['cliente_id'] == cliente.id) & (tabela1['banco_id'] == banco)]
             tabela1_filtered = tabela1_filtered.sort_values('data').set_index('data')
             saldofinal = tabela1_filtered.at[data1, 'saldofinal']
@@ -108,7 +108,7 @@ def extrato(cliente, banco, mes):
                 {% for row in tabela %}
                 <tr>
                     <td class="w-2/12">{{ row['data'].strftime('%d/%m/%Y') }}</td>
-                    <td class="w-7/12 text-left">{{ row['descrição'] }}</td>
+                    <td class="w-7/12 text-left">{{ row['descricao'] }}</td>
                     <td class="w-1/12">{{ formatar_valor(row['entradas']) if row['entradas'] != '' else '' }}</td>
                     <td class="w-1/12">{{ formatar_valor(row['saídas']) if row['saídas'] != '' else '' }}</td>
                     <td class="w-1/12">{{ formatar_valor(row['saldo']) if row['saldo'] != '' else ''  }}</td>
@@ -121,8 +121,7 @@ def extrato(cliente, banco, mes):
         tabela_html = template.render(tabela=tabela.to_dict(orient='records'), formatar_valor=formatar_valor)
 
     except Exception as e:
-
-        tabela_html = f'Impossível exibir extrato, tente cadastrar um saldo inicial anterior ao mês de visualização Error occurred: {e}'
+        tabela_html = f'Impossível exibir extrato, tente cadastrar um saldo inicial anterior ao mês de visualização. Erro: {e}'
 
     return tabela_html
 
