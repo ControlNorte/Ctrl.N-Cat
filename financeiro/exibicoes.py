@@ -20,9 +20,7 @@ def formatar_valor(valor):
 def extrato(cliente, banco, mes):
     try:
         # Conectar ao banco de dados PostgreSQL
-        db_url = os.getenv('DATABASE_URL')
-        if not db_url:
-            raise ValueError("Variável de ambiente DATABASE_URL não definida")
+        db_url = "postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
         engine = create_engine(db_url)
 
         with engine.connect() as conexao:
@@ -73,6 +71,7 @@ def extrato(cliente, banco, mes):
             descricao.append('SALDO')
             data1 = str(data.date())
             datas.append(data.date())
+            tabela1 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
             tabela1_filtered = tabela1[(tabela1['cliente_id'] == cliente.id) & (tabela1['banco_id'] == banco)]
             tabela1_filtered = tabela1_filtered.sort_values('data').set_index('data')
             saldofinal = tabela1_filtered.at[data1, 'saldofinal']
