@@ -7,6 +7,7 @@ import plotly.express as px
 import io
 import base64
 import plotly.graph_objects as go
+import psycopg2
 
 # EXTRATO NO HTML: caixa.html
 
@@ -20,9 +21,16 @@ def extrato(cliente, banco, mes):
         mes = mes
         cliente = cliente
         banco = banco
-        conexao = sqlite3.connect(r"C:\Users\Dell\PycharmProjects\ProjetoDjango\db.sqlite3")
-        tabela = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
-        tabela = tabela[(tabela['cliente_id'] == cliente.id) & (tabela['banco_id'] == banco)]
+        # Conectar ao banco de dados PostgreSQL
+        with psycopg2.connect(
+                dbname='railway',
+                user='postgres',
+                password='rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg',
+                host='postgres.railway.internal',
+                port='5432'
+        ) as conexao:
+            tabela = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
+            tabela = tabela[(tabela['cliente_id'] == cliente.id) & (tabela['banco_id'] == banco)]
 
         tabela = tabela[['data', 'descricao', 'valor']]
         tabela['data'] = pd.to_datetime(tabela['data'], format='ISO8601')
@@ -37,8 +45,7 @@ def extrato(cliente, banco, mes):
         if datastabela.empty:
             tabela = 'Selecione o mês para filtrar'
         else:
-            conexao0 = sqlite3.connect(r"C:\Users\Dell\PycharmProjects\ProjetoDjango\db.sqlite3")
-            tabela0 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao0)
+            tabela0 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
             tabela0['data'] = pd.to_datetime(tabela0['data'], format='ISO8601')
             tabela0['mes'] = tabela0['data'].dt.month
             tabela0['ano'] = tabela0['data'].dt.year
@@ -69,8 +76,7 @@ def extrato(cliente, banco, mes):
 
             for data in datastabela:
                 descricao.append('SALDO')
-                conexao1 = sqlite3.connect(r"C:\Users\Dell\PycharmProjects\ProjetoDjango\db.sqlite3")
-                tabela1 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao1)
+                tabela1 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
                 data1 = str(data.date())
                 datas.append(data.date())
                 tabela1 = tabela1[(tabela1['cliente_id'] == cliente.id) & (tabela1['banco_id'] == banco)]
@@ -136,9 +142,16 @@ def gerar_grafico(cliente, banco, mes):
         mes = mes
         cliente = cliente
         banco = banco
-        conexao = sqlite3.connect(r"C:\Users\Dell\PycharmProjects\ProjetoDjango\db.sqlite3")
-        tabela = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
-        tabela = tabela[(tabela['cliente_id'] == cliente.id) & (tabela['banco_id'] == banco)]
+        # Conectar ao banco de dados PostgreSQL
+        with psycopg2.connect(
+                dbname='railway',
+                user='postgres',
+                password='rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg',
+                host='postgres.railway.internal',
+                port='5432'
+        ) as conexao:
+            tabela = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
+            tabela = tabela[(tabela['cliente_id'] == cliente.id) & (tabela['banco_id'] == banco)]
 
         tabela = tabela[['data', 'descricao', 'valor']]
         tabela['data'] = pd.to_datetime(tabela['data'], format='ISO8601')
@@ -153,8 +166,7 @@ def gerar_grafico(cliente, banco, mes):
         if datastabela.empty:
             return None
         else:
-            conexao0 = sqlite3.connect(r"C:\Users\Dell\PycharmProjects\ProjetoDjango\db.sqlite3")
-            tabela0 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao0)
+            tabela0 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
             tabela0['data'] = pd.to_datetime(tabela0['data'], format='ISO8601')
             tabela0['mes'] = tabela0['data'].dt.month
             tabela0['ano'] = tabela0['data'].dt.year
@@ -173,8 +185,7 @@ def gerar_grafico(cliente, banco, mes):
 
             for data in datastabela:
                 descricao.append('SALDO')
-                conexao1 = sqlite3.connect(r"C:\Users\Dell\PycharmProjects\ProjetoDjango\db.sqlite3")
-                tabela1 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao1)
+                tabela1 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
                 data1 = str(data.date())
                 datas.append(data.date())
                 tabela1 = tabela1[(tabela1['cliente_id'] == cliente.id) & (tabela1['banco_id'] == banco)]
@@ -243,9 +254,16 @@ def dreresumida(cliente):
     try:
         cliente = cliente  # Atribua a variável cliente corretamente
         mes = datetime.now().month
-        conexao = sqlite3.connect(r"C:\Users\Dell\PycharmProjects\ProjetoDjango\db.sqlite3")
+        # Conectar ao banco de dados PostgreSQL
+        with psycopg2.connect(
+                dbname='railway',
+                user='postgres',
+                password='rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg',
+                host='postgres.railway.internal',
+                port='5432'
+        ) as conexao:
+            movi = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
 
-        movi = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
         movi['data'] = pd.to_datetime(movi['data'], format='ISO8601')
         movi['mes'] = movi['data'].dt.month
         movi = movi[(movi['cliente_id'] == cliente.id) & (movi['mes'] == mes)]
@@ -285,14 +303,22 @@ def dreresumida(cliente):
 def dreprincipal(cliente, ano, centrocusto=None):
     cliente = cliente
     ano = int(ano)
-    conexao = sqlite3.connect(r"C:\Users\Dell\PycharmProjects\ProjetoDjango\db.sqlite3")
 
-    # Carregar as tabelas do banco de dados
-    movi = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
-    categoria = pd.read_sql("SELECT * FROM financeiro_categoria", conexao)
-    categoriamae = pd.read_sql("SELECT * FROM financeiro_categoriamae", conexao)
-    subcategoria = pd.read_sql("SELECT * FROM financeiro_subcategoria", conexao)
-    centrodecusto = pd.read_sql("SELECT * FROM financeiro_centrodecusto", conexao)
+    # Conectar ao banco de dados PostgreSQL
+    with psycopg2.connect(
+            dbname='railway',
+            user='postgres',
+            password='rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg',
+            host='postgres.railway.internal',
+            port='5432'
+    ) as conexao:
+
+        # Carregar as tabelas do banco de dados
+        movi = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
+        categoria = pd.read_sql("SELECT * FROM financeiro_categoria", conexao)
+        categoriamae = pd.read_sql("SELECT * FROM financeiro_categoriamae", conexao)
+        subcategoria = pd.read_sql("SELECT * FROM financeiro_subcategoria", conexao)
+        centrodecusto = pd.read_sql("SELECT * FROM financeiro_centrodecusto", conexao)
 
     # Processar as tabelas
     movi['data'] = pd.to_datetime(movi['data'], format='ISO8601')
@@ -480,14 +506,21 @@ def dreprincipal(cliente, ano, centrocusto=None):
 
 
 def drecomp(mes1, ano1, mes2, ano2, cliente, centrocusto=None):
-    conexao = sqlite3.connect(r"C:\Users\Dell\PycharmProjects\ProjetoDjango\db.sqlite3")
+    # Conectar ao banco de dados PostgreSQL
+    with psycopg2.connect(
+            dbname='railway',
+            user='postgres',
+            password='rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg',
+            host='postgres.railway.internal',
+            port='5432'
+    ) as conexao:
 
-    # Carregar as tabelas do banco de dados
-    movi = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
-    categoria = pd.read_sql("SELECT * FROM financeiro_categoria", conexao)
-    categoriamae = pd.read_sql("SELECT * FROM financeiro_categoriamae", conexao)
-    subcategoria = pd.read_sql("SELECT * FROM financeiro_subcategoria", conexao)
-    centrodecusto = pd.read_sql("SELECT * FROM financeiro_centrodecusto", conexao)
+        # Carregar as tabelas do banco de dados
+        movi = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
+        categoria = pd.read_sql("SELECT * FROM financeiro_categoria", conexao)
+        categoriamae = pd.read_sql("SELECT * FROM financeiro_categoriamae", conexao)
+        subcategoria = pd.read_sql("SELECT * FROM financeiro_subcategoria", conexao)
+        centrodecusto = pd.read_sql("SELECT * FROM financeiro_centrodecusto", conexao)
 
     # Processar as tabelas
     movi['data'] = pd.to_datetime(movi['data'], format='ISO8601')

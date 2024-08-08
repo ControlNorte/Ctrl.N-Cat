@@ -70,11 +70,16 @@ def alteracaosaldo(banco, cliente, data, dias=0):
         data_anterior_str = (current_date - timedelta(days=1)).strftime('%Y-%m-%d')
 
         # Conectar ao banco de dados uma vez
-        conexao = sqlite3.connect(r"C:\Users\Dell\PycharmProjects\ProjetoDjango\db.sqlite3")
-
-        # Ler tabelas uma vez
-        tabela_saldo = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
-        tabela_movimentacoes = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
+        with psycopg2.connect(
+                dbname='railway',
+                user='postgres',
+                password='rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg',
+                host='postgres.railway.internal',
+                port='5432'
+        ) as conexao:
+            # Ler tabelas uma vez
+            tabela_saldo = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
+            tabela_movimentacoes = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
 
         # Fechar a conexão
         conexao.close()
