@@ -168,15 +168,18 @@ def gerar_grafico(cliente, banco, mes):
             tabela1 = tabela1[(tabela1['cliente_id'] == cliente.id) & (tabela1['banco_id'] == banco)]
             tabela1 = tabela1.set_index('data')
 
+            # Converter o índice para datetime.date
+            tabela1_dates = tabela1.index.to_series().apply(lambda x: x.date()).tolist()
+
             for data in datastabela:
                 descricao.append('SALDO')
                 data1 = data.date()
 
                 datas.append(data1)
 
-                # Converter índice do DataFrame para datetime.date para comparação
-                if data1 in tabela1.index.date:
-                    saldofinal = tabela1.loc[tabela1.index.date == data1, 'saldofinal'].values[0]
+                # Verificar se a data está presente na lista convertida
+                if data1 in tabela1_dates:
+                    saldofinal = tabela1.loc[pd.Timestamp(data1), 'saldofinal']
                     valor.append(float(saldofinal))
                 else:
                     valor.append(None)  # Ou use um valor padrão, se preferir
