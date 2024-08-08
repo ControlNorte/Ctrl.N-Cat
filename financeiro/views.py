@@ -416,9 +416,15 @@ def bancosaldo(request, pk):
         dados = request.POST.dict()
         data = dados.get('data')
         saldofinal = float(dados.get("saldofinal"))
-        saldo = Saldo.objects.create(banco=BancosCliente.objects.get(id=banco.id, cliente=dadoscliente), cliente=dadoscliente,
-                                     data=dados.get('data'), saldofinal=saldofinal)
-        saldo.save()
+        Saldo.objects.update_or_create(
+            data=data,
+            banco=BancosCliente.objects.get(id=banco),
+            cliente=dadoscliente,
+            defaults={
+                'saldoinicial': float(0.0),
+                'saldofinal': float(saldofinal)
+            }
+        )
         saldodiario(banco=banco.id, cliente=dadoscliente, data=data)
         return redirect('financeiro:banco')
     context = {'dadoscliente': dadoscliente, 'banco': banco}

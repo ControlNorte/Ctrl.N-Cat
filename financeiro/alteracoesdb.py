@@ -17,18 +17,16 @@ def saldodiario(banco, cliente, data):
     datainicialord = datainicial.toordinal() + 1
     datafinal = datainicialord + 31
 
+    # Configurar a string de conexão com o SQLAlchemy
+    DATABASE_URL = "postgresql+psycopg2://your_username:your_password@monorail.proxy.rlwy.net:5432/your_dbname"
+    engine = create_engine(DATABASE_URL)
+
     for data_ord in range(datainicialord, datafinal):
         data = datetime.fromordinal(data_ord).date()
         data_anterior = datetime.fromordinal(data_ord - 1).date()
 
-        # Conectar ao banco de dados PostgreSQL
-        with psycopg2.connect(
-                dbname='railway',
-                user='postgres',
-                password='rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg',
-                host='postgres.railway.internal',
-                port='5432'
-        ) as conexao:
+        # Conectar ao banco de dados PostgreSQL usando SQLAlchemy
+        with engine.connect() as conexao:
             tabela_saldo = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
             tabela_mov = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
 
@@ -36,13 +34,13 @@ def saldodiario(banco, cliente, data):
             (tabela_saldo['cliente_id'] == cliente.id) &
             (tabela_saldo['banco_id'] == banco) &
             (tabela_saldo['data'] == str(data_anterior))
-            ]['saldofinal'].sum() if not tabela_saldo.empty else 0
+        ]['saldofinal'].sum() if not tabela_saldo.empty else 0
 
         saldodia = tabela_mov[
             (tabela_mov['cliente_id'] == cliente.id) &
             (tabela_mov['banco_id'] == banco) &
             (tabela_mov['data'] == str(data))
-            ]['valor'].sum() if not tabela_mov.empty else 0
+        ]['valor'].sum() if not tabela_mov.empty else 0
 
         saldofinal = saldoinicial + saldodia
 
