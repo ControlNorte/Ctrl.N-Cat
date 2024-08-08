@@ -172,13 +172,13 @@ def gerar_grafico(cliente, banco, mes):
 
             for data in datastabela:
                 descricao.append('SALDO')
-                data1 = data.date  # Extrair a data do Timestamp
+                data1 = data  # Extrair a data do Timestamp
 
                 datas.append(data1)
 
                 # Verificar se a data está presente na lista convertida
                 if data1 in tabela1_dates:
-                    saldofinal = tabela1.loc[tabela1.index.to_series().apply(lambda x: x) == data1, 'saldofinal'].values[0]
+                    saldofinal = tabela1.loc[tabela1.index.to_series().apply(lambda x: x.date()) == data1, 'saldofinal'].values[0]
                     valor.append(float(saldofinal))
                 else:
                     valor.append(None)  # Ou use um valor padrão, se preferir
