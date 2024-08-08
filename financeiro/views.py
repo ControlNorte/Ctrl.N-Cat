@@ -418,7 +418,7 @@ def bancosaldo(request, pk):
         saldofinal = float(dados.get("saldofinal"))
         Saldo.objects.update_or_create(
             data=data,
-            banco=BancosCliente.objects.get(id=banco),
+            banco=BancosCliente.objects.get(id=banco.id),
             cliente=dadoscliente,
             defaults={
                 'saldoinicial': float(0.0),
