@@ -174,9 +174,9 @@ def gerar_grafico(cliente, banco, mes):
 
                 datas.append(data1)
 
-                # Converter data1 para Timestamp ou usar .date() para comparação
-                if pd.Timestamp(data1) in tabela1.index:
-                    saldofinal = tabela1.at[pd.Timestamp(data1), 'saldofinal']
+                # Converter índice do DataFrame para datetime.date para comparação
+                if data1 in tabela1.index.date:
+                    saldofinal = tabela1.loc[tabela1.index.date == data1, 'saldofinal'].values[0]
                     valor.append(float(saldofinal))
                 else:
                     valor.append(None)  # Ou use um valor padrão, se preferir
