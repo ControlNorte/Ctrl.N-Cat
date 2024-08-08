@@ -26,6 +26,8 @@ def saldodiario(banco, cliente, data):
             tabela_saldo = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
             tabela_mov = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
 
+        conexao.close()
+
         data = datetime.fromordinal(data_ord).date()
         data_anterior = datetime.fromordinal(data_ord - 1).date()
 
@@ -54,7 +56,6 @@ def saldodiario(banco, cliente, data):
         )
 
 
-
 def alteracaosaldo(banco, cliente, data, dias=0):
     # Conversão inicial da data
     datainicial = datetime.strptime(data, '%Y-%m-%d').date()
@@ -66,14 +67,10 @@ def alteracaosaldo(banco, cliente, data, dias=0):
         data_str = current_date.strftime('%Y-%m-%d')
         data_anterior_str = (current_date - timedelta(days=1)).strftime('%Y-%m-%d')
 
-        # Conectar ao banco de dados uma vez
-        with psycopg2.connect(
-                dbname='railway',
-                user='postgres',
-                password='rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg',
-                host='postgres.railway.internal',
-                port='5432'
-        ) as conexao:
+        db_url = "postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
+        engine = create_engine(db_url)
+
+        with engine.connect() as conexao:
             # Ler tabelas uma vez
             tabela_saldo = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
             tabela_movimentacoes = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
