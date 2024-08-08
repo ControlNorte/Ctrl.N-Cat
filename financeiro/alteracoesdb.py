@@ -18,18 +18,20 @@ def saldodiario(banco, cliente, data):
     datafinal = datainicialord + 31
 
     # Configurar a string de conexão com o SQLAlchemy
-    DATABASE_URL = "postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
-    engine = create_engine(DATABASE_URL)
+
 
     for data_ord in range(datainicialord, datafinal):
         data = datetime.fromordinal(data_ord).date()
         data_anterior = datetime.fromordinal(data_ord - 1).date()
 
+        DATABASE_URL = "postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
+        engine = create_engine(DATABASE_URL)
+
         # Conectar ao banco de dados PostgreSQL usando SQLAlchemy
         with engine.connect() as conexao:
             tabela_saldo = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
             tabela_mov = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
-            print(tabela_saldo)
+
 
         saldoinicial = tabela_saldo[
             (tabela_saldo['cliente_id'] == cliente.id) &
