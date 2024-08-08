@@ -134,84 +134,84 @@ def gerar_grafico(cliente, banco, mes):
             tabela = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
             tabela0 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
 
-        # Filtrar e preparar a tabela
-        tabela = tabela[(tabela['cliente_id'] == cliente.id) & (tabela['banco_id'] == banco)]
-        tabela['data'] = pd.to_datetime(tabela['data'])
-        tabela['mes'] = tabela['data'].dt.month
-        tabela = tabela[tabela['mes'] == mes]
-        tabela = tabela[['data', 'descricao', 'valor']].sort_values('data')
+            # Filtrar e preparar a tabela
+            tabela = tabela[(tabela['cliente_id'] == cliente.id) & (tabela['banco_id'] == banco)]
+            tabela['data'] = pd.to_datetime(tabela['data'])
+            tabela['mes'] = tabela['data'].dt.month
+            tabela = tabela[tabela['mes'] == mes]
+            tabela = tabela[['data', 'descricao', 'valor']].sort_values('data')
 
-        datastabela = tabela[['data']].drop_duplicates()['data']
+            datastabela = tabela[['data']].drop_duplicates()['data']
 
-        if datastabela.empty:
-            return None
+            if datastabela.empty:
+                return None
 
-        # Preparar tabela0
-        tabela0['data'] = pd.to_datetime(tabela0['data'])
-        tabela0['mes'] = tabela0['data'].dt.month
-        tabela0['ano'] = tabela0['data'].dt.year
-        tabela0 = tabela0.sort_values('data')
+            # Preparar tabela0
+            tabela0['data'] = pd.to_datetime(tabela0['data'])
+            tabela0['mes'] = tabela0['data'].dt.month
+            tabela0['ano'] = tabela0['data'].dt.year
+            tabela0 = tabela0.sort_values('data')
 
-        ano = datastabela.iloc[0].year
-        if mes == 1:
-            mes = 12
-            ano -= 1
-        else:
-            mes -= 1
+            ano = datastabela.iloc[0].year
+            if mes == 1:
+                mes = 12
+                ano -= 1
+            else:
+                mes -= 1
 
-        # Adicionar saldo
-        descricao = []
-        datas = []
-        valor = []
+            # Adicionar saldo
+            descricao = []
+            datas = []
+            valor = []
 
-        tabela1 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
-        tabela1 = tabela1[(tabela1['cliente_id'] == cliente.id) & (tabela1['banco_id'] == banco)]
-        tabela1 = tabela1.set_index('data')
+            tabela1 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
+            tabela1 = tabela1[(tabela1['cliente_id'] == cliente.id) & (tabela1['banco_id'] == banco)]
+            tabela1 = tabela1.set_index('data')
 
-        for data in datastabela:
-            descricao.append('SALDO')
-            data1 = str(data.date())
-            datas.append(data.date())
-            saldofinal = tabela1.at[data1, 'saldofinal']
-            valor.append(float(saldofinal))
+            for data in datastabela:
+                descricao.append('SALDO')
+                data1 = str(data.date())
+                datas.append(data.date())
+                saldofinal = tabela1.at[data1, 'saldofinal']
+                valor.append(float(saldofinal))
 
-        adicionar = pd.DataFrame({'data': datas, 'descricao': descricao, 'valor': valor})
-        tabela = pd.concat([tabela, adicionar], ignore_index=True)
-        tabela = tabela.sort_values(by=['data'])
-        tabela['entradas'] = tabela.apply(
-            lambda row: row['valor'] if row['valor'] > 0 and 'saldo' not in row['descricao'].lower() else '', axis=1)
-        tabela['saídas'] = tabela.apply(
-            lambda row: row['valor'] if row['valor'] < 0 and 'saldo' not in row['descricao'].lower() else '', axis=1)
-        tabela['saldo'] = tabela.apply(
-            lambda row: row['valor'] if 'saldo' in row['descricao'].lower() else row['valor'], axis=1)
-        tabela = tabela[['data', 'descricao', 'entradas', 'saídas', 'saldo']]
+            adicionar = pd.DataFrame({'data': datas, 'descricao': descricao, 'valor': valor})
+            tabela = pd.concat([tabela, adicionar], ignore_index=True)
+            tabela = tabela.sort_values(by=['data'])
+            tabela['entradas'] = tabela.apply(
+                lambda row: row['valor'] if row['valor'] > 0 and 'saldo' not in row['descricao'].lower() else '', axis=1)
+            tabela['saídas'] = tabela.apply(
+                lambda row: row['valor'] if row['valor'] < 0 and 'saldo' not in row['descricao'].lower() else '', axis=1)
+            tabela['saldo'] = tabela.apply(
+                lambda row: row['valor'] if 'saldo' in row['descricao'].lower() else row['valor'], axis=1)
+            tabela = tabela[['data', 'descricao', 'entradas', 'saídas', 'saldo']]
 
-        # Manter apenas as linhas onde a descrição contém 'saldo'
-        tabela = tabela[tabela['descricao'].str.contains('saldo', case=False, na=False)]
+            # Manter apenas as linhas onde a descrição contém 'saldo'
+            tabela = tabela[tabela['descricao'].str.contains('saldo', case=False, na=False)]
 
-        if tabela.empty:
-            return None
+            if tabela.empty:
+                return None
 
-        tabela['dia'] = tabela['data'].dt.day
-        fig = go.Figure()
+            tabela['dia'] = tabela['data'].dt.day
+            fig = go.Figure()
 
-        # Adicionar linha de saldo
-        fig.add_trace(go.Scatter(x=tabela['dia'], y=tabela['saldo'], mode='lines+markers',
-                                 text=tabela['saldo'].apply(lambda x: f'R${x:,.2f}')))
+            # Adicionar linha de saldo
+            fig.add_trace(go.Scatter(x=tabela['dia'], y=tabela['saldo'], mode='lines+markers',
+                                    text=tabela['saldo'].apply(lambda x: f'R${x:,.2f}')))
 
-        fig.update_yaxes(title_text='', showticklabels=False)
+            fig.update_yaxes(title_text='', showticklabels=False)
 
-        # Remover margens e bordas
-        fig.update_layout(
-            margin=dict(l=0, r=0, t=0, b=0),
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            width=1000,
-            height=300
-        )
+            # Remover margens e bordas
+            fig.update_layout(
+                margin=dict(l=0, r=0, t=0, b=0),
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                width=1000,
+                height=300
+            )
 
-        config = {'displayModeBar': False}
-        grafico_html = fig.to_html(full_html=False, config=config)
+            config = {'displayModeBar': False}
+            grafico_html = fig.to_html(full_html=False, config=config)
 
     except Exception as e:
         grafico_html = f'Impossível exibir gráfico, tente cadastrar um saldo inicial anterior ao mês de visualização. Erro: {e}'
