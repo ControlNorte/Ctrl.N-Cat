@@ -18,27 +18,28 @@ def saldodiario(banco, cliente, data):
     datafinal = datainicialord + 31
 
     for data_ord in range(datainicialord, datafinal):
-        data = datetime.fromordinal(data_ord).date()
-        data_anterior = datetime.fromordinal(data_ord - 1).date()
-
         # Configurar a string de conexão com o SQLAlchemy
         db_url = "postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
         engine = create_engine(db_url)
-        conexao = engine.connect()
-        tabela_saldo = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
-        tabela_mov = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
+
+        with engine.connect() as conexao:
+            tabela_saldo = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
+            tabela_mov = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
+
+        data = datetime.fromordinal(data_ord).date()
+        data_anterior = datetime.fromordinal(data_ord - 1).date()
 
         saldoinicial = tabela_saldo[
             (tabela_saldo['cliente_id'] == cliente.id) &
             (tabela_saldo['banco_id'] == banco) &
-            (tabela_saldo['data'] == str(data_anterior))
-        ]['saldofinal'].sum() if not tabela_saldo.empty else 0
+            (tabela_saldo['data'] == data_anterior)
+            ]['saldofinal'].sum()
 
         saldodia = tabela_mov[
             (tabela_mov['cliente_id'] == cliente.id) &
             (tabela_mov['banco_id'] == banco) &
-            (tabela_mov['data'] == str(data))
-        ]['valor'].sum() if not tabela_mov.empty else 0
+            (tabela_mov['data'] == data)
+            ]['valor'].sum()
 
         saldofinal = saldoinicial + saldodia
 
