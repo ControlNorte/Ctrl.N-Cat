@@ -174,9 +174,9 @@ def gerar_grafico(cliente, banco, mes):
 
                 datas.append(data1)
 
-                # Verificar se a data está presente no índice
-                if data1 in tabela1.index:
-                    saldofinal = tabela1.at[data1, 'saldofinal']
+                # Converter data1 para Timestamp ou usar .date() para comparação
+                if pd.Timestamp(data1) in tabela1.index:
+                    saldofinal = tabela1.at[pd.Timestamp(data1), 'saldofinal']
                     valor.append(float(saldofinal))
                 else:
                     valor.append(None)  # Ou use um valor padrão, se preferir
