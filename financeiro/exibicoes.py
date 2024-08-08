@@ -123,6 +123,7 @@ def extrato(cliente, banco, mes):
 
     return tabela_html
 
+
 def gerar_grafico(cliente, banco, mes):
     try:
         # Conectar ao banco de dados PostgreSQL
@@ -178,7 +179,7 @@ def gerar_grafico(cliente, banco, mes):
 
                 # Verificar se a data está presente na lista convertida
                 if data1 in tabela1_dates:
-                    saldofinal = tabela1.loc[tabela1.index.to_series().apply(lambda x: x.date()) == data1, 'saldofinal'].values[0]
+                    saldofinal = tabela1.loc[tabela1.index.to_series().apply(lambda x: x) == data1, 'saldofinal'].values[0]
                     valor.append(float(saldofinal))
                 else:
                     valor.append(None)  # Ou use um valor padrão, se preferir
