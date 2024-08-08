@@ -123,7 +123,6 @@ def extrato(cliente, banco, mes):
 
     return tabela_html
 
-
 def gerar_grafico(cliente, banco, mes):
     try:
         # Conectar ao banco de dados PostgreSQL
