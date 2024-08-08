@@ -69,11 +69,11 @@ def extrato(cliente, banco, mes):
 
         for data in datastabela:
             descricao.append('SALDO')
-            data1 = str(data.date())
-            datas.append(data.date())
+            data1 = data.date()  # Conversão para datetime.date
+            datas.append(data1)
             tabela0_filtered = tabela0[(tabela0['cliente_id'] == cliente.id) & (tabela0['banco_id'] == banco)]
             tabela0_filtered = tabela0_filtered.sort_values('data').set_index('data')
-            saldofinal = tabela0_filtered.at[data1, 'saldofinal']
+            saldofinal = tabela0_filtered.at[pd.Timestamp(data1), 'saldofinal']  # Usando pd.Timestamp para garantir comparação correta
             valor.append(float(saldofinal))
 
         adicionar = {'data': datas, 'descricao': descricao, 'valor': valor}
