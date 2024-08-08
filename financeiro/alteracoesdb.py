@@ -29,6 +29,7 @@ def saldodiario(banco, cliente, data):
         with engine.connect() as conexao:
             tabela_saldo = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
             tabela_mov = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
+            print(tabela_saldo)
 
         saldoinicial = tabela_saldo[
             (tabela_saldo['cliente_id'] == cliente.id) &
