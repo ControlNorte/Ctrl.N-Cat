@@ -172,7 +172,7 @@ def gerar_grafico(cliente, banco, mes):
 
             for data in datastabela:
                 descricao.append('SALDO')
-                data1 = data.date()  # Extrair a data do Timestamp
+                data1 = data.date  # Extrair a data do Timestamp
 
                 datas.append(data1)
 
