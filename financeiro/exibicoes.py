@@ -170,10 +170,16 @@ def gerar_grafico(cliente, banco, mes):
 
             for data in datastabela:
                 descricao.append('SALDO')
-                data1 = str(data.date())
-                datas.append(data.date())
-                saldofinal = tabela1.at[data1, 'saldofinal']
-                valor.append(float(saldofinal))
+                data1 = data.date()
+
+                datas.append(data1)
+
+                # Verificar se a data está presente no índice
+                if data1 in tabela1.index:
+                    saldofinal = tabela1.at[data1, 'saldofinal']
+                    valor.append(float(saldofinal))
+                else:
+                    valor.append(None)  # Ou use um valor padrão, se preferir
 
             adicionar = pd.DataFrame({'data': datas, 'descricao': descricao, 'valor': valor})
             tabela = pd.concat([tabela, adicionar], ignore_index=True)
