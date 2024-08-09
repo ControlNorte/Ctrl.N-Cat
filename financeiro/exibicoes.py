@@ -211,7 +211,7 @@ def gerar_grafico(cliente, banco, mes):
             y=tabela['saldo'],
             mode='lines+markers',
             text=tabela['saldo'].apply(lambda x: f'R${float(x):,.2f}' if isinstance(x, (int, float)) else ''),
-            line={'dash': '10px'}
+            line={'dash': 'dashdot'}
         ))
 
         # Configurar eixos
