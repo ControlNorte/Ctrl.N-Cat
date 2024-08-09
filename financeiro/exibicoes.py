@@ -124,6 +124,7 @@ def extrato(cliente, banco, mes):
     return tabela_html
 
 
+
 def gerar_grafico(cliente, banco, mes):
     try:
         # Conectar ao banco de dados PostgreSQL
@@ -207,7 +208,7 @@ def gerar_grafico(cliente, banco, mes):
         # Remover a linha de saldo inicial
         tabela = tabela[tabela['descricao'] != 'SALDO INICIAL']
 
-        # Criar gráfico usando Plotly Graph Objects para garantir a linha
+        # Criar gráfico usando Plotly Graph Objects
         fig = go.Figure()
 
         # Adicionar linha de saldo
