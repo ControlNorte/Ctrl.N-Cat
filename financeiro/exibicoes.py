@@ -199,6 +199,10 @@ def gerar_grafico(cliente, banco, mes):
             return 'Selecione o mês para filtrar'
 
         tabela['dia'] = tabela['data'].dt.day
+
+        # Remover linhas com "SALDO INICIAL" na descrição
+        tabela = tabela[tabela['descricao'] != 'SALDO INICIAL']
+
         fig = go.Figure()
 
         # Adicionar linha de saldo
