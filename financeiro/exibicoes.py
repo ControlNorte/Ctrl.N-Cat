@@ -130,76 +130,73 @@ def gerar_grafico(cliente, banco, mes):
         db_url = "postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
         engine = create_engine(db_url)
 
+        # Ler tabelas do banco de dados
         with engine.connect() as conexao:
             tabela = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
             tabela0 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
 
-            # Filtrar e preparar a tabela
-            tabela = tabela[(tabela['cliente_id'] == cliente.id) & (tabela['banco_id'] == banco)]
-            tabela['data'] = pd.to_datetime(tabela['data'])
-            tabela['mes'] = tabela['data'].dt.month
-            tabela = tabela[tabela['mes'] == mes]
-            tabela = tabela[['data', 'descricao', 'valor']].sort_values('data')
+        # Filtrar e preparar a tabela
+        tabela = tabela[(tabela['cliente_id'] == cliente.id) & (tabela['banco_id'] == banco)]
+        tabela['data'] = pd.to_datetime(tabela['data'], format='ISO8601')
+        tabela['mes'] = tabela['data'].dt.month
+        tabela = tabela[tabela['mes'] == mes]
+        tabela = tabela[['data', 'descricao', 'valor']].sort_values('data')
 
-            datastabela = tabela[['data']].drop_duplicates()['data']
+        datastabela = tabela[['data']].drop_duplicates()['data']
 
-            if datastabela.empty:
-                return None
+        if datastabela.empty:
+            return 'Selecione o mês para filtrar'
 
-            # Preparar tabela0
-            tabela0['data'] = pd.to_datetime(tabela0['data'])
-            tabela0['mes'] = tabela0['data'].dt.month
-            tabela0['ano'] = tabela0['data'].dt.year
-            tabela0 = tabela0.sort_values('data')
+        # Preparar tabela0
+        tabela0['data'] = pd.to_datetime(tabela0['data'], format='ISO8601')
+        tabela0['mes'] = tabela0['data'].dt.month
+        tabela0['ano'] = tabela0['data'].dt.year
+        tabela0 = tabela0.sort_values('data')
 
-            ano = datastabela.iloc[0].year
-            if mes == 1:
-                mes = 12
-                ano -= 1
-            else:
-                mes -= 1
+        ano = datastabela.iloc[0].year
+        if mes == 1:
+            mes = 12
+            ano -= 1
+        else:
+            mes -= 1
 
-            # Adicionar saldo
-            descricao = []
+        saldoinicial = tabela0[(tabela0['ano'] == ano) & (tabela0['mes'] == mes) & (tabela0['banco_id'] == banco) &
+                               (tabela0['cliente_id'] == cliente.id)]
+
+        if saldoinicial.empty:
             datas = []
+            descricao = []
             valor = []
+        else:
+            saldoinicialdata = saldoinicial['data'].iloc[-1]
+            saldoinicialvalor = saldoinicial['saldofinal'].iloc[-1]
+            datas = [saldoinicialdata]
+            descricao = ['SALDO INICIAL']
+            valor = [saldoinicialvalor]
 
-            tabela1 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
-            tabela1 = tabela1[(tabela1['cliente_id'] == cliente.id) & (tabela1['banco_id'] == banco)]
-            tabela1 = tabela1.set_index('data')
+        for data in datastabela:
+            descricao.append('SALDO')
+            datas.append(data)
+            tabela0_filtered = tabela0[(tabela0['cliente_id'] == cliente.id) & (tabela0['banco_id'] == banco)]
+            tabela0_filtered = tabela0_filtered.sort_values('data').set_index('data')
+            saldofinal = tabela0_filtered.at[data, 'saldofinal']
+            valor.append(float(saldofinal))
 
-            # Converter o índice para datetime.date
-            tabela1_dates = tabela1.index.to_series().apply(lambda x: x.date()).tolist()
+        adicionar = {'data': datas, 'descricao': descricao, 'valor': valor}
+        adicionar = pd.DataFrame(adicionar)
 
-            for data in datastabela:
-                descricao.append('SALDO')
-                data1 = data  # Extrair a data do Timestamp
+        tabela = pd.concat([tabela, adicionar], ignore_index=True)
+        tabela = tabela.sort_values(by=['data'])
+        tabela['entradas'] = tabela.apply(
+            lambda row: row['valor'] if row['valor'] > 0 and 'SALDO' not in row['descricao'] else '', axis=1)
+        tabela['saídas'] = tabela.apply(
+            lambda row: row['valor'] if row['valor'] < 0 and 'SALDO' not in row['descricao'] else '', axis=1)
+        tabela['saldo'] = tabela.apply(
+            lambda row: row['valor'] if 'SALDO' in row['descricao'] else '', axis=1)
+        tabela = tabela[['data', 'descricao', 'entradas', 'saídas', 'saldo']]
 
-                datas.append(data1)
-
-                # Verificar se a data está presente na lista convertida
-                if data1 in tabela1_dates:
-                    saldofinal = tabela1.loc[tabela1.index.to_series().apply(lambda x: x) == data1, 'saldofinal'].values[0]
-                    valor.append(float(saldofinal))
-                else:
-                    valor.append(None)  # Ou use um valor padrão, se preferir
-
-            adicionar = pd.DataFrame({'data': datas, 'descricao': descricao, 'valor': valor})
-            tabela = pd.concat([tabela, adicionar], ignore_index=True)
-            tabela = tabela.sort_values(by=['data'])
-            tabela['entradas'] = tabela.apply(
-                lambda row: row['valor'] if row['valor'] > 0 and 'saldo' not in row['descricao'].lower() else '', axis=1)
-            tabela['saídas'] = tabela.apply(
-                lambda row: row['valor'] if row['valor'] < 0 and 'saldo' not in row['descricao'].lower() else '', axis=1)
-            tabela['saldo'] = tabela.apply(
-                lambda row: row['valor'] if 'saldo' in row['descricao'].lower() else row['valor'], axis=1)
-            tabela = tabela[['data', 'descricao', 'entradas', 'saídas', 'saldo']]
-
-            # Manter apenas as linhas onde a descrição contém 'saldo'
-            tabela = tabela[tabela['descricao'].str.contains('saldo', case=False, na=False)]
-
-            if tabela.empty:
-                return None
+        if tabela.empty:
+            return 'Selecione o mês para filtrar'
 
             tabela['dia'] = tabela['data'].dt.day
             fig = go.Figure()
