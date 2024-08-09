@@ -212,11 +212,11 @@ def gerar_grafico(cliente, banco, mes):
 
         # Adicionar linha de saldo com shape linear
         fig.add_trace(go.Scatter(
-            x0=tabela['dia'],
+            x=tabela['dia'],
             y=tabela['saldo'],
             mode='lines+markers',
             text=tabela['saldo'].apply(lambda x: f'R${x:,.2f}' if pd.notnull(x) else ''),
-            line={'dash': 'dashdot'}
+            line=dict(color='blue', width=2)
         ))
 
         # Configurar eixos
