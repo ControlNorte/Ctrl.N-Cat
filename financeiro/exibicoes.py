@@ -203,7 +203,7 @@ def gerar_grafico(cliente, banco, mes):
 
         # Adicionar linha de saldo
         fig.add_trace(go.Scatter(x=tabela['dia'], y=tabela['saldo'], mode='lines+markers',
-                                text=tabela['saldo'].apply(lambda x: f'R${x:,.2f}')))
+                                text=tabela['saldo'].apply(lambda x: f'R${float(x):,.2f}' if isinstance(x, (int, float)) else '')))
 
         fig.update_yaxes(title_text='', showticklabels=False)
 
