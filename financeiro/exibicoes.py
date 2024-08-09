@@ -125,7 +125,6 @@ def extrato(cliente, banco, mes):
 
 
 
-
 def gerar_grafico(cliente, banco, mes):
     try:
         # Conectar ao banco de dados PostgreSQL
@@ -222,17 +221,6 @@ def gerar_grafico(cliente, banco, mes):
             text=tabela['saldo'].apply(lambda x: f'R${x:,.2f}' if pd.notnull(x) else ''),
             textposition='top right'
         ))
-
-        # Adicionar linha conectando os pontos
-        for i in range(len(tabela) - 1):
-            fig.add_shape(
-                type="line",
-                x0=tabela['dia'].iloc[i],
-                y0=tabela['saldo'].iloc[i],
-                x1=tabela['dia'].iloc[i + 1],
-                y1=tabela['saldo'].iloc[i + 1],
-                line=dict(color="RoyalBlue", width=2)
-            )
 
         # Configurações de eixos e layout
         fig.update_yaxes(title_text='Saldo', showticklabels=True)
