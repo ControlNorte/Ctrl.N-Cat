@@ -207,21 +207,23 @@ def gerar_grafico(cliente, banco, mes):
         # Remover a linha de saldo inicial
         tabela = tabela[tabela['descricao'] != 'SALDO INICIAL']
 
-        # Criar gráfico usando Plotly Express
-        fig = px.line(
-            tabela,
-            x='dia',
-            y='saldo',
-            title='Evolução do Saldo no Mês',
-            labels={'dia': 'Dia', 'saldo': 'Saldo'},
-            markers=True
-        )
+        # Criar gráfico usando Plotly Graph Objects para garantir a linha
+        fig = go.Figure()
 
-        # Adicionar texto aos pontos
-        fig.update_traces(text=tabela['saldo'].apply(lambda x: f'R${x:,.2f}' if pd.notnull(x) else ''),
-                          textposition='top right')
+        # Adicionar linha de saldo
+        fig.add_trace(go.Scatter(
+            x=tabela['dia'],
+            y=tabela['saldo'],
+            mode='lines+markers',
+            line=dict(color='#7c3aed', width=2),
+            marker=dict(size=6),
+            text=tabela['saldo'].apply(lambda x: f'R${x:,.2f}' if pd.notnull(x) else ''),
+            textposition='top right'
+        ))
 
-        # Configurações adicionais do gráfico
+        # Configurações de eixos e layout
+        fig.update_yaxes(title_text='Saldo', showticklabels=True)
+        fig.update_xaxes(title_text='Dia')
         fig.update_layout(
             margin=dict(l=0, r=0, t=40, b=0),
             plot_bgcolor='rgba(0,0,0,0)',
@@ -231,12 +233,8 @@ def gerar_grafico(cliente, banco, mes):
         )
 
         # Configuração para não exibir a barra de ferramentas
-        fig.update_layout(
-            modebar=dict(remove=['zoom', 'pan', 'select', 'lasso', 'zoomIn', 'zoomOut', 'resetScale'])
-        )
-
-        # Converter para HTML
-        grafico_html = fig.to_html(full_html=False)
+        config = {'displayModeBar': False}
+        grafico_html = fig.to_html(full_html=False, config=config)
 
         return grafico_html
 
