@@ -215,7 +215,7 @@ def gerar_grafico(cliente, banco, mes):
             x=tabela['dia'],
             y=tabela['saldo'],
             mode='lines+markers',
-            text=tabela['saldo'].apply(lambda x: f'R${x:,.2f}' if pd.notnull(x) else ''),
+            text=tabela['saldo'],
             line={'dash': 'dashdot'}
         ))
 
