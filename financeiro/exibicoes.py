@@ -232,7 +232,7 @@ def gerar_grafico(cliente, banco, mes):
             height=300
         )
 
-        config = {'displayModeBar': False}
+        config = {'displayModeBar': True}
         grafico_html = fig.to_html(full_html=False, config=config)
 
     except Exception as e:
