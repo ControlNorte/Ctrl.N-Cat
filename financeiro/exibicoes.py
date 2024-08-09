@@ -188,16 +188,21 @@ def gerar_grafico(cliente, banco, mes):
         tabela = pd.concat([tabela, adicionar], ignore_index=True)
         tabela = tabela.sort_values(by=['data'])
         tabela['entradas'] = tabela.apply(
-            lambda row: row['valor'] if row['valor'] > 0 and 'SALDO' not in row['descricao'] else '', axis=1)
+            lambda row: row['valor'] if row['valor'] > 0 and 'SALDO' not in row['descricao'] else None, axis=1)
         tabela['saídas'] = tabela.apply(
-            lambda row: row['valor'] if row['valor'] < 0 and 'SALDO' not in row['descricao'] else '', axis=1)
+            lambda row: row['valor'] if row['valor'] < 0 and 'SALDO' not in row['descricao'] else None, axis=1)
+
+        # Atualização para garantir que 'saldo' seja numérico
         tabela['saldo'] = tabela.apply(
-            lambda row: row['valor'] if 'SALDO' in row['descricao'] else '', axis=1)
+            lambda row: row['valor'] if 'SALDO' in row['descricao'] else None, axis=1
+        )
+        tabela['saldo'] = pd.to_numeric(tabela['saldo'], errors='coerce')
+
+        # Verificar se há valores nulos ou vazios na coluna 'saldo'
+        if tabela['saldo'].isnull().all():
+            return 'Nenhum dado de saldo disponível para exibir no gráfico.'
+
         tabela = tabela[['data', 'descricao', 'entradas', 'saídas', 'saldo']]
-
-        if tabela.empty:
-            return 'Selecione o mês para filtrar'
-
         tabela['dia'] = tabela['data'].dt.day
 
         # Remover linhas com "SALDO INICIAL" na descrição
@@ -210,7 +215,7 @@ def gerar_grafico(cliente, banco, mes):
             x=tabela['dia'],
             y=tabela['saldo'],
             mode='lines+markers',
-            text=tabela['saldo'].apply(lambda x: f'R${float(x):,.2f}' if isinstance(x, (int, float)) else ''),
+            text=tabela['saldo'].apply(lambda x: f'R${x:,.2f}' if pd.notnull(x) else ''),
             line={'dash': 'dashdot'}
         ))
 
@@ -234,7 +239,6 @@ def gerar_grafico(cliente, banco, mes):
         grafico_html = f'Impossível exibir gráfico, tente cadastrar um saldo inicial anterior ao mês de visualização. Erro: {e}'
 
     return grafico_html
-
 
 def dreresumida(cliente):
     try:
