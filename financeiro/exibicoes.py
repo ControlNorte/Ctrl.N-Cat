@@ -198,26 +198,26 @@ def gerar_grafico(cliente, banco, mes):
         if tabela.empty:
             return 'Selecione o mês para filtrar'
 
-            tabela['dia'] = tabela['data'].dt.day
-            fig = go.Figure()
+        tabela['dia'] = tabela['data'].dt.day
+        fig = go.Figure()
 
-            # Adicionar linha de saldo
-            fig.add_trace(go.Scatter(x=tabela['dia'], y=tabela['saldo'], mode='lines+markers',
-                                    text=tabela['saldo'].apply(lambda x: f'R${x:,.2f}')))
+        # Adicionar linha de saldo
+        fig.add_trace(go.Scatter(x=tabela['dia'], y=tabela['saldo'], mode='lines+markers',
+                                text=tabela['saldo'].apply(lambda x: f'R${x:,.2f}')))
 
-            fig.update_yaxes(title_text='', showticklabels=False)
+        fig.update_yaxes(title_text='', showticklabels=False)
 
-            # Remover margens e bordas
-            fig.update_layout(
-                margin=dict(l=0, r=0, t=0, b=0),
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                width=1000,
-                height=300
-            )
+        # Remover margens e bordas
+        fig.update_layout(
+            margin=dict(l=0, r=0, t=0, b=0),
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            width=1000,
+            height=300
+        )
 
-            config = {'displayModeBar': False}
-            grafico_html = fig.to_html(full_html=False, config=config)
+        config = {'displayModeBar': False}
+        grafico_html = fig.to_html(full_html=False, config=config)
 
     except Exception as e:
         grafico_html = f'Impossível exibir gráfico, tente cadastrar um saldo inicial anterior ao mês de visualização. Erro: {e}'
