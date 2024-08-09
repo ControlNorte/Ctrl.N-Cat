@@ -205,11 +205,18 @@ def gerar_grafico(cliente, banco, mes):
 
         fig = go.Figure()
 
-        # Adicionar linha de saldo
-        fig.add_trace(go.Scatter(x=tabela['dia'], y=tabela['saldo'], mode='lines+markers',
-                                text=tabela['saldo'].apply(lambda x: f'R${float(x):,.2f}' if isinstance(x, (int, float)) else '')))
+        # Adicionar linha de saldo com shape linear
+        fig.add_trace(go.Scatter(
+            x=tabela['dia'],
+            y=tabela['saldo'],
+            mode='lines+markers',
+            text=tabela['saldo'].apply(lambda x: f'R${float(x):,.2f}' if isinstance(x, (int, float)) else ''),
+            line_shape='linear'  # Assegura que a linha seja desenhada de forma linear
+        ))
 
-        fig.update_yaxes(title_text='', showticklabels=False)
+        # Configurar eixos
+        fig.update_yaxes(title_text='Saldo', showticklabels=True)
+        fig.update_xaxes(title_text='Dia')
 
         # Remover margens e bordas
         fig.update_layout(
