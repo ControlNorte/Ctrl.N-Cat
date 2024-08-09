@@ -142,7 +142,7 @@ def gerar_grafico(cliente, banco, mes):
         tabela = tabela[tabela['mes'] == mes]
         tabela = tabela[['data', 'descricao', 'valor']].sort_values('data')
 
-        datastabela = tabela[['data']].drop_duplicates()['data']
+        datastabela = tabela['data'].drop_duplicates()
 
         if datastabela.empty:
             return 'Selecione o mês para filtrar'
@@ -153,26 +153,27 @@ def gerar_grafico(cliente, banco, mes):
         tabela0['ano'] = tabela0['data'].dt.year
         tabela0 = tabela0.sort_values('data')
 
+        # Determinar o saldo inicial do mês anterior
         ano = datastabela.iloc[0].year
         if mes == 1:
-            mes = 12
+            mes_anterior = 12
             ano -= 1
         else:
-            mes -= 1
+            mes_anterior = mes - 1
 
-        saldoinicial = tabela0[(tabela0['ano'] == ano) & (tabela0['mes'] == mes) & (tabela0['banco_id'] == banco) &
-                               (tabela0['cliente_id'] == cliente.id)]
+        saldoinicial = tabela0[(tabela0['ano'] == ano) & (tabela0['mes'] == mes_anterior) &
+                               (tabela0['banco_id'] == banco) & (tabela0['cliente_id'] == cliente.id)]
 
-        if saldoinicial.empty:
-            datas = []
-            descricao = []
-            valor = []
-        else:
+        if not saldoinicial.empty:
             saldoinicialdata = saldoinicial['data'].iloc[-1]
             saldoinicialvalor = saldoinicial['saldofinal'].iloc[-1]
             datas = [saldoinicialdata]
             descricao = ['SALDO INICIAL']
             valor = [saldoinicialvalor]
+        else:
+            datas = []
+            descricao = []
+            valor = []
 
         for data in datastabela:
             descricao.append('SALDO')
@@ -182,63 +183,66 @@ def gerar_grafico(cliente, banco, mes):
             saldofinal = tabela0_filtered.at[data, 'saldofinal']
             valor.append(float(saldofinal))
 
-        adicionar = {'data': datas, 'descricao': descricao, 'valor': valor}
-        adicionar = pd.DataFrame(adicionar)
+        # Criar tabela com saldo e transações
+        adicionar = pd.DataFrame({'data': datas, 'descricao': descricao, 'valor': valor})
+        tabela = pd.concat([tabela, adicionar], ignore_index=True).sort_values(by=['data'])
 
-        tabela = pd.concat([tabela, adicionar], ignore_index=True)
-        tabela = tabela.sort_values(by=['data'])
         tabela['entradas'] = tabela.apply(
             lambda row: row['valor'] if row['valor'] > 0 and 'SALDO' not in row['descricao'] else None, axis=1)
         tabela['saídas'] = tabela.apply(
             lambda row: row['valor'] if row['valor'] < 0 and 'SALDO' not in row['descricao'] else None, axis=1)
 
-        # Atualização para garantir que 'saldo' seja numérico
+        # Atualizar o saldo para valores numéricos
         tabela['saldo'] = tabela.apply(
             lambda row: row['valor'] if 'SALDO' in row['descricao'] else None, axis=1
         )
         tabela['saldo'] = pd.to_numeric(tabela['saldo'], errors='coerce')
 
-        # Verificar se há valores nulos ou vazios na coluna 'saldo'
         if tabela['saldo'].isnull().all():
             return 'Nenhum dado de saldo disponível para exibir no gráfico.'
 
         tabela = tabela[['data', 'descricao', 'entradas', 'saídas', 'saldo']]
         tabela['dia'] = tabela['data'].dt.day
 
-        # Remover linhas com "SALDO INICIAL" na descrição
+        # Remover a linha de saldo inicial
         tabela = tabela[tabela['descricao'] != 'SALDO INICIAL']
 
-        fig = go.Figure()
+        # Criar gráfico usando Plotly Express
+        fig = px.line(
+            tabela,
+            x='dia',
+            y='saldo',
+            title='Evolução do Saldo no Mês',
+            labels={'dia': 'Dia', 'saldo': 'Saldo'},
+            markers=True
+        )
 
-        # Adicionar linha de saldo com shape linear
-        fig.add_trace(go.Scatter(
-            x=tabela['dia'],
-            y=tabela['saldo'],
-            mode='lines+markers',
-            text=tabela['saldo'].apply(lambda x: f'R${x:,.2f}' if pd.notnull(x) else ''),
-            line=dict(color='blue', width=2)
-        ))
+        # Adicionar texto aos pontos
+        fig.update_traces(text=tabela['saldo'].apply(lambda x: f'R${x:,.2f}' if pd.notnull(x) else ''),
+                          textposition='top right')
 
-        # Configurar eixos
-        fig.update_yaxes(title_text='Saldo', showticklabels=True)
-        fig.update_xaxes(title_text='Dia')
-
-        # Remover margens e bordas
+        # Configurações adicionais do gráfico
         fig.update_layout(
-            margin=dict(l=0, r=0, t=0, b=0),
+            margin=dict(l=0, r=0, t=40, b=0),
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
             width=1000,
             height=300
         )
 
-        config = {'displayModeBar': True}
-        grafico_html = fig.to_html(full_html=False, config=config)
+        # Configuração para não exibir a barra de ferramentas
+        fig.update_layout(
+            modebar=dict(remove=['zoom', 'pan', 'select', 'lasso', 'zoomIn', 'zoomOut', 'resetScale'])
+        )
+
+        # Converter para HTML
+        grafico_html = fig.to_html(full_html=False)
+
+        return grafico_html
 
     except Exception as e:
-        grafico_html = f'Impossível exibir gráfico, tente cadastrar um saldo inicial anterior ao mês de visualização. Erro: {e}'
+        return f'Ocorreu um erro ao gerar o gráfico: {str(e)}'
 
-    return grafico_html
 
 def dreresumida(cliente):
     try:
