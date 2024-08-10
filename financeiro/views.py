@@ -160,7 +160,7 @@ def movimentacao(request, banco):
 def save_data(request):
     movimentacoes_to_create = []
     if request.method == 'POST':
-        cliente = cadastro_de_cliente.objects.get(id=dadoscliente)
+        cliente = cadastro_de_cliente.objects.get(id=dadoscliente.id)
         banco = bancoatual.id
         data = request.POST.get('data')
         data = datetime.strptime(data, '%d/%m/%Y').strftime('%Y-%m-%d')
