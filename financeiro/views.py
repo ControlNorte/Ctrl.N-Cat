@@ -174,7 +174,7 @@ def save_data(request):
         valor = float(valor.replace('.', '').replace(',', '.'))
         try:
             movimentacoes_to_create.append(MovimentacoesCliente(
-                        cliente=cliente,
+                        cliente=cadastro_de_cliente.objects.get(id=cliente),
                         banco=BancosCliente.objects.get(id=banco),
                         data=data,
                         descricao=descricao,
@@ -186,7 +186,7 @@ def save_data(request):
             ))
         except:
             movimentacoes_to_create.append(MovimentacoesCliente(
-                            cliente=cliente,
+                            cliente=cadastro_de_cliente.objects.get(id=cliente),
                             banco=BancosCliente.objects.get(id=banco),
                             data=data,
                             descricao=descricao,
@@ -211,9 +211,11 @@ def delete(request):
     if request.method == 'POST':
         cliente = dadoscliente
         banco = bancoatual.id
+        data = request.POST.get('data')
+        data = datetime.strptime(data, '%d/%m/%Y').strftime('%Y-%m-%d')
         id = request.POST.get('id')
         MovimentacoesCliente.objects.get(id=id).delete()
-        alteracaosaldo(banco=banco, cliente=cliente, data=str(movimentacao.data))
+        alteracaosaldo(banco=banco, cliente=cliente, data=str(data))
         TransicaoCliente.objects.get(id=id).delete()
 
         return JsonResponse({'success': True})
@@ -235,14 +237,14 @@ def save_data_rule(request):
         centrocusto = request.POST.get('centrocusto')
         valor = request.POST.get('valor')
         valor = float(valor.replace('.', '').replace(',', '.'))
-        regras = Regra.objects.create(cliente=dadoscliente, categoria=Categoria.objects.get(id=categoria, cliente=dadoscliente),
+        regras = Regra.objects.create(cliente=cadastro_de_cliente.objects.get(id=cliente), categoria=Categoria.objects.get(id=categoria, cliente=dadoscliente),
                                       subcategoria=SubCategoria.objects.get(id=subcategoria, cliente=dadoscliente),
                                       centrodecusto=CentroDeCusto.objects.get(id=centrocusto, cliente=dadoscliente),
                                       descricao=descricao, ativo=True)
         regras.save()
         try:
             movimentacoes_to_create.append(MovimentacoesCliente(
-                        cliente=cliente,
+                        cliente=cadastro_de_cliente.objects.get(id=cliente),
                         banco=BancosCliente.objects.get(id=banco),
                         data=data,
                         descricao=descricao,
@@ -254,7 +256,7 @@ def save_data_rule(request):
             ))
         except:
             movimentacoes_to_create.append(MovimentacoesCliente(
-                            cliente=cliente,
+                            cliente=cadastro_de_cliente.objects.get(id=cliente),
                             banco=BancosCliente.objects.get(id=banco),
                             data=data,
                             descricao=descricao,
