@@ -214,7 +214,6 @@ def delete(request):
         data = request.POST.get('data')
         data = datetime.strptime(data, '%d/%m/%Y').strftime('%Y-%m-%d')
         id = request.POST.get('id')
-        MovimentacoesCliente.objects.get(id=id).delete()
         TransicaoCliente.objects.get(id=id).delete()
 
         return JsonResponse({'success': True})
