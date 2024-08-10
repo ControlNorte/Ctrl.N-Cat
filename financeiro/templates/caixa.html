@@ -591,6 +591,7 @@ Financeiro | {{ dadoscliente }}
     });
 
     document.querySelectorAll('.deleteBtn').forEach(button => {
+        button.addEventListener('click', () => handleFormSubmission(button, "{% url 'financeiro:delete' %}"))
         button.addEventListener('click', function () {
             const form = button.closest('form');
             form.style.display = 'none';

@@ -42,6 +42,7 @@ urlpatterns = [
     path('save-data/', save_data, name='save_data_url'),
     path('save-data-rule/', save_data_rule, name='save_data_url_rule'),
     path('transf/', transf, name='transf'),
+    path('delete/', delete, name='delete'),
     path('edit_movimentacao/', views.edit_movimentacao, name='edit_movimentacao'),
     path('delete_movimentacao/<int:id>/', views.delete_movimentacao, name='delete_movimentacao'),
     path('get_movimentacao/<int:id>/', views.get_movimentacao, name='get_movimentacao'),

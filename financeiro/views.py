@@ -207,6 +207,20 @@ def save_data(request):
     return JsonResponse({'success': False})
 
 
+def delete(request):
+    if request.method == 'POST':
+        cliente = dadoscliente
+        banco = bancoatual.id
+        id = request.POST.get('id')
+        MovimentacoesCliente.objects.get(id=id).delete()
+        alteracaosaldo(banco=banco, cliente=cliente, data=str(movimentacao.data))
+        TransicaoCliente.objects.get(id=id).delete()
+
+        return JsonResponse({'success': True})
+
+    return JsonResponse({'success': False})
+
+
 def save_data_rule(request):
     movimentacoes_to_create = []
     if request.method == 'POST':
@@ -276,7 +290,7 @@ def transf(request):
         valor = request.POST.get('valor')
         valor = float(valor.replace('.', '').replace(',', '.'))
         saida_to_create.append(MovimentacoesCliente(
-                        cliente=cliente,
+                        cliente=cadastro_de_cliente.objects.get(id=cliente),
                         banco=BancosCliente.objects.get(id=banco),
                         data=data,
                         descricao=descricao,
@@ -291,7 +305,7 @@ def transf(request):
             alteracaosaldo(banco=banco, cliente=cliente, data=movimentacao.data)
         valor = valor * -1.0
         entrada_to_create.append(MovimentacoesCliente(
-                        cliente=cliente,
+                        cliente=cadastro_de_cliente.objects.get(id=cliente),
                         banco=BancosCliente.objects.get(id=bancodestino),
                         data=data,
                         descricao=descricao,
