@@ -174,7 +174,7 @@ def save_data(request):
         valor = float(valor.replace('.', '').replace(',', '.'))
         try:
             movimentacoes_to_create.append(MovimentacoesCliente(
-                        cliente=cliente,
+                        cliente=cadastro_de_cliente.objects.get(id=cliente),
                         banco=BancosCliente.objects.get(id=banco),
                         data=data,
                         descricao=descricao,
@@ -186,7 +186,7 @@ def save_data(request):
             ))
         except:
             movimentacoes_to_create.append(MovimentacoesCliente(
-                            cliente=cliente,
+                            cliente=cadastro_de_cliente.objects.get(id=cliente),
                             banco=BancosCliente.objects.get(id=banco),
                             data=data,
                             descricao=descricao,
