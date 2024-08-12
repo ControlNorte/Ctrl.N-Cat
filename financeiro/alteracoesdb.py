@@ -101,7 +101,7 @@ def alteracaosaldo(banco, cliente, data, dias=0):
             saldo, criado = Saldo.objects.update_or_create(
                 data=data_str,
                 banco=BancosCliente.objects.get(id=banco),
-                cliente=cliente.id,
+                cliente=cliente,
                 defaults={'saldoinicial': float(saldoinicial), 'saldofinal': float(saldofinal)},
             )
         
