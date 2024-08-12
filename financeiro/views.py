@@ -160,8 +160,7 @@ def movimentacao(request, banco):
 def save_data(request):
     movimentacoes_to_create = []
     if request.method == 'POST':
-        cliente_id = dadoscliente
-        cliente = cadastro_de_cliente.objects.get(id=cliente_id)  # Certifique-se de buscar a instância do cliente
+        cliente = dadoscliente  # Aqui, dadoscliente já é a instância correta de cadastro_de_cliente
         banco = bancoatual.id
         data = request.POST.get('data')
         data = datetime.strptime(data, '%d/%m/%Y').strftime('%Y-%m-%d')
@@ -201,7 +200,7 @@ def save_data(request):
 
         MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
         for movimentacao in movimentacoes_to_create:
-            alteracaosaldo(banco=banco, cliente=cliente_id, data=str(movimentacao.data))  # Aqui pode passar cliente_id
+            alteracaosaldo(banco=banco, cliente=cliente.id, data=str(movimentacao.data))  # Passando cliente.id
         TransicaoCliente.objects.get(id=id).delete()
 
         return JsonResponse({'success': True})
