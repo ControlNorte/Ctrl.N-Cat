@@ -98,7 +98,7 @@ Financeiro | {{ dadoscliente }}
                         </a></div>
 
                     {% for banco in bancos %}
-                    <p class="text-lg text-violet-700 px-2">
+                    <p class="text-violet-700 px-2">
                         <a href="{% url 'financeiro:movimentacao' banco.banco %}">{{ banco.banco }}</a>
                     </p>
                     {% endfor %}
