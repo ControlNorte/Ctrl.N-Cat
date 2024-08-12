@@ -160,7 +160,8 @@ def movimentacao(request, banco):
 def save_data(request):
     movimentacoes_to_create = []
     if request.method == 'POST':
-        cliente = dadoscliente
+        cliente_id = dadoscliente
+        cliente = cadastro_de_cliente.objects.get(id=cliente_id)  # Certifique-se de buscar a instância do cliente
         banco = bancoatual.id
         data = request.POST.get('data')
         data = datetime.strptime(data, '%d/%m/%Y').strftime('%Y-%m-%d')
@@ -172,9 +173,10 @@ def save_data(request):
         valor = request.POST.get('valor')
         id = request.POST.get('id')
         valor = float(valor.replace('.', '').replace(',', '.'))
+
         try:
             movimentacoes_to_create.append(MovimentacoesCliente(
-                        cliente=cadastro_de_cliente.objects.get(id=cliente),
+                        cliente=cliente,
                         banco=BancosCliente.objects.get(id=banco),
                         data=data,
                         descricao=descricao,
@@ -186,7 +188,7 @@ def save_data(request):
             ))
         except:
             movimentacoes_to_create.append(MovimentacoesCliente(
-                            cliente=cadastro_de_cliente.objects.get(id=cliente),
+                            cliente=cliente,
                             banco=BancosCliente.objects.get(id=banco),
                             data=data,
                             descricao=descricao,
@@ -199,7 +201,7 @@ def save_data(request):
 
         MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
         for movimentacao in movimentacoes_to_create:
-            alteracaosaldo(banco=banco, cliente=cliente, data=str(movimentacao.data))
+            alteracaosaldo(banco=banco, cliente=cliente_id, data=str(movimentacao.data))  # Aqui pode passar cliente_id
         TransicaoCliente.objects.get(id=id).delete()
 
         return JsonResponse({'success': True})
