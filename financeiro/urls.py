@@ -6,7 +6,7 @@ from .views import *
 app_name = 'financeiro'
 
 urlpatterns = [
-    path('', Financeiro.as_view(), name='financeiro'),
+    path('', financeiro_view, name='financeiro'),
     path('financeirocliente/<int:pk>/', financeirocliente, name='financeirocliente'),
 
     path('financeirocliente/caixa/', caixa, name='caixa'),

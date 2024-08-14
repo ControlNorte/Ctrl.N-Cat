@@ -15,14 +15,16 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
 
-
-class Financeiro(LoginRequiredMixin, ListView):
-    template_name = 'homepagefinanceiro.html'
-    model = cadastro_de_cliente
+@login_required
+def financeiro_view(request):
+    clientes = cadastro_de_cliente.objects.filter(ativo=True)
+    context = {'object_list': clientes}
+    return render(request, 'homepagefinanceiro.html', context)
 
 
 def financeirocliente(request, pk):
