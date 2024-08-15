@@ -78,7 +78,7 @@ def extrato(cliente, banco, mes):
         adicionar = {'data': datas, 'descricao': descricao, 'valor': valor}
         adicionar = pd.DataFrame(adicionar)
 
-        tabela = pd.concat([tabela, adicionar], ignore_index=True)
+        tabela = pd.concat([tabela, adicionar], ignore_index=False)
         tabela['id'] = tabela.index
         tabela = tabela.sort_values(by=['data', 'id'])
         tabela['entradas'] = tabela.apply(
