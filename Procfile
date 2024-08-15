@@ -1,1 +1,1 @@
-web: sh -c 'python manage.py migrate && gunicorn ControlNorte.wsgi --log-file - --timeout 0 --workers=3'
+web: python manage.py migrate &&  gunicorn ControlNorte.wsgi --log-file - && gunicorn ControlNorte.wsgi --timeout 0 && gunicorn ControlNorte.wsgi --workers=3
