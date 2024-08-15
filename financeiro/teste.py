@@ -8,6 +8,7 @@ from django.middleware.csrf import get_token
 from .alteracoesdb import *
 import ahocorasick
 import os
+from sqlalchemy import create_engine
 
 register = template.Library()
 
@@ -81,8 +82,12 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
         dados_dict = dados.to_dict('records')
 
-        # Buscar as regras relacionadas ao cliente
+        # Criar o autômato Aho-Corasick
+        A = ahocorasick.Automaton()
         regras = Regra.objects.filter(cliente=cliente).select_related('categoria', 'subcategoria', 'centrodecusto')
+        for idx, regra in enumerate(regras):
+            A.add_word(str(regra.descricao), (idx, regra))
+        A.make_automaton()
 
         movimentacoes_to_create = []
         transicoes_to_create = []
@@ -93,23 +98,21 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
             descricao = dado['Descrição']
             matched = False
 
-            # Verificação manual das regras
-            for regra in regras:
-                if regra.descricao in descricao:
-                    movimentacoes_to_create.append(MovimentacoesCliente(
-                        cliente=cliente,
-                        banco=banco,
-                        data=dado['Data'].date(),
-                        descricao=descricao,
-                        detalhe='Sem Detalhe',
-                        valor=dado['Valor'],
-                        categoria=regra.categoria,
-                        subcategoria=regra.subcategoria,
-                        centrodecusto=regra.centrodecusto
-                    ))
-                    matched = True
-                    conciliados += 1
-                    break
+            for _, (_, regra) in A.iter(descricao):
+                movimentacoes_to_create.append(MovimentacoesCliente(
+                    cliente=cliente,
+                    banco=banco,
+                    data=dado['Data'].date(),
+                    descricao=descricao,
+                    detalhe='Sem Detalhe',
+                    valor=dado['Valor'],
+                    categoria=regra.categoria,
+                    subcategoria=regra.subcategoria,
+                    centrodecusto=regra.centrodecusto
+                ))
+                matched = True
+                conciliados += 1
+                break
 
             if not matched:
                 transicoes_to_create.append(TransicaoCliente(
