@@ -61,48 +61,57 @@ def alteracaosaldo(banco, cliente, data, dias=0):
     datainicial = datetime.strptime(data, '%Y-%m-%d').date()
     datafinal = datainicial + timedelta(days=31 + dias)
 
-    current_date = datainicial
-    
-    while current_date <= datafinal:
-        data_str = current_date.strftime('%Y-%m-%d')
-        data_anterior_str = (current_date - timedelta(days=1)).strftime('%Y-%m-%d')
+    db_url = r"postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
+    engine = create_engine(db_url)
 
-        db_url = "postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
-        engine = create_engine(db_url)
+    with engine.connect() as conexao:
+        # Filtrar as tabelas diretamente na consulta SQL
+        query_saldo = f"""
+        SELECT * FROM financeiro_saldo 
+        WHERE cliente_id = {cliente.id} 
+        AND banco_id = {int(banco)} 
+        AND data BETWEEN '{datainicial}' AND '{datafinal}'
+        """
+        tabela_saldo = pd.read_sql(query_saldo, conexao)
 
-        with engine.connect() as conexao:
-            # Ler tabelas uma vez
-            tabela_saldo = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
-            tabela_movimentacoes = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
+        query_movimentacoes = f"""
+        SELECT * FROM financeiro_movimentacoescliente 
+        WHERE cliente_id = {cliente.id} 
+        AND banco_id = {int(banco)} 
+        AND data BETWEEN '{datainicial}' AND '{datafinal}'
+        """
+        tabela_movimentacoes = pd.read_sql(query_movimentacoes, conexao)
 
-        # Fechar a conexão
-        conexao.close()
-        
-        # Cálculo do saldo inicial
-        saldoinicial = tabela_saldo[
-            (tabela_saldo['cliente_id'] == cliente.id) & 
-            (tabela_saldo['banco_id'] == int(banco)) & 
-            (tabela_saldo['data'] == data_anterior_str)
-        ]
-        saldoinicial = saldoinicial['saldofinal'].sum() if not saldoinicial.empty else 0
-        
-        # Cálculo do saldo diário
-        saldodia = tabela_movimentacoes[
-            (tabela_movimentacoes['cliente_id'] == cliente.id) & 
-            (tabela_movimentacoes['banco_id'] == int(banco)) & 
-            (tabela_movimentacoes['data'] == data_str)
-        ]
-        saldodia = saldodia['valor'].sum() if not saldodia.empty else 0
-        
-        saldofinal = saldoinicial + saldodia
-        
-        # Atualização do banco de dados Django
-        with transaction.atomic():
-            saldo, criado = Saldo.objects.update_or_create(
-                data=data_str,
-                banco=BancosCliente.objects.get(id=banco),
-                cliente=cliente,
-                defaults={'saldoinicial': float(saldoinicial), 'saldofinal': float(saldofinal)},
-            )
-        
-        current_date += timedelta(days=1)
+        current_date = datainicial
+        while current_date <= datafinal:
+            data_str = current_date.strftime('%Y-%m-%d')
+            data_anterior_str = (current_date - timedelta(days=1)).strftime('%Y-%m-%d')
+
+            # Cálculo do saldo inicial
+            saldoinicial = tabela_saldo[
+                (tabela_saldo['cliente_id'] == cliente.id) &
+                (tabela_saldo['banco_id'] == int(banco)) &
+                (tabela_saldo['data'] == data_anterior_str)
+                ]
+            saldoinicial = saldoinicial['saldofinal'].sum() if not saldoinicial.empty else 0
+
+            # Cálculo do saldo diário
+            saldodia = tabela_movimentacoes[
+                (tabela_movimentacoes['cliente_id'] == cliente.id) &
+                (tabela_movimentacoes['banco_id'] == int(banco)) &
+                (tabela_movimentacoes['data'] == data_str)
+                ]
+            saldodia = saldodia['valor'].sum() if not saldodia.empty else 0
+
+            saldofinal = saldoinicial + saldodia
+
+            # Atualização do banco de dados Django
+            with transaction.atomic():
+                saldo, criado = Saldo.objects.update_or_create(
+                    data=data_str,
+                    banco=BancosCliente.objects.get(id=banco),
+                    cliente=cliente,
+                    defaults={'saldoinicial': float(saldoinicial), 'saldofinal': float(saldofinal)},
+                )
+
+            current_date += timedelta(days=1)
