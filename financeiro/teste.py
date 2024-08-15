@@ -68,22 +68,18 @@ def format_currency(value):
 
 def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     try:
-        # Verificar se o arquivo foi fornecido
         if not arquivo_upload:
             return "Erro: Nenhum arquivo foi selecionado."
 
-        # Carregar os dados do Excel
+        # Carregar e processar os dados do Excel
         dados = pd.read_excel(arquivo_upload, dtype={'Descrição': str, 'Data': str, 'Valor': float})
+        dados['Data'] = pd.to_datetime(dados['Data'], errors='coerce')
 
-        # Converter as datas levando em consideração diferentes formatos
-        dados['Data'] = pd.to_datetime(dados['Data'])
-
-        # Verificar se há valores NaT (resultantes de erros na conversão de datas)
+        # Verificar se há valores NaT
         if dados['Data'].isna().any():
-            print('erro')
             return "Erro: Algumas datas não puderam ser convertidas. Verifique o formato das datas no arquivo Excel."
 
-        dados = dados.to_dict('records')
+        dados_dict = dados.to_dict('records')
 
         # Criar o autômato Aho-Corasick
         A = ahocorasick.Automaton()
@@ -95,56 +91,96 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
         movimentacoes_to_create = []
         transicoes_to_create = []
         conciliados = 0
-        i = 0
 
-        while i < len(dados):
-            descricao = dados[i]['Descrição']
-            linha_removida = False
+        # Processamento das transações
+        for dado in dados_dict:
+            descricao = dado['Descrição']
+            matched = False
 
-            for end_index, (idx, regra) in A.iter(descricao):
+            for _, (_, regra) in A.iter(descricao):
                 movimentacoes_to_create.append(MovimentacoesCliente(
                     cliente=cliente,
                     banco=banco,
-                    data=dados[i]['Data'].date(),
+                    data=dado['Data'].date(),
                     descricao=descricao,
                     detalhe='Sem Detalhe',
-                    valor=dados[i]['Valor'],
+                    valor=dado['Valor'],
                     categoria=regra.categoria,
                     subcategoria=regra.subcategoria,
                     centrodecusto=regra.centrodecusto
                 ))
-                del dados[i]
-                linha_removida = True
+                matched = True
                 conciliados += 1
                 break
 
-            if not linha_removida:
+            if not matched:
                 transicoes_to_create.append(TransicaoCliente(
                     cliente=cliente,
                     banco=banco,
-                    data=dados[i]['Data'].date(),
-                    descricao=dados[i]['Descrição'],
-                    valor=dados[i]['Valor']
+                    data=dado['Data'].date(),
+                    descricao=descricao,
+                    valor=dado['Valor']
                 ))
-                i += 1
 
-        # Salvar movimentações e transições em batch
+        # Inserção em batch das movimentações e transições
         if movimentacoes_to_create:
             MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
 
         if transicoes_to_create:
             TransicaoCliente.objects.bulk_create(transicoes_to_create)
 
-        # Atualizar saldo baseado nas novas movimentações
+        # Atualização do saldo baseado nas novas movimentações
+        if movimentacoes_to_create:
+            datainicial = min(mov.data for mov in movimentacoes_to_create)
+            datafinal = max(mov.data for mov in movimentacoes_to_create)
 
-        for movimentacao in movimentacoes_to_create:
-            alteracaosaldo(banco=banco.id, cliente=cliente, data=str(movimentacao.data))
-            print(f'Saldo atualizado para {movimentacao.data}')
+            db_url = r"postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
+            engine = create_engine(db_url)
+
+            with engine.connect() as conexao:
+                query_saldo = f"""
+                SELECT * FROM financeiro_saldo 
+                WHERE cliente_id = {cliente.id} 
+                AND banco_id = {int(banco)} 
+                AND data BETWEEN '{datainicial}' AND '{datafinal}'
+                """
+                tabela_saldo = pd.read_sql(query_saldo, conexao)
+
+                query_movimentacoes = f"""
+                SELECT * FROM financeiro_movimentacoescliente 
+                WHERE cliente_id = {cliente.id} 
+                AND banco_id = {int(banco)} 
+                AND data BETWEEN '{datainicial}' AND '{datafinal}'
+                """
+                tabela_movimentacoes = pd.read_sql(query_movimentacoes, conexao)
+
+                saldo_atualizacoes = []
+                current_date = datainicial
+
+                while current_date <= datafinal:
+                    data_str = current_date.strftime('%Y-%m-%d')
+                    data_anterior_str = (current_date - timedelta(days=1)).strftime('%Y-%m-%d')
+
+                    saldoinicial = tabela_saldo.loc[tabela_saldo['data'] == data_anterior_str, 'saldofinal'].sum() or 0
+                    saldodia = tabela_movimentacoes.loc[tabela_movimentacoes['data'] == data_str, 'valor'].sum() or 0
+                    saldofinal = saldoinicial + saldodia
+
+                    saldo_atualizacoes.append(Saldo(
+                        data=data_str,
+                        banco=BancosCliente.objects.get(id=banco),
+                        cliente=cliente,
+                        saldoinicial=float(saldoinicial),
+                        saldofinal=float(saldofinal)
+                    ))
+
+                    current_date += timedelta(days=1)
+
+                Saldo.objects.bulk_update(saldo_atualizacoes, ['saldoinicial', 'saldofinal'])
 
         return f'Importação concluída. {conciliados} movimentações conciliadas.'
 
     except Exception as e:
-        print(f"Erro ao importar arquivo: {e}")
+        logger.error(f"Erro ao importar arquivo: {e}")
         return f"Erro ao importar arquivo: {e}"
 
 
