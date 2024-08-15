@@ -80,8 +80,7 @@ def extrato(cliente, banco, mes):
 
         tabela = pd.concat([tabela, adicionar], ignore_index=True)
         tabela['id'] = tabela.index
-        print(tabela)
-        tabela = tabela.sort_values(by=['data'])
+        tabela = tabela.sort_values(by=['data', 'id'])
         tabela['entradas'] = tabela.apply(
             lambda row: row['valor'] if row['valor'] > 0 and 'SALDO' not in row['descricao'] else '', axis=1)
         tabela['saídas'] = tabela.apply(
