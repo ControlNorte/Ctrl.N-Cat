@@ -44,7 +44,7 @@ def caixa(request):
 
 @csrf_exempt
 def movimentacao(request, banco):
-    # bancos = BancosCliente.objects.filter(ativo='True', cliente=dadoscliente)
+    bancos = BancosCliente.objects.filter(ativo='True', cliente=dadoscliente)
     global bancoatual
     bancoatual = BancosCliente.objects.get(ativo='True', cliente=dadoscliente, banco=banco)
     mesatual = datetime.now().month

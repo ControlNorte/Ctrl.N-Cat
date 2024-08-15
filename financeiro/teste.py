@@ -9,6 +9,8 @@ from .alteracoesdb import *
 import ahocorasick
 import os
 from sqlalchemy import create_engine
+from datetime import timedelta
+import logging
 
 register = template.Library()
 
