@@ -69,7 +69,7 @@ def extrato(cliente, banco, mes):
 
         for data in datastabela:
             descricao.append('SALDO')
-            datas.append(data)
+            datas.append(data.date)
             tabela0_filtered = tabela0[(tabela0['cliente_id'] == cliente.id) & (tabela0['banco_id'] == banco)]
             tabela0_filtered = tabela0_filtered.sort_values('data').set_index('data')
             saldofinal = tabela0_filtered.at[data, 'saldofinal']
@@ -179,7 +179,7 @@ def gerar_grafico(cliente, banco, mes):
 
         for data in datastabela:
             descricao.append('SALDO')
-            datas.append(data)
+            datas.append(data.date)
             tabela0_filtered = tabela0[(tabela0['cliente_id'] == cliente.id) & (tabela0['banco_id'] == banco)]
             tabela0_filtered = tabela0_filtered.sort_values('data').set_index('data')
             saldofinal = tabela0_filtered.at[data, 'saldofinal']
