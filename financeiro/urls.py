@@ -24,20 +24,20 @@ urlpatterns = [
     path('financeirocliente/maisopicoes/', maisopicoes, name='maisopicoes'),
 
     path('financeirocliente/maisopicoes/banco/', banco, name='banco'),
-    path('financeirocliente/maisopicoes/banco/editar/<int:pk>', editarbanco, name='editarbanco'),
-    path('financeirocliente/maisopicoes/banco/saldo/<int:pk>', bancosaldo, name='bancosaldo'),
+    path('financeirocliente/maisopicoes/banco/editar/<int:id>', editarbanco, name='editarbanco'),
+    path('financeirocliente/maisopicoes/banco/saldo/<int:id>', bancosaldo, name='bancosaldo'),
 
     path('financeirocliente/maisopicoes/categoria/', categoria, name='categoria'),
-    path('financeirocliente/maisopicoes/categoria/editar/<int:pk>', editarcategoria, name='editarcategoria'),
+    path('financeirocliente/maisopicoes/categoria/editar/<int:id>', editarcategoria, name='editarcategoria'),
 
     path('financeirocliente/maisopicoes/subcategoria/', subcategoria, name='subcategoria'),
-    path('financeirocliente/maisopicoes/subcategoria/editar/<int:pk>', editarsubcategoria, name='editarsubcategoria'),
+    path('financeirocliente/maisopicoes/subcategoria/editar/<int:id>', editarsubcategoria, name='editarsubcategoria'),
 
     path('financeirocliente/maisopicoes/centrocusto/', centrocusto, name='centrocusto'),
-    path('financeirocliente/maisopicoes/centrocusto/editar/<int:pk>', editarcentrocusto, name='editarcentrocusto'),
+    path('financeirocliente/maisopicoes/centrocusto/editar/<int:id>', editarcentrocusto, name='editarcentrocusto'),
 
     path('financeirocliente/maisopicoes/regra/', regra, name='regra'),
-    path('financeirocliente/maisopicoes/regra/editar/<int:pk>', editarregra, name='editarregra'),
+    path('financeirocliente/maisopicoes/regra/editar/<int:id>', editarregra, name='editarregra'),
 
     path('save-data/', save_data, name='save_data_url'),
     path('save-data-rule/', save_data_rule, name='save_data_url_rule'),
