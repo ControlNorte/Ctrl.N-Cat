@@ -17,7 +17,6 @@ from django.shortcuts import render, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 
-
 # Create your views here.
 
 @login_required
@@ -28,8 +27,8 @@ def financeiro_view(request):
 
 
 def financeirocliente(request, pk):
-    global dadoscliente
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    request.session['dadoscliente'] = pk  # Armazena o pk na sessão
     if request.method == 'GET':
         dreresumo = dreresumida(cliente=dadoscliente)
     context = {'dadoscliente': dadoscliente, 'dreresumo': dreresumo}
@@ -37,6 +36,11 @@ def financeirocliente(request, pk):
 
 
 def caixa(request):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     bancos = BancosCliente.objects.filter(ativo='True', cliente=dadoscliente)
     context = {'dadoscliente': dadoscliente, 'bancos': bancos}
     return render(request, 'caixa.html', context)
@@ -44,6 +48,11 @@ def caixa(request):
 
 @csrf_exempt
 def movimentacao(request, banco):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     bancos = BancosCliente.objects.filter(ativo='True', cliente=dadoscliente)
     global bancoatual
     bancoatual = BancosCliente.objects.get(ativo='True', cliente=dadoscliente, banco=banco)
@@ -160,6 +169,11 @@ def movimentacao(request, banco):
 
 
 def save_data(request):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     movimentacoes_to_create = []
     if request.method == 'POST':
         cliente = dadoscliente  # Aqui, dadoscliente já é a instância correta de cadastro_de_cliente
@@ -212,10 +226,6 @@ def save_data(request):
 
 def delete(request):
     if request.method == 'POST':
-        cliente = dadoscliente
-        banco = bancoatual.id
-        data = request.POST.get('data')
-        data = datetime.strptime(data, '%d/%m/%Y').strftime('%Y-%m-%d')
         id = request.POST.get('id')
         TransicaoCliente.objects.get(id=id).delete()
 
@@ -225,6 +235,11 @@ def delete(request):
 
 
 def save_data_rule(request):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     movimentacoes_to_create = []
     if request.method == 'POST':
         cliente = dadoscliente
@@ -279,6 +294,11 @@ def save_data_rule(request):
 
 
 def transf(request):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     saida_to_create = []
     entrada_to_create = []
     if request.method == 'POST':
@@ -330,6 +350,11 @@ def transf(request):
 
 
 def dre(request):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     cdcseleted = ''
     cdcseleted2 = ''
     anos = []
@@ -380,21 +405,41 @@ def dre(request):
 
 
 def dashboard(request):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     context = {'dadoscliente': dadoscliente}
     return render(request, 'dashboard.html', context)
 
 
 def orcamento(request):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     context = {'dadoscliente': dadoscliente}
     return render(request, 'orcamento.html', context)
 
 
 def cadastrarorcamento(request):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     context = {'dadoscliente': dadoscliente}
     return render(request, 'cadastrarorcamento.html', context)
 
 
 def contas(request):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     movimentacoes = MovimentacoesCliente.objects.filter(cliente=dadoscliente).order_by('id')
     paginator = Paginator(movimentacoes, 100)
     page_number = request.GET.get('page')
@@ -409,11 +454,21 @@ def contas(request):
 
 
 def maisopicoes(request):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     context = {'dadoscliente': dadoscliente}
     return render(request, 'maisopicoes.html', context)
 
 
 def banco(request):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     if request.method == 'POST':
         dados = request.POST.dict()
         banco = BancosCliente.objects.create(cliente=dadoscliente, banco=dados.get("banco"),
@@ -428,6 +483,11 @@ def banco(request):
 
 
 def bancosaldo(request, pk):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     banco = BancosCliente.objects.get(cliente=dadoscliente, id=pk)
     if request.method == 'POST':
         dados = request.POST.dict()
@@ -449,6 +509,11 @@ def bancosaldo(request, pk):
 
 
 def editarbanco(request, pk):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     bancoeditado = BancosCliente.objects.get(cliente=dadoscliente, id=pk)
     bancos = BancosCliente.objects.filter(cliente=dadoscliente)
     if request.method == 'POST':
@@ -462,6 +527,11 @@ def editarbanco(request, pk):
 
 
 def categoria(request):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     if request.method == 'POST':
         dados = request.POST.dict()
         categoriamae = CategoriaMae.objects.get(id=dados.get("categoriamae"))
@@ -485,6 +555,11 @@ def categoria(request):
 
 
 def editarcategoria(request, pk):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     categoriaeditada = Categoria.objects.get(cliente=dadoscliente, id=pk)
     if request.method == 'POST':
         dados = request.POST.dict()
@@ -500,6 +575,11 @@ def editarcategoria(request, pk):
 
 
 def subcategoria(request):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     if request.method == 'POST':
         dados = request.POST.dict()
         categoria = Categoria.objects.get(id=dados.get("categoria"), cliente=dadoscliente)
@@ -525,6 +605,11 @@ def subcategoria(request):
 
 
 def editarsubcategoria(request, pk):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     subcategoriaeditada = SubCategoria.objects.get(cliente=dadoscliente, id=pk)
     if request.method == 'POST':
         dados = request.POST.dict()
@@ -542,6 +627,11 @@ def editarsubcategoria(request, pk):
 
 
 def centrocusto(request):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     if request.method == 'POST':
         dados = request.POST.dict()
         nome = dados.get("nome")
@@ -560,6 +650,11 @@ def centrocusto(request):
 
 
 def editarcentrocusto(request, pk):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     centrocustoeditado = CentroDeCusto.objects.get(cliente=dadoscliente, id=pk)
     if request.method == 'POST':
         dados = request.POST.dict()
@@ -572,6 +667,11 @@ def editarcentrocusto(request, pk):
 
 
 def editarregra(request, pk):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     regraeditada = Regra.objects.get(cliente=dadoscliente, id=pk)
     if request.method == 'POST':
         dados = request.POST.dict()
@@ -593,6 +693,11 @@ def editarregra(request, pk):
 
 
 def regra(request):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     if request.method == 'POST':
         dados = request.POST.dict()
         
@@ -650,6 +755,11 @@ def get_movimentacao(request, id):
         return JsonResponse({'error': 'Movimentação não encontrada'}, status=404)
     
 def edit_movimentacao(request):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     if request.method == 'POST':
         id = request.POST.get('id')
         movimentacao = get_object_or_404(MovimentacoesCliente, id=id)
