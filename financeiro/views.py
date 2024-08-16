@@ -482,13 +482,13 @@ def banco(request):
     return render(request, 'banco.html', context)
 
 
-def bancosaldo(request, pk):
+def bancosaldo(request, id):
     pk = request.session.get('dadoscliente')
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
-    banco = BancosCliente.objects.get(cliente=dadoscliente, id=pk)
+    banco = BancosCliente.objects.get(cliente=dadoscliente, id=id)
     if request.method == 'POST':
         dados = request.POST.dict()
         data = dados.get('data')
@@ -508,13 +508,13 @@ def bancosaldo(request, pk):
     return render(request, 'bancosaldo.html', context)
 
 
-def editarbanco(request, pk):
+def editarbanco(request, id):
     pk = request.session.get('dadoscliente')
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
-    bancoeditado = BancosCliente.objects.get(cliente=dadoscliente, id=pk)
+    bancoeditado = BancosCliente.objects.get(cliente=dadoscliente, id=id)
     bancos = BancosCliente.objects.filter(cliente=dadoscliente)
     if request.method == 'POST':
         dados = request.POST.dict()
@@ -554,13 +554,13 @@ def categoria(request):
     return render(request, 'categoria.html', context)
 
 
-def editarcategoria(request, pk):
+def editarcategoria(request, id):
     pk = request.session.get('dadoscliente')
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
-    categoriaeditada = Categoria.objects.get(cliente=dadoscliente, id=pk)
+    categoriaeditada = Categoria.objects.get(cliente=dadoscliente, id=id)
     if request.method == 'POST':
         dados = request.POST.dict()
         Categoria.objects.filter(id=pk, cliente=dadoscliente).update(cliente=dadoscliente,
@@ -604,13 +604,13 @@ def subcategoria(request):
     return render(request, 'subcategoria.html', context)
 
 
-def editarsubcategoria(request, pk):
+def editarsubcategoria(request, id):
     pk = request.session.get('dadoscliente')
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
-    subcategoriaeditada = SubCategoria.objects.get(cliente=dadoscliente, id=pk)
+    subcategoriaeditada = SubCategoria.objects.get(cliente=dadoscliente, id=id)
     if request.method == 'POST':
         dados = request.POST.dict()
         SubCategoria.objects.filter(id=pk, cliente=dadoscliente).update(cliente=dadoscliente,
@@ -649,13 +649,13 @@ def centrocusto(request):
     return render(request, 'centrocusto.html', context)
 
 
-def editarcentrocusto(request, pk):
+def editarcentrocusto(request, id):
     pk = request.session.get('dadoscliente')
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
-    centrocustoeditado = CentroDeCusto.objects.get(cliente=dadoscliente, id=pk)
+    centrocustoeditado = CentroDeCusto.objects.get(cliente=dadoscliente, id=id)
     if request.method == 'POST':
         dados = request.POST.dict()
         CentroDeCusto.objects.filter(id=pk, cliente=dadoscliente).update(cliente=dadoscliente, nome=dados.get("nome"),
@@ -666,13 +666,13 @@ def editarcentrocusto(request, pk):
     return render(request, 'editarcentrocusto.html', context)
 
 
-def editarregra(request, pk):
+def editarregra(request, id):
     pk = request.session.get('dadoscliente')
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
-    regraeditada = Regra.objects.get(cliente=dadoscliente, id=pk)
+    regraeditada = Regra.objects.get(cliente=dadoscliente, id=id)
     if request.method == 'POST':
         dados = request.POST.dict()
         Regra.objects.filter(id=pk, cliente=dadoscliente).update(cliente=dadoscliente,
