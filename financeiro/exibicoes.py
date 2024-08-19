@@ -34,6 +34,7 @@ def extrato(cliente, banco, mes):
         tabela['mes'] = tabela['data'].dt.month
         tabela = tabela[tabela['mes'] == mes]
         tabela = tabela[['data', 'descricao', 'valor']].sort_values('data')
+        print(tabela)
 
         datastabela = tabela[['data']].drop_duplicates()['data']
 
@@ -77,7 +78,7 @@ def extrato(cliente, banco, mes):
 
         adicionar = {'data': datas, 'descricao': descricao, 'valor': valor}
         adicionar = pd.DataFrame(adicionar)
-        print(adicionar)
+
         tabela = pd.concat([tabela, adicionar], ignore_index=False)
         tabela['id'] = tabela.index
         tabela = tabela.sort_values(by=['data', 'id'], ascending=[True, False])
