@@ -136,11 +136,13 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
         db_url = r"postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
         engine = create_engine(db_url)
 
+        banco = int(banco)
+
         with engine.connect() as conexao:
             query_saldo = f"""
             SELECT * FROM financeiro_saldo 
             WHERE cliente_id = {cliente.id} 
-            AND banco_id = {int(banco)} 
+            AND banco_id = {banco} 
             AND data BETWEEN '{datainicial}' AND '{datafinal}'
             """
             tabela_saldo = pd.read_sql(query_saldo, conexao)
@@ -148,7 +150,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
             query_movimentacoes = f"""
             SELECT * FROM financeiro_movimentacoescliente 
             WHERE cliente_id = {cliente.id} 
-            AND banco_id = {int(banco)} 
+            AND banco_id = {banco} 
             AND data BETWEEN '{datainicial}' AND '{datafinal}'
             """
             tabela_movimentacoes = pd.read_sql(query_movimentacoes, conexao)
