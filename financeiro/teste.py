@@ -136,7 +136,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
         db_url = r"postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
         engine = create_engine(db_url)
 
-        banco = int(banco)
+        banco = int(banco.id)
 
         with engine.connect() as conexao:
             query_saldo = f"""
