@@ -54,8 +54,8 @@ def movimentacao(request, banco):
 
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     bancos = BancosCliente.objects.filter(ativo='True', cliente=dadoscliente)
-    global bancoatual
     bancoatual = BancosCliente.objects.get(ativo='True', cliente=dadoscliente, banco=banco)
+    request.session['bancoatual'] = bancoatual.id
     mesatual = datetime.now().month
     mesatual = mes(mesatual)
 
@@ -174,6 +174,13 @@ def save_data(request):
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+
+    bancoatual = request.session.get('bancoatual')
+    if not bancoatual:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    bancoatual = BancosCliente.objects.get(pk=bancoatual)
+
     movimentacoes_to_create = []
     if request.method == 'POST':
         cliente = dadoscliente  # Aqui, dadoscliente já é a instância correta de cadastro_de_cliente
@@ -240,6 +247,13 @@ def save_data_rule(request):
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+
+    bancoatual = request.session.get('bancoatual')
+    if not bancoatual:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    bancoatual = BancosCliente.objects.get(pk=bancoatual)
+
     movimentacoes_to_create = []
     if request.method == 'POST':
         cliente = dadoscliente
@@ -299,6 +313,13 @@ def transf(request):
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+
+    bancoatual = request.session.get('bancoatual')
+    if not bancoatual:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    bancoatual = BancosCliente.objects.get(pk=bancoatual)
+
     saida_to_create = []
     entrada_to_create = []
     if request.method == 'POST':
@@ -734,6 +755,7 @@ def regra(request):
                'centrodecustos': centrodecustos, 'regras': regras}
     return render(request, 'regra.html', context)
 
+
 def get_movimentacao(request, id):
     try:
         movimentacao = MovimentacoesCliente.objects.get(pk=id)
@@ -753,7 +775,8 @@ def get_movimentacao(request, id):
         return JsonResponse(data)
     except MovimentacoesCliente.DoesNotExist:
         return JsonResponse({'error': 'Movimentação não encontrada'}, status=404)
-    
+
+
 def edit_movimentacao(request):
     pk = request.session.get('dadoscliente')
     if not pk:
@@ -813,6 +836,7 @@ def edit_movimentacao(request):
         alteracaosaldo(banco=banco_id, cliente=dadoscliente, data=data)
     
     return JsonResponse({'success': False})
+
 
 def delete_movimentacao(request, id):
     if request.method == 'POST':
