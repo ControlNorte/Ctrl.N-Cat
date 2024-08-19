@@ -18,110 +18,105 @@ def formatar_valor(valor):
 
 
 def extrato(cliente, banco, mes):
-    try:
-        # Conectar ao banco de dados PostgreSQL
-        db_url = "postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
-        engine = create_engine(db_url)
+    # Conectar ao banco de dados PostgreSQL
+    db_url = "postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
+    engine = create_engine(db_url)
 
-        # Ler tabelas do banco de dados
-        with engine.connect() as conexao:
-            tabela = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
-            tabela0 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
+    # Ler tabelas do banco de dados
+    with engine.connect() as conexao:
+        tabela = pd.read_sql("SELECT * FROM financeiro_movimentacoescliente", conexao)
+        tabela0 = pd.read_sql("SELECT * FROM financeiro_saldo", conexao)
 
-        # Filtrar e preparar a tabela
-        tabela = tabela[(tabela['cliente_id'] == cliente.id) & (tabela['banco_id'] == banco)]
-        tabela['data'] = pd.to_datetime(tabela['data'], format='ISO8601')
-        tabela['mes'] = tabela['data'].dt.month
-        tabela = tabela[tabela['mes'] == mes]
-        tabela = tabela[['data', 'descricao', 'valor']].sort_values('data')
-        print(tabela)
+    # Filtrar e preparar a tabela
+    tabela = tabela[(tabela['cliente_id'] == cliente.id) & (tabela['banco_id'] == banco)]
+    tabela['data'] = pd.to_datetime(tabela['data'], format='ISO8601')
+    tabela['mes'] = tabela['data'].dt.month
+    tabela = tabela[tabela['mes'] == mes]
+    tabela = tabela[['data', 'descricao', 'valor']].sort_values('data')
 
-        datastabela = tabela[['data']].drop_duplicates()['data']
+    datastabela = tabela[['data']].drop_duplicates()['data']
 
-        if datastabela.empty:
-            return 'Selecione o mês para filtrar'
+    if datastabela.empty:
+        return 'Selecione o mês para filtrar'
 
-        # Preparar tabela0
-        tabela0['data'] = pd.to_datetime(tabela0['data'], format='ISO8601')
-        tabela0['mes'] = tabela0['data'].dt.month
-        tabela0['ano'] = tabela0['data'].dt.year
-        tabela0 = tabela0.sort_values('data')
+    # Preparar tabela0
+    tabela0['data'] = pd.to_datetime(tabela0['data'], format='ISO8601')
+    tabela0['mes'] = tabela0['data'].dt.month
+    tabela0['ano'] = tabela0['data'].dt.year
+    tabela0 = tabela0.sort_values('data')
 
-        ano = datastabela.iloc[0].year
-        if mes == 1:
-            mes = 12
-            ano -= 1
-        else:
-            mes -= 1
+    ano = datastabela.iloc[0].year
+    if mes == 1:
+        mes = 12
+        ano -= 1
+    else:
+        mes -= 1
 
-        saldoinicial = tabela0[(tabela0['ano'] == ano) & (tabela0['mes'] == mes) & (tabela0['banco_id'] == banco) &
-                               (tabela0['cliente_id'] == cliente.id)]
+    saldoinicial = tabela0[(tabela0['ano'] == ano) & (tabela0['mes'] == mes) & (tabela0['banco_id'] == banco) &
+                           (tabela0['cliente_id'] == cliente.id)]
 
-        if saldoinicial.empty:
-            datas = []
-            descricao = []
-            valor = []
-        else:
-            saldoinicialdata = saldoinicial['data'].iloc[-1]
-            saldoinicialvalor = saldoinicial['saldofinal'].iloc[-1]
-            datas = [saldoinicialdata]
-            descricao = ['SALDO INICIAL']
-            valor = [saldoinicialvalor]
+    if saldoinicial.empty:
+        datas = []
+        descricao = []
+        valor = []
+    else:
+        saldoinicialdata = saldoinicial['data'].iloc[-1]
+        saldoinicialvalor = saldoinicial['saldofinal'].iloc[-1]
+        datas = [saldoinicialdata]
+        descricao = ['SALDO INICIAL']
+        valor = [saldoinicialvalor]
 
-        for data in datastabela:
-            descricao.append('SALDO')
-            datas.append(data)
-            tabela0_filtered = tabela0[(tabela0['cliente_id'] == cliente.id) & (tabela0['banco_id'] == banco)]
-            tabela0_filtered = tabela0_filtered.sort_values('data').set_index('data')
-            saldofinal = tabela0_filtered.at[data, 'saldofinal']
-            valor.append(float(saldofinal))
+    for data in datastabela:
+        descricao.append('SALDO')
+        datas.append(data)
+        tabela0_filtered = tabela0[(tabela0['cliente_id'] == cliente.id) & (tabela0['banco_id'] == banco)]
+        tabela0_filtered = tabela0_filtered.sort_values('data').set_index('data')
+        saldofinal = tabela0_filtered.at[data, 'saldofinal']
+        valor.append(float(saldofinal))
 
-        adicionar = {'data': datas, 'descricao': descricao, 'valor': valor}
-        adicionar = pd.DataFrame(adicionar)
+    adicionar = {'data': datas, 'descricao': descricao, 'valor': valor}
+    adicionar = pd.DataFrame(adicionar)
 
-        tabela = pd.concat([tabela, adicionar], ignore_index=False)
-        tabela['id'] = tabela.index
-        tabela = tabela.sort_values(by=['data', 'id'], ascending=[True, False])
-        tabela['entradas'] = tabela.apply(
-            lambda row: row['valor'] if row['valor'] > 0 and 'SALDO' not in row['descricao'] else '', axis=1)
-        tabela['saídas'] = tabela.apply(
-            lambda row: row['valor'] if row['valor'] < 0 and 'SALDO' not in row['descricao'] else '', axis=1)
-        tabela['saldo'] = tabela.apply(
-            lambda row: row['valor'] if 'SALDO' in row['descricao'] else '', axis=1)
-        tabela = tabela[['data', 'descricao', 'entradas', 'saídas', 'saldo']]
+    tabela = pd.concat([tabela, adicionar], ignore_index=False)
+    tabela['id'] = tabela.index
+    tabela = tabela.sort_values(by=['data', 'id'], ascending=[True, False])
+    tabela['entradas'] = tabela.apply(
+        lambda row: row['valor'] if row['valor'] > 0 and 'SALDO' not in row['descricao'] else '', axis=1)
+    tabela['saídas'] = tabela.apply(
+        lambda row: row['valor'] if row['valor'] < 0 and 'SALDO' not in row['descricao'] else '', axis=1)
+    tabela['saldo'] = tabela.apply(
+        lambda row: row['valor'] if 'SALDO' in row['descricao'] else '', axis=1)
+    tabela = tabela[['data', 'descricao', 'entradas', 'saídas', 'saldo']]
 
-        if tabela.empty:
-            return 'Selecione o mês para filtrar'
+    if tabela.empty:
+        return 'Selecione o mês para filtrar'
 
-        template_html = """
-        <table>
-            <thead>
-                <tr>
-                    <th class="w-2/12">Data</th>
-                    <th class="w-7/12 text-left">Descrição</th>
-                    <th class="w-1/12">Entradas</th>
-                    <th class="w-1/12">Saídas</th>
-                    <th class="w-1/12">Saldo</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in tabela %}
-                <tr>
-                    <td class="w-2/12">{{ row['data'].strftime('%d/%m/%Y') }}</td>
-                    <td class="w-7/12 text-left">{{ row['descricao'] }}</td>
-                    <td class="w-1/12">{{ formatar_valor(row['entradas']) if row['entradas'] != '' else '' }}</td>
-                    <td class="w-1/12">{{ formatar_valor(row['saídas']) if row['saídas'] != '' else '' }}</td>
-                    <td class="w-1/12">{{ formatar_valor(row['saldo']) if row['saldo'] != '' else ''  }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        """
-        template = Template(template_html)
-        tabela_html = template.render(tabela=tabela.to_dict(orient='records'), formatar_valor=formatar_valor)
-
-    except Exception as e:
-        tabela_html = f'Impossível exibir extrato, tente cadastrar um saldo inicial anterior ao mês de visualização. Erro: {e}'
+    template_html = """
+    <table>
+        <thead>
+            <tr>
+                <th class="w-2/12">Data</th>
+                <th class="w-7/12 text-left">Descrição</th>
+                <th class="w-1/12">Entradas</th>
+                <th class="w-1/12">Saídas</th>
+                <th class="w-1/12">Saldo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in tabela %}
+            <tr>
+                <td class="w-2/12">{{ row['data'].strftime('%d/%m/%Y') }}</td>
+                <td class="w-7/12 text-left">{{ row['descricao'] }}</td>
+                <td class="w-1/12">{{ formatar_valor(row['entradas']) if row['entradas'] != '' else '' }}</td>
+                <td class="w-1/12">{{ formatar_valor(row['saídas']) if row['saídas'] != '' else '' }}</td>
+                <td class="w-1/12">{{ formatar_valor(row['saldo']) if row['saldo'] != '' else ''  }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    """
+    template = Template(template_html)
+    tabela_html = template.render(tabela=tabela.to_dict(orient='records'), formatar_valor=formatar_valor)
 
     return tabela_html
 
