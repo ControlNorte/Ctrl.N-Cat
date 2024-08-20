@@ -320,7 +320,12 @@ Financeiro | {{ dadoscliente }}
                                                         </div>
                                                         <div class="flex flex-nowrap pt-2">
                                                             <label class="p-2">Descrição:</label>
-                                                            <input type="text" name="descricao" class="text-gray-700 " value="{{ transicao.descricao }}">
+                                                            <input
+                                                                type="text"
+                                                                name="descricao"
+                                                                class="text-gray-700"
+                                                                value="{{ transicao.descricao }}"
+                                                                id="descricaoInput">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -596,6 +601,12 @@ Financeiro | {{ dadoscliente }}
             const form = button.closest('form');
             form.style.display = 'none';
         });
+    });
+
+    const descricaoInput = document.getElementById('descricaoInput');
+
+    descricaoInput.addEventListener('input', function() {
+        this.setAttribute('value', this.value);
     });
 </script>
 </main>
