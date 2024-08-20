@@ -86,6 +86,8 @@ class Saldo(models.Model):
     saldoinicial = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     saldofinal = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
+    class Meta:
+        unique_together = ('cliente', 'banco', 'data')  # Adiciona a restrição de unicidade
     def __str__(self):
         return f'{self.cliente}, {self.banco.banco}'
 
