@@ -267,7 +267,7 @@ def save_data_rule(request):
         centrocusto = request.POST.get('centrocusto')
         valor = request.POST.get('valor')
         valor = float(valor.replace('.', '').replace(',', '.'))
-        regras = Regra.objects.create(cliente=cadastro_de_cliente.objects.get(id=cliente), categoria=Categoria.objects.get(id=categoria, cliente=dadoscliente),
+        regras = Regra.objects.create(cliente=dadoscliente, categoria=Categoria.objects.get(id=categoria, cliente=dadoscliente),
                                       subcategoria=SubCategoria.objects.get(id=subcategoria, cliente=dadoscliente),
                                       centrodecusto=CentroDeCusto.objects.get(id=centrocusto, cliente=dadoscliente),
                                       descricao=descricao, ativo=True)
