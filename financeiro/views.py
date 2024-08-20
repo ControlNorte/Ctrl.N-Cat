@@ -298,8 +298,10 @@ def save_data_rule(request):
             ))
         
         MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
+
         for movimentacao in movimentacoes_to_create:
             alteracaosaldo(banco=banco, cliente=dadoscliente, data=str(movimentacao.data))
+
         TransicaoCliente.objects.get(id=id).delete()
 
         return JsonResponse({'success': True})
