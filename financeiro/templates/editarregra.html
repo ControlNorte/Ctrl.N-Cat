@@ -40,13 +40,15 @@ Financeiro | {{ dadoscliente }}
                         <div class="text-violet-800">
                             <div class="row g-3">
                             <div>
-                                <label class="p-2">Descrição:</label>
+                                <label>Descrição: </label>
                                 <input
                                     type="text"
+                                    id="descricao"
                                     name="descricao"
-                                    class="text-gray-700"
+                                    class="form-control"
+                                    placeholder="Descrição"
                                     value="{{ regraeditada.descricao }}"
-                                    id="descricaoInput">
+                                    required>
                                 <br>
                                 <label>Categoria: </label>
                                 <select name="categoria" class="form-control">
@@ -124,7 +126,7 @@ Financeiro | {{ dadoscliente }}
         </section>
 </main>
 <script>
-    const descricaoInput = document.getElementById('descricaoInput');
+    const descricaoInput = document.getElementById('descricao');
 
     descricaoInput.addEventListener('input', function() {
         this.setAttribute('value', this.value);
