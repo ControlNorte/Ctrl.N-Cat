@@ -334,7 +334,7 @@ def transf(request):
         valor = request.POST.get('valor')
         valor = float(valor.replace('.', '').replace(',', '.'))
         saida_to_create.append(MovimentacoesCliente(
-                        cliente=cadastro_de_cliente.objects.get(id=cliente),
+                        cliente=cliente,
                         banco=BancosCliente.objects.get(id=banco),
                         data=data,
                         descricao=descricao,
@@ -349,7 +349,7 @@ def transf(request):
             alteracaosaldo(banco=banco, cliente=cliente, data=movimentacao.data)
         valor = valor * -1.0
         entrada_to_create.append(MovimentacoesCliente(
-                        cliente=cadastro_de_cliente.objects.get(id=cliente),
+                        cliente=cliente,
                         banco=BancosCliente.objects.get(id=bancodestino),
                         data=data,
                         descricao=descricao,
