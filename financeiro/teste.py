@@ -68,7 +68,7 @@ def format_currency(value):
 
 def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     if not arquivo_upload:
-        return "Erro: Nenhum arquivo foi selecionado."  # Retorna erro se nenhum arquivo foi selecionado
+        return print("Erro: Nenhum arquivo foi selecionado.")  # Retorna erro se nenhum arquivo foi selecionado
 
     # Carregar e processar os dados do Excel
     dados = pd.read_excel(arquivo_upload, dtype={'Descrição': str, 'Data': str, 'Valor': float})
@@ -76,7 +76,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
     # Verificar se há valores NaT
     if dados['Data'].isna().any():
-        return "Erro: Algumas datas não puderam ser convertidas. Verifique o formato das datas no arquivo Excel."
+        return print("Erro: Algumas datas não puderam ser convertidas. Verifique o formato das datas no arquivo Excel.")
 
     dados_dict = dados.to_dict('records')
 
@@ -176,7 +176,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
                         saldo_atualizacao.saldofinal
                     ])
 
-    return f'Importação concluída. {conciliados} movimentações conciliadas.'  # Retorna uma mensagem de sucesso
+    return print(f'Importação concluída. {conciliados} movimentações conciliadas.')  # Retorna uma mensagem de sucesso
 
 
 class UploadFileForm(forms.ModelForm):
