@@ -2,12 +2,11 @@ from datetime import *
 import pandas as pd
 from django import forms, template
 from .models import UploadedFile
-from jinja2 import Template, Environment, FileSystemLoader
 from .models import *
-from django.middleware.csrf import get_token
+from django.db import connection
 from .alteracoesdb import *
 import ahocorasick
-import os
+
 
 register = template.Library()
 
@@ -68,11 +67,11 @@ def format_currency(value):
 
 def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     if not arquivo_upload:
-        return "Erro: Nenhum arquivo foi selecionado."
+        return "Erro: Nenhum arquivo foi selecionado."  # Retorna erro se nenhum arquivo foi selecionado
 
     # Carregar e processar os dados do Excel
     dados = pd.read_excel(arquivo_upload, dtype={'Descrição': str, 'Data': str, 'Valor': float})
-    dados['Data'] = pd.to_datetime(dados['Data'], errors='coerce')
+    dados['Data'] = pd.to_datetime(dados['Data'], errors='coerce')  # Converte as datas para o formato datetime
 
     # Verificar se há valores NaT
     if dados['Data'].isna().any():
@@ -84,18 +83,19 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     A = ahocorasick.Automaton()
     regras = Regra.objects.filter(cliente=cliente).select_related('categoria', 'subcategoria', 'centrodecusto')
     for idx, regra in enumerate(regras):
-        A.add_word(str(regra.descricao), (idx, regra))
-    A.make_automaton()
+        A.add_word(str(regra.descricao), (idx, regra))  # Adiciona as descrições das regras no autômato
+    A.make_automaton()  # Compila o autômato para otimizar a pesquisa
 
-    movimentacoes_to_create = []
-    transicoes_to_create = []
-    conciliados = 0
+    movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
+    transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
+    conciliados = 0  # Contador para o número de movimentações conciliadas
 
     # Processamento das transações
     for dado in dados_dict:
         descricao = dado['Descrição']
-        matched = False
+        matched = False  # Indicador de correspondência
 
+        # Itera pelas correspondências usando o autômato
         for _, (_, regra) in A.iter(descricao):
             movimentacoes_to_create.append(MovimentacoesCliente(
                 cliente=cliente,
@@ -108,11 +108,11 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
                 subcategoria=regra.subcategoria,
                 centrodecusto=regra.centrodecusto
             ))
-            matched = True
-            conciliados += 1
-            break
+            matched = True  # Marca como correspondido
+            conciliados += 1  # Incrementa o contador de movimentações conciliadas
+            break  # Sai do loop após a primeira correspondência
 
-        if not matched:
+        if not matched:  # Se nenhuma correspondência foi encontrada
             transicoes_to_create.append(TransicaoCliente(
                 cliente=cliente,
                 banco=banco,
@@ -121,65 +121,61 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
                 valor=dado['Valor']
             ))
 
-    # Inserção em batch das movimentações e transições
+    # Inserção em batch das movimentações no banco de dados
     if movimentacoes_to_create:
         MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
 
+    # Inserção em batch das transições no banco de dados
     if transicoes_to_create:
         TransicaoCliente.objects.bulk_create(transicoes_to_create)
 
     # Atualização do saldo baseado nas novas movimentações
     if movimentacoes_to_create:
-        datainicial = min(mov.data for mov in movimentacoes_to_create)
-        datafinal = max(mov.data for mov in movimentacoes_to_create)
+        datainicial = min(mov.data for mov in movimentacoes_to_create)  # Determina a menor data entre as movimentações
+        datafinal = max(mov.data for mov in movimentacoes_to_create)  # Determina a maior data entre as movimentações
 
-        db_url = r"postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
-        engine = create_engine(db_url)
+        # Preparando a lista de atualizações de saldo
+        saldo_atualizacoes = []
+        current_date = datainicial
 
-        banco = int(banco.id)
+        while current_date <= datafinal:
+            # Calcula o saldo inicial e final do dia
+            saldo_inicial = Saldo.objects.filter(cliente=cliente, banco=banco, data=current_date - timedelta(days=1)).first()
+            saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
 
-        with engine.connect() as conexao:
-            query_saldo = f"""
-            SELECT * FROM financeiro_saldo 
-            WHERE cliente_id = {cliente.id} 
-            AND banco_id = {banco} 
-            AND data BETWEEN '{datainicial}' AND '{datafinal}'
-            """
-            tabela_saldo = pd.read_sql(query_saldo, conexao)
+            saldo_movimentacoes = MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=current_date).aggregate(total_movimentacoes=pd.Sum('valor'))['total_movimentacoes'] or 0
+            saldo_final = saldo_inicial + saldo_movimentacoes
 
-            query_movimentacoes = f"""
-            SELECT * FROM financeiro_movimentacoescliente 
-            WHERE cliente_id = {cliente.id} 
-            AND banco_id = {banco} 
-            AND data BETWEEN '{datainicial}' AND '{datafinal}'
-            """
-            tabela_movimentacoes = pd.read_sql(query_movimentacoes, conexao)
+            saldo_atualizacoes.append(Saldo(
+                data=current_date,
+                banco=BancosCliente.objects.get(id=banco.id),
+                cliente=cliente,
+                saldoinicial=saldo_inicial,
+                saldofinal=saldo_final
+            ))
 
-            saldo_atualizacoes = []
-            current_date = datainicial
+            current_date += timedelta(days=1)  # Incrementa o dia
 
-            while current_date <= datafinal:
-                data_str = current_date.strftime('%Y-%m-%d')
-                data_anterior_str = (current_date - timedelta(days=1)).strftime('%Y-%m-%d')
+        # Usando conexão direta com o banco de dados para executar SQL bruto
+        if saldo_atualizacoes:
+            with connection.cursor() as cursor:
+                insert_query = """
+                    INSERT INTO financeiro_saldo (cliente_id, banco_id, data, saldoinicial, saldofinal)
+                    VALUES (%s, %s, %s, %s, %s)
+                    ON CONFLICT (cliente_id, banco_id, data)
+                    DO UPDATE SET saldoinicial = EXCLUDED.saldoinicial, saldofinal = EXCLUDED.saldofinal;
+                """
 
-                saldoinicial = tabela_saldo.loc[tabela_saldo['data'] == data_anterior_str, 'saldofinal'].sum() or 0
-                saldodia = tabela_movimentacoes.loc[tabela_movimentacoes['data'] == data_str, 'valor'].sum() or 0
-                saldofinal = saldoinicial + saldodia
+                for saldo_atualizacao in saldo_atualizacoes:
+                    cursor.execute(insert_query, [
+                        cliente.id,
+                        banco.id,
+                        saldo_atualizacao.data,
+                        saldo_atualizacao.saldoinicial,
+                        saldo_atualizacao.saldofinal
+                    ])
 
-                saldo_atualizacoes.append(Saldo(
-                    data=data_str,
-                    banco=BancosCliente.objects.get(id=banco),
-                    cliente=cliente,
-                    saldoinicial=float(saldoinicial),
-                    saldofinal=float(saldofinal)
-                ))
-
-                current_date += timedelta(days=1)
-
-            Saldo.objects.bulk_update(saldo_atualizacoes, ['saldoinicial', 'saldofinal'])
-
-    return f'Importação concluída. {conciliados} movimentações conciliadas.'
-
+    return f'Importação concluída. {conciliados} movimentações conciliadas.'  # Retorna uma mensagem de sucesso
 
 
 class UploadFileForm(forms.ModelForm):
