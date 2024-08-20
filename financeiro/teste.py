@@ -85,7 +85,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     A = ahocorasick.Automaton()
     regras = Regra.objects.filter(cliente=cliente).select_related('categoria', 'subcategoria', 'centrodecusto')
     for idx, regra in enumerate(regras):
-        A.add_word(str(regra.descricao), (idx, regra))  # Adiciona as descrições das regras no autômato
+        A.add_word(str(regra.descricao).upper(), (idx, regra))  # Adiciona as descrições das regras no autômato
     A.make_automaton()  # Compila o autômato para otimizar a pesquisa
 
     movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
@@ -94,7 +94,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
     # Processamento das transações
     for dado in dados_dict:
-        descricao = dado['Descrição']
+        descricao = dado['Descrição'].upper()
         matched = False  # Indicador de correspondência
 
         # Itera pelas correspondências usando o autômato
