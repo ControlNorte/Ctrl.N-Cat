@@ -256,7 +256,6 @@ def save_data_rule(request):
 
     movimentacoes_to_create = []
     if request.method == 'POST':
-        cliente = dadoscliente
         banco = bancoatual.id
         data = request.POST.get('data')
         data = datetime.strptime(data, '%d/%m/%Y').strftime('%Y-%m-%d')
@@ -299,7 +298,7 @@ def save_data_rule(request):
         
         MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
         for movimentacao in movimentacoes_to_create:
-            alteracaosaldo(banco=banco, cliente=cliente.id, data=str(movimentacao.data))
+            alteracaosaldo(banco=banco, cliente=dadoscliente, data=str(movimentacao.data))
         TransicaoCliente.objects.get(id=id).delete()
 
         return JsonResponse({'success': True})
