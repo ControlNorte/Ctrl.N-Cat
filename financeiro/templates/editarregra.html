@@ -4,6 +4,17 @@
 Financeiro | {{ dadoscliente }}
 {% endblock %}
 
+{% block head %}
+<script>
+    const descricaoInput = document.getElementById('descricaoInput');
+
+    descricaoInput.addEventListener('change', function() {
+        this.setAttribute('value', this.value);
+    });
+</script>
+{% endblock %}
+
+
 {% block content %}
 <main class="py-20 px-10">
 
@@ -125,11 +136,4 @@ Financeiro | {{ dadoscliente }}
             </div>
         </section>
 </main>
-<script>
-    const descricaoInput = document.getElementById('descricaoInput');
-
-    descricaoInput.addEventListener('change', function() {
-        this.setAttribute('value', this.value);
-    });
-</script>
 {% endblock %}
