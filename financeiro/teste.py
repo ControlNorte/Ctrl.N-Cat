@@ -143,7 +143,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
             saldo_inicial = Saldo.objects.filter(cliente=cliente, banco=banco, data=current_date - timedelta(days=1)).first()
             saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
 
-            saldo_movimentacoes = MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=current_date).aggregate(total_movimentacoes=pd.Sum('valor'))['total_movimentacoes'] or 0
+            saldo_movimentacoes = MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=current_date).aggregate(total_movimentacoes=pd.sum('valor'))['total_movimentacoes'] or 0
             saldo_final = saldo_inicial + saldo_movimentacoes
 
             saldo_atualizacoes.append(Saldo(
