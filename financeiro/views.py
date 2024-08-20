@@ -348,21 +348,23 @@ def transf(request):
         for movimentacao in saida_to_create:
             alteracaosaldo(banco=banco, cliente=cliente, data=movimentacao.data)
         valor = valor * -1.0
-        entrada_to_create.append(MovimentacoesCliente(
-                        cliente=cliente,
-                        banco=BancosCliente.objects.get(id=bancodestino),
-                        data=data,
-                        descricao=descricao,
-                        detalhe=detalhe,
-                        valor=valor,
-                        categoria=None,
-                        subcategoria=None,
-                        centrodecusto=None
-        ))
+        nova_transf = MovimentacoesCliente.objects.filter(data=data, cliente=cliente, banco=bancodestino, valor=valor)
+        if not nova_transf:
+            entrada_to_create.append(MovimentacoesCliente(
+                            cliente=cliente,
+                            banco=BancosCliente.objects.get(id=bancodestino),
+                            data=data,
+                            descricao=descricao,
+                            detalhe=detalhe,
+                            valor=valor,
+                            categoria=None,
+                            subcategoria=None,
+                            centrodecusto=None
+            ))
         bancoentrada = BancosCliente.objects.get(id=bancodestino, cliente=dadoscliente)
         MovimentacoesCliente.objects.bulk_create(entrada_to_create)
         for movimentacao in entrada_to_create:
-            alteracaosaldo(banco=bancoentrada.id, cliente=cliente, data=movimentacao.data)
+            alteracaosaldo(banco=bancodestino, cliente=cliente, data=movimentacao.data)
         TransicaoCliente.objects.get(id=id).delete()
 
         return JsonResponse({'success': True})

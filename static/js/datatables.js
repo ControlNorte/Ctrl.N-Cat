@@ -547,8 +547,8 @@ $jscomp.polyfillIsolated = function (l, y, A, q) {
           a.sInstance + "_" + location.pathname, JSON.stringify(b))
       } catch (c) { }
     }, fnStateSaveParams: null, iStateDuration: 7200, iDeferLoading: null, iDisplayLength: 10, iDisplayStart: 0, iTabIndex: 0, oClasses: {}, oLanguage: {
-      oAria: { sSortAscending: ": activate to sort column ascending", sSortDescending: ": activate to sort column descending" }, oPaginate: { sFirst: "First", sLast: "Last", sNext: ">>", sPrevious: "<<" }, sEmptyTable: "No data available in table", sInfo: "Exibindo _START_ até _END_ de _TOTAL_ Lançamentos", sInfoEmpty: "Exibindo 0 até 0 de 0 Lançamentos",
-      sInfoFiltered: "(filtrando de _MAX_ lançamentos", sInfoPostFix: "", sDecimal: "", sThousands: ",", sLengthMenu: "Exibindo _MENU_ Lançamentos", sLoadingRecords: "Loading...", sProcessing: "", sSearch: "Pesquisar:", sSearchPlaceholder: "", sUrl: "", sZeroRecords: "No matching records found"
+      oAria: { sSortAscending: ": activate to sort column ascending", sSortDescending: ": activate to sort column descending" }, oPaginate: { sFirst: "First", sLast: "Last", sNext: ">>", sPrevious: "<<" }, sEmptyTable: "No data available in table", sInfo: "", sInfoEmpty: "",
+      sInfoFiltered: "", sInfoPostFix: "", sDecimal: "", sThousands: ",", sLengthMenu: "Exibindo _MENU_ Lançamentos", sLoadingRecords: "Loading...", sProcessing: "", sSearch: "Pesquisar:", sSearchPlaceholder: "", sUrl: "", sZeroRecords: "No matching records found"
     }, oSearch: l.extend({}, u.models.oSearch), sAjaxDataProp: "data", sAjaxSource: null, sDom: "lfrtip", searchDelay: null, sPaginationType: "simple_numbers", sScrollX: "", sScrollXInner: "", sScrollY: "", sServerMethod: "GET", renderer: null, rowId: "DT_RowId"
   }; E(u.defaults);
   u.defaults.column = { aDataSort: null, iDataSort: -1, asSorting: ["asc", "desc"], bSearchable: !0, bSortable: !0, bVisible: !0, fnCreatedCell: null, mData: null, mRender: null, sCellType: "td", sClass: "", sContentPadding: "", sDefaultContent: null, sName: "", sSortDataType: "std", sTitle: null, sType: null, sWidth: null }; E(u.defaults.column); u.models.oSettings = {
