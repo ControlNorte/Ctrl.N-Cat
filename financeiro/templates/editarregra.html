@@ -6,10 +6,15 @@ Financeiro | {{ dadoscliente }}
 
 {% block head %}
 <script>
-    const descricaoInput = document.getElementById('descricaoInput');
+    const descricaoInput = document.getElementById('descricao');
 
-    descricaoInput.addEventListener('change', function() {
-        this.setAttribute('value', this.value);
+    // Restore value if it exists in localStorage
+    if (localStorage.getItem('descricao')) {
+        descricaoInput.value = localStorage.getItem('descricao');
+    }
+
+    descricaoInput.addEventListener('input', function() {
+        localStorage.setItem('descricao', this.value);
     });
 </script>
 {% endblock %}
@@ -54,7 +59,7 @@ Financeiro | {{ dadoscliente }}
                                 <label>Descrição: </label>
                                 <input
                                     type="text"
-                                    id="descricaoInput"
+                                    id="descricao"
                                     name="descricao"
                                     class="form-control"
                                     placeholder="Descrição"
