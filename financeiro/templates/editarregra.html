@@ -43,7 +43,7 @@ Financeiro | {{ dadoscliente }}
                                 <label>Descrição: </label>
                                 <input
                                     type="text"
-                                    id="descricao"
+                                    id="descricaoInput"
                                     name="descricao"
                                     class="form-control"
                                     placeholder="Descrição"
@@ -126,7 +126,7 @@ Financeiro | {{ dadoscliente }}
         </section>
 </main>
 <script>
-    const descricaoInput = document.getElementById('descricao');
+    const descricaoInput = document.getElementById('descricaoInput');
 
     descricaoInput.addEventListener('input', function() {
         this.setAttribute('value', this.value);
