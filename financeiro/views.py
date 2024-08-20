@@ -274,7 +274,7 @@ def save_data_rule(request):
         regras.save()
         try:
             movimentacoes_to_create.append(MovimentacoesCliente(
-                        cliente=cadastro_de_cliente.objects.get(id=cliente),
+                        cliente=dadoscliente,
                         banco=BancosCliente.objects.get(id=banco),
                         data=data,
                         descricao=descricao,
@@ -286,7 +286,7 @@ def save_data_rule(request):
             ))
         except:
             movimentacoes_to_create.append(MovimentacoesCliente(
-                            cliente=cadastro_de_cliente.objects.get(id=cliente),
+                            cliente=dadoscliente,
                             banco=BancosCliente.objects.get(id=banco),
                             data=data,
                             descricao=descricao,
