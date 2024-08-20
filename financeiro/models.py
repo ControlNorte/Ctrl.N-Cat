@@ -85,7 +85,6 @@ class Saldo(models.Model):
     data = models.DateField()
     saldoinicial = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     saldofinal = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    teste = models.CharField(null=True, blank=True)
 
     class Meta:
         constraints = [
