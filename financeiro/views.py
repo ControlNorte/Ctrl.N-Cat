@@ -258,6 +258,7 @@ def save_data_rule(request):
     if request.method == 'POST':
         banco = bancoatual.id
         data = request.POST.get('data')
+        id = request.POST.get('id')
         data = datetime.strptime(data, '%d/%m/%Y').strftime('%Y-%m-%d')
         descricao = request.POST.get('descricao')
         categoria = request.POST.get('categoria')
