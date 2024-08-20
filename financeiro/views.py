@@ -700,7 +700,7 @@ def editarregra(request, id):
     regraeditada = Regra.objects.get(cliente=dadoscliente, id=id)
     if request.method == 'POST':
         dados = request.POST.dict()
-        Regra.objects.filter(id=pk, cliente=dadoscliente).update(cliente=dadoscliente,
+        Regra.objects.filter(id=id, cliente=dadoscliente).update(cliente=dadoscliente,
                                            categoria=Categoria.objects.get(nome=dados.get("categoria"), cliente=dadoscliente),
                                            subcategoria=SubCategoria.objects.get(nome=dados.get("subcategoria"), cliente=dadoscliente),
                                            centrodecusto=CentroDeCusto.objects.get(nome=dados.get("centrodecusto"), cliente=dadoscliente),
