@@ -72,6 +72,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
     # Carregar e processar os dados do Excel
     dados = pd.read_excel(arquivo_upload, dtype={'Descrição': str, 'Data': str, 'Valor': float})
+    print(dados)
     dados['Data'] = pd.to_datetime(dados['Data'], errors='coerce')  # Converte as datas para o formato datetime
 
     # Verificar se há valores NaT
