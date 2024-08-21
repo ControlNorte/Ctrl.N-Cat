@@ -798,8 +798,8 @@ def pivot_regras_por_categoria_subcategoria(regras_queryset):
         index=['categoria__nome', 'subcategoria__nome'],
         aggfunc=list,
         values=['descricao', 'centrodecusto__nome', 'ativo']
-    )
-
+    ).to_dict()
+    print(df_pivot)
     return df_pivot
 
     
