@@ -16,6 +16,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
+from collections import defaultdict
 
 # Create your views here.
 
@@ -698,22 +699,38 @@ def editarregra(request, id):
 
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     regraeditada = Regra.objects.get(cliente=dadoscliente, id=id)
+
     if request.method == 'POST':
         dados = request.POST.dict()
-        Regra.objects.filter(id=id, cliente=dadoscliente).update(cliente=dadoscliente,
-                                           categoria=Categoria.objects.get(nome=dados.get("categoria"), cliente=dadoscliente),
-                                           subcategoria=SubCategoria.objects.get(nome=dados.get("subcategoria"), cliente=dadoscliente),
-                                           centrodecusto=CentroDeCusto.objects.get(nome=dados.get("centrodecusto"), cliente=dadoscliente),
-                                           descricao=dados.get("descricao"), ativo=dados.get("ativo"))
+        Regra.objects.filter(id=id, cliente=dadoscliente).update(
+            cliente=dadoscliente,
+            categoria=Categoria.objects.get(nome=dados.get("categoria"), cliente=dadoscliente),
+            subcategoria=SubCategoria.objects.get(nome=dados.get("subcategoria"), cliente=dadoscliente),
+            centrodecusto=CentroDeCusto.objects.get(nome=dados.get("centrodecusto"), cliente=dadoscliente),
+            descricao=dados.get("descricao"),
+            ativo=dados.get("ativo")
+        )
+
+    # Obtém todas as regras do cliente
+    regras = Regra.objects.filter(cliente=dadoscliente)
+
+    # Cria o dicionário aninhado
+    regras_organizadas = defaultdict(lambda: defaultdict(list))
+    for regra in regras:
+        regras_organizadas[regra.categoria.nome][regra.subcategoria.nome].append(regra)
 
     categorias = Categoria.objects.filter(cliente=dadoscliente)
     subcategorias = SubCategoria.objects.filter(cliente=dadoscliente)
     centrodecustos = CentroDeCusto.objects.filter(cliente=dadoscliente)
-    regras = Regra.objects.filter(cliente=dadoscliente)
 
-    regras = Regra.objects.filter(cliente=dadoscliente)
-    context = {'dadoscliente': dadoscliente, 'regras': regras, 'regraeditada': regraeditada, 'categorias': categorias, 
-               'subcategorias': subcategorias,'centrodecustos': centrodecustos}
+    context = {
+        'dadoscliente': dadoscliente,
+        'regras': regras_organizadas,  # Passa o dicionário aninhado ao template
+        'regraeditada': regraeditada,
+        'categorias': categorias,
+        'subcategorias': subcategorias,
+        'centrodecustos': centrodecustos
+    }
     return render(request, 'editarregra.html', context)
 
 
