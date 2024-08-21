@@ -780,6 +780,7 @@ def drecomp(mes1, ano1, mes2, ano2, cliente, centrocusto=None):
     # Retornar o código HTML resultante
     return tabela_final_html
 
+
 def pivot_regras_por_categoria_subcategoria(regras_queryset):
     """
     Converte um queryset de regras em um DataFrame pandas,
@@ -795,9 +796,9 @@ def pivot_regras_por_categoria_subcategoria(regras_queryset):
 
     # Realiza o pivot para reorganizar as regras por categoria e subcategoria
     df_pivot = df.pivot_table(
-        index=['categoria__nome', 'subcategoria__nome'],
+        index=['categoria__nome', 'subcategoria__nome', 'centrodecusto__nome'],
         aggfunc=list,
-        values=['descricao', 'centrodecusto__nome', 'ativo']
+        values=['descricao']
     ).to_dict()
     print(df_pivot)
     return df_pivot
