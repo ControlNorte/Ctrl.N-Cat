@@ -723,7 +723,8 @@ def editarregra(request, id):
         'regraeditada': regraeditada,
         'categorias': categorias,
         'subcategorias': subcategorias,
-        'centrodecustos': centrodecustos
+        'centrodecustos': centrodecustos,
+        'regras': regras
     }
     return render(request, 'editarregra.html', context)
 
