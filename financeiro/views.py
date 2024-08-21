@@ -223,8 +223,54 @@ def save_data(request):
             ))
 
         MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
-        for movimentacao in movimentacoes_to_create:
-            alteracaosaldo(banco=banco, cliente=cliente, data=str(movimentacao.data))  # Passando cliente.id
+        if movimentacoes_to_create:
+            datainicial = min(
+                mov.data for mov in movimentacoes_to_create)  # Determina a menor data entre as movimentações
+            datafinal = max(
+                mov.data for mov in movimentacoes_to_create)  # Determina a maior data entre as movimentações
+
+            # Preparando a lista de atualizações de saldo
+            saldo_atualizacoes = []
+
+            while datainicial <= datafinal:
+                # Calcula o saldo inicial e final do dia
+                saldo_inicial = Saldo.objects.filter(cliente=cliente, banco=banco,
+                                                     data=datainicial - timedelta(days=1)).first()
+                saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
+
+                saldo_movimentacoes = \
+                MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=datainicial).aggregate(
+                    total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
+                saldo_final = saldo_inicial + saldo_movimentacoes
+
+                saldo_atualizacoes.append(Saldo(
+                    data=datainicial,
+                    banco=BancosCliente.objects.get(id=banco.id),
+                    cliente=cliente,
+                    saldoinicial=saldo_inicial,
+                    saldofinal=saldo_final
+                ))
+
+                datainicial += timedelta(days=1)  # Incrementa o dia
+
+            # Usando conexão direta com o banco de dados para executar SQL bruto
+            if saldo_atualizacoes:
+                with connection.cursor() as cursor:
+                    insert_query = """
+                        INSERT INTO financeiro_saldo (cliente_id, banco_id, data, saldoinicial, saldofinal)
+                        VALUES (%s, %s, %s, %s, %s)
+                        ON CONFLICT (cliente_id, banco_id, data)
+                        DO UPDATE SET saldoinicial = EXCLUDED.saldoinicial, saldofinal = EXCLUDED.saldofinal;
+                    """
+
+                    for saldo_atualizacao in saldo_atualizacoes:
+                        cursor.execute(insert_query, [
+                            cliente.id,
+                            banco.id,
+                            saldo_atualizacao.data,
+                            saldo_atualizacao.saldoinicial,
+                            saldo_atualizacao.saldofinal
+                        ])
         TransicaoCliente.objects.get(id=id).delete()
 
         return JsonResponse({'success': True})
