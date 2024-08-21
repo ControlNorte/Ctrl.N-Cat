@@ -123,23 +123,26 @@ Financeiro | {{ dadoscliente }}
                     <tbody>
                         {% for categoria, subcategorias in regras.items %}
                             <tr>
-                                <td rowspan="{{ subcategorias|length * subcategorias.values|sum('|length') }}" class="border px-5 py-2">{{ categoria }}</td>
-                                <td colspan="5"></td> <!-- Colspan para preencher as outras colunas -->
-                            </tr>
-                            {% for subcategoria, regras_list in subcategorias.items %}
-                                <tr>
+                                <td rowspan="{{ rowspans.categoria }}" class="border px-5 py-2">{{ categoria }}</td>
+                                {% for subcategoria, regras_list in subcategorias.items %}
+                                    {% if not forloop.first %}
+                                        <tr>
+                                    {% endif %}
                                     <td rowspan="{{ regras_list|length }}" class="border px-5 py-2">{{ subcategoria }}</td>
                                     {% for regra in regras_list %}
-                                    {% if not forloop.first %}<tr>{% endif %}
+                                        {% if not forloop.first %}
+                                            <tr>
+                                        {% endif %}
                                         <td class="border px-5 py-2">{{ regra.descricao }}</td>
                                         <td class="border px-5 py-2">{{ regra.centrodecusto.nome }}</td>
                                         <td class="border px-5 py-2">{{ regra.ativo|yesno:"Sim,Não" }}</td>
                                         <td class="border px-5 py-2">
                                             <a href="{% url 'financeiro:editarregra' regra.id %}" class="text-blue-500 hover:text-blue-700">Editar</a>
                                         </td>
-                                    </tr>
+                                        </tr>
                                     {% endfor %}
                                 {% endfor %}
+                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>

@@ -695,7 +695,7 @@ def editarcentrocusto(request, id):
 def editarregra(request, id):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('alguma_view_de_erro')
 
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     regraeditada = Regra.objects.get(cliente=dadoscliente, id=id)
@@ -714,26 +714,31 @@ def editarregra(request, id):
     # Obtém todas as regras do cliente
     regras = Regra.objects.filter(cliente=dadoscliente)
 
-    # Cria o dicionário aninhado
+    # Cria o dicionário aninhado e calcula os rowspans
     regras_organizadas = defaultdict(lambda: defaultdict(list))
+    rowspans = {}
     for regra in regras:
         regras_organizadas[regra.categoria.nome][regra.subcategoria.nome].append(regra)
+
+    for categoria, subcats in regras_organizadas.items():
+        total_regras = sum(len(regras_list) for regras_list in subcats.values())
+        rowspans[categoria] = total_regras
 
     categorias = Categoria.objects.filter(cliente=dadoscliente)
     subcategorias = SubCategoria.objects.filter(cliente=dadoscliente)
     centrodecustos = CentroDeCusto.objects.filter(cliente=dadoscliente)
 
-    print(regras_organizadas)
-
     context = {
         'dadoscliente': dadoscliente,
-        'regras': regras_organizadas,  # Passa o dicionário aninhado ao template
+        'regras': regras_organizadas,
+        'rowspans': rowspans,  # Adiciona os rowspans ao contexto
         'regraeditada': regraeditada,
         'categorias': categorias,
         'subcategorias': subcategorias,
         'centrodecustos': centrodecustos
     }
     return render(request, 'editarregra.html', context)
+
 
 def regra(request):
     pk = request.session.get('dadoscliente')
