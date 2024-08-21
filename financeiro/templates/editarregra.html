@@ -122,49 +122,30 @@ Financeiro | {{ dadoscliente }}
                     </thead>
                     <tbody>
                         {% for categoria, subcategorias in regras.items %}
-                            <tr>
-                                <td rowspan="{{ rowspans.categoria }}" class="border px-5 py-2">{{ categoria }}</td>
-                                {% for subcategoria, regras_list in subcategorias.items %}
+                            {% for subcategoria, regras_list in subcategorias.items %}
+                                {% for regra in regras_list %}
                                     {% if forloop.first %}
-                                        <td rowspan="{{ regras_list|length }}" class="border px-5 py-2">{{ subcategoria }}</td>
-                                        <td class="border px-5 py-2">{{ regras_list.0.descricao }}</td>
-                                        <td class="border px-5 py-2">{{ regras_list.0.centrodecusto.nome }}</td>
-                                        <td class="border px-5 py-2">{{ regras_list.0.ativo|yesno:"Sim,Não" }}</td>
-                                        <td class="border px-5 py-2">
-                                            <a href="{% url 'financeiro:editarregra' regras_list.0.id %}" class="text-blue-500 hover:text-blue-700">Editar</a>
-                                        </td>
-                                    </tr>
-                                    {% for regra in regras_list|slice:"1:" %}
-                                    <tr>
-                                        <td class="border px-5 py-2">{{ regra.descricao }}</td>
-                                        <td class="border px-5 py-2">{{ regra.centrodecusto.nome }}</td>
-                                        <td class="border px-5 py-2">{{ regra.ativo|yesno:"Sim,Não" }}</td>
-                                        <td class="border px-5 py-2">
-                                            <a href="{% url 'financeiro:editarregra' regra.id %}" class="text-blue-500 hover:text-blue-700">Editar</a>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
+                                        <tr>
+                                            <td rowspan="{{ subcategorias|length }}" class="border px-5 py-2">{{ categoria }}</td>
+                                            <td rowspan="{{ regras_list|length }}" class="border px-5 py-2">{{ subcategoria }}</td>
+                                            <td class="border px-5 py-2">{{ regra.descricao }}</td>
+                                            <td class="border px-5 py-2">{{ regra.centrodecusto.nome }}</td>
+                                            <td class="border px-5 py-2">{{ regra.ativo|yesno:"Sim,Não" }}</td>
+                                            <td class="border px-5 py-2">
+                                                <a href="{% url 'financeiro:editarregra' regra.id %}" class="text-blue-500 hover:text-blue-700">Editar</a>
+                                            </td>
+                                        </tr>
                                     {% else %}
-                                    <tr>
-                                        <td rowspan="{{ regras_list|length }}" class="border px-5 py-2">{{ subcategoria }}</td>
-                                        <td class="border px-5 py-2">{{ regras_list.0.descricao }}</td>
-                                        <td class="border px-5 py-2">{{ regras_list.0.centrodecusto.nome }}</td>
-                                        <td class="border px-5 py-2">{{ regras_list.0.ativo|yesno:"Sim,Não" }}</td>
-                                        <td class="border px-5 py-2">
-                                            <a href="{% url 'financeiro:editarregra' regras_list.0.id %}" class="text-blue-500 hover:text-blue-700">Editar</a>
-                                        </td>
-                                    </tr>
-                                    {% for regra in regras_list|slice:"1:" %}
-                                    <tr>
-                                        <td class="border px-5 py-2">{{ regra.descricao }}</td>
-                                        <td class="border px-5 py-2">{{ regra.centrodecusto.nome }}</td>
-                                        <td class="border px-5 py-2">{{ regra.ativo|yesno:"Sim,Não" }}</td>
-                                        <td class="border px-5 py-2">
-                                            <a href="{% url 'financeiro:editarregra' regra.id %}" class="text-blue-500 hover:text-blue-700">Editar</a>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                {% endif %}
+                                        <tr>
+                                            <td class="border px-5 py-2">{{ regra.descricao }}</td>
+                                            <td class="border px-5 py-2">{{ regra.centrodecusto.nome }}</td>
+                                            <td class="border px-5 py-2">{{ regra.ativo|yesno:"Sim,Não" }}</td>
+                                            <td class="border px-5 py-2">
+                                                <a href="{% url 'financeiro:editarregra' regra.id %}" class="text-blue-500 hover:text-blue-700">Editar</a>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
                             {% endfor %}
                         {% endfor %}
                     </tbody>
