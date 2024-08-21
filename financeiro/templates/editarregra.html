@@ -109,36 +109,39 @@ Financeiro | {{ dadoscliente }}
 
                 <hr>
 
-                <table class="min-w-full border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100 text-left">
-                            <th class="py-2 px-4">Descrição</th>
-                            <th class="py-2 px-4">Categoria</th>
-                            <th class="py-2 px-4">Sub-Categoria</th>
-                            <th class="py-2 px-4">Centro de Custo</th>
-                            <th class="py-2 px-4">Ativo</th>
-                            <th class="py-2 px-4">Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for regra in regras %}
-                        <tr class="border-b">
-                            <td class="py-2 px-4">{{ regra.descricao }}</td>
-                            <td class="py-2 px-4">{{ regra.categoria }}</td>
-                            <td class="py-2 px-4">{{ regra.subcategoria }}</td>
-                            <td class="py-2 px-4">{{ regra.centrodecusto }}</td>
-                            <td class="py-2 px-4">{% if regra.ativo %} Sim {% else %} Não {% endif %}</td>
-                            <td class="py-2 px-4">
-                                <a href="{% url 'financeiro:editarregra' regra.pk %}" class="text-violet-700 hover:text-black">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
-                                        <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
-                                    </svg>
-                                </a>
-                            </td>
-                        </tr>
+                <div class="container mx-auto">
+                {% for categoria, subcategorias in regras.items %}
+                <div class="py-2">
+                    <div class="text-2xl text-violet-900">{{ categoria }}</div>
+                    <div class="ml-4">
+                        {% for subcategoria, regras in subcategorias.items %}
+                            <div class="py-1">
+                                <div class="text-xl text-violet-700">{{ subcategoria }}</div>
+                                <div class="ml-4">
+                                    {% for regra in regras %}
+                                        <div class="flex flex-nowrap justify-between border-b py-2">
+                                            <div class="flex flex-col">
+                                                <div class="text-lg text-gray-900">Descrição: {{ regra.descricao }}</div>
+                                                <div class="text-lg text-gray-700">Centro de Custo: {{ regra.centrodecusto }}</div>
+                                                <div class="text-lg text-gray-700">Ativo: {% if regra.ativo %} Sim {% else %} Não {% endif %}</div>
+                                            </div>
+                                            <div class="content-center">
+                                                <a href="{% url 'financeiro:editarregra' regra.pk %}" class="text-violet-700 hover:text-black">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                                        <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         {% endfor %}
-                    </tbody>
-                </table>
+                    </div>
+
+                </div>
+            {% endfor %}
+            </div>
 
             </div>
         </section>
