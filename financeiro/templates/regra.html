@@ -96,10 +96,10 @@ Financeiro | {{ dadoscliente }}
                             {% for regra in regras %}
                             <tr>
                                 {% if forloop.first %}
-                                <td rowspan="{{ subcategorias|length }}">{{ categoria }}</td>
+                                <td>{{ categoria }}</td>
                                 {% endif %}
                                 {% if forloop.first %}
-                                <td rowspan="{{ regras|length }}">{{ subcategoria }}</td>
+                                <td>{{ subcategoria }}</td>
                                 {% endif %}
                                 <td>{{ regra.descricao }}</td>
                                 <td>{{ regra.centrodecusto }}</td>

@@ -797,7 +797,6 @@ def pivot_regras_por_categoria_subcategoria(regras_queryset):
     # Realiza o pivot para reorganizar as regras por categoria e subcategoria
     df_pivot = df.pivot_table(
         index=['categoria__nome', 'subcategoria__nome', 'centrodecusto__nome'],
-        aggfunc=list,
         values=['descricao']
     ).to_dict()
     print(df_pivot)
