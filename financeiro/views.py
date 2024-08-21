@@ -233,6 +233,7 @@ def save_data(request):
             saldo_atualizacoes = []
 
             while datainicial <= datafinal:
+                datainicial = datetime.strptime(datainicial, "%Y-%m-%d")
                 # Calcula o saldo inicial e final do dia
                 saldo_inicial = Saldo.objects.filter(cliente=cliente, banco=banco,
                                                      data=datainicial - timedelta(days=1)).first()
