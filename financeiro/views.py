@@ -267,8 +267,8 @@ def save_data(request):
 
                     for saldo_atualizacao in saldo_atualizacoes:
                         cursor.execute(insert_query, [
-                            saldo_atualizacao.cliente,
-                            saldo_atualizacao.banco,
+                            cliente.id,
+                            banco,
                             saldo_atualizacao.data,
                             saldo_atualizacao.saldoinicial,
                             saldo_atualizacao.saldofinal
