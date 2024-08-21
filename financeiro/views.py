@@ -246,7 +246,7 @@ def save_data(request):
 
                 saldo_atualizacoes.append(Saldo(
                     data=datainicial,
-                    banco=BancosCliente.objects.get(id=banco.id),
+                    banco=BancosCliente.objects.get(id=banco),
                     cliente=cliente,
                     saldoinicial=saldo_inicial,
                     saldofinal=saldo_final
@@ -266,8 +266,8 @@ def save_data(request):
 
                     for saldo_atualizacao in saldo_atualizacoes:
                         cursor.execute(insert_query, [
-                            cliente.id,
-                            banco.id,
+                            saldo_atualizacao.cliente,
+                            saldo_atualizacao.banco,
                             saldo_atualizacao.data,
                             saldo_atualizacao.saldoinicial,
                             saldo_atualizacao.saldofinal
