@@ -714,24 +714,12 @@ def editarregra(request, id):
     # Obtém todas as regras do cliente
     regras = Regra.objects.filter(cliente=dadoscliente)
 
-    # Cria o dicionário aninhado e calcula os rowspans
-    regras_organizadas = defaultdict(lambda: defaultdict(list))
-    rowspans = {}
-    for regra in regras:
-        regras_organizadas[regra.categoria.nome][regra.subcategoria.nome].append(regra)
-
-    for categoria, subcats in regras_organizadas.items():
-        total_regras = sum(len(regras_list) for regras_list in subcats.values())
-        rowspans[categoria] = total_regras
-
     categorias = Categoria.objects.filter(cliente=dadoscliente)
     subcategorias = SubCategoria.objects.filter(cliente=dadoscliente)
     centrodecustos = CentroDeCusto.objects.filter(cliente=dadoscliente)
 
     context = {
         'dadoscliente': dadoscliente,
-        'regras': regras_organizadas,
-        'rowspans': rowspans,  # Adiciona os rowspans ao contexto
         'regraeditada': regraeditada,
         'categorias': categorias,
         'subcategorias': subcategorias,
