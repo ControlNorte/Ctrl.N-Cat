@@ -71,7 +71,6 @@ def extrato(cliente, banco, mes):
         datas.append(data)
         tabela0_filtered = tabela0[(tabela0['cliente_id'] == cliente.id) & (tabela0['banco_id'] == banco)]
         tabela0_filtered = tabela0_filtered.sort_values('data').set_index('data')
-        print(tabela0_filtered)
         saldofinal = tabela0_filtered.at[str(data.date()), 'saldofinal']
         valor.append(float(saldofinal))
 
