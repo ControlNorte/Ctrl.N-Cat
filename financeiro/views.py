@@ -767,10 +767,17 @@ def regra(request):
             )
             regras.save()
 
+    regras_queryset = Regra.objects.filter(cliente=dadoscliente).values(
+        'categoria__nome', 'subcategoria__nome', 'descricao', 'centrodecusto__nome', 'ativo'
+    )
+
+    # Chama a função para pivotar os dados
+    regras = pivot_regras_por_categoria_subcategoria(regras_queryset)
+
+
     categorias = Categoria.objects.filter(cliente=dadoscliente)
     subcategorias = SubCategoria.objects.filter(cliente=dadoscliente)
     centrodecustos = CentroDeCusto.objects.filter(cliente=dadoscliente)
-    regras = Regra.objects.filter(cliente=dadoscliente)
 
     context = {'dadoscliente': dadoscliente, 'categorias': categorias, 'subcategorias': subcategorias,
                'centrodecustos': centrodecustos, 'regras': regras}
