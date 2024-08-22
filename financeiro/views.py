@@ -62,7 +62,6 @@ def movimentacao(request, banco):
     mesatual = mes(mesatual)
 
     exbextrato = 'Não tem movimentações registradas nesse mês!'
-    transicoes = ''
     grafico = ''
     erroentrada = ''
     errosaida = ''
@@ -90,17 +89,14 @@ def movimentacao(request, banco):
                     datanova = dados.get('data')
 
                 movimentacoes = MovimentacoesCliente.objects.create(cliente=dadoscliente,
-                                                                    banco=BancosCliente.objects.get(id=bancoatual.id, cliente=dadoscliente),
+                                                                    banco=BancosCliente.objects.get(id=bancoatual.id),
                                                                     data=datanova,
                                                                     descricao=dados.get('descricao'),
                                                                     detalhe=dados.get('detalhe'),
                                                                     valor=valor,
-                                                                    categoria=Categoria.objects.get(
-                                                                        id=dados.get("categoria"), cliente=dadoscliente),
-                                                                    subcategoria=SubCategoria.objects.get
-                                                                    (id=dados.get("subcategoria"), cliente=dadoscliente),
-                                                                    centrodecusto=CentroDeCusto.objects.get
-                                                                    (id=dados.get("centrocusto"), cliente=dadoscliente))
+                                                                    categoria=Categoria.objects.get(id=dados.get("categoria")),
+                                                                    subcategoria=SubCategoria.objects.get(id=dados.get("subcategoria")),
+                                                                    centrodecusto=CentroDeCusto.objects.get(id=dados.get("centrocusto")))
                 movimentacoes.save()
                 alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente, data=datanova)
             else:
@@ -159,7 +155,6 @@ def movimentacao(request, banco):
     centrodecustos = CentroDeCusto.objects.filter(cliente=dadoscliente)
     transicoes = TransicaoCliente.objects.filter(cliente=dadoscliente, banco=bancoatual)
     bancodestinos = BancosCliente.objects.filter(cliente=dadoscliente, ativo=True)
-
 
     context = {'dadoscliente': dadoscliente, 'banco': bancoatual, 'categorias': categorias,
                'subcategorias': subcategorias, 'centrodecustos': centrodecustos, 'bancos': bancos, 'mesatual': mesatual,
