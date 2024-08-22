@@ -133,31 +133,32 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     # Atualização do saldo baseado nas novas movimentações
     if movimentacoes_to_create:
         datainicial = min(mov.data for mov in movimentacoes_to_create)  # Determina a menor data entre as movimentações
-        datafinal = MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco).order_by('-data').first()  # Determina a maior data entre as movimentações
-        datafinal = datafinal.data if datafinal else 0
+        datafinal = MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco).order_by('-data').first()
+        datafinal = str(datafinal.data) if datafinal else str(datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=31))  # Determina a maior data entre as movimentações
 
         # Preparando a lista de atualizações de saldo
         saldo_atualizacoes = []
-        current_date = datainicial
 
-        while current_date <= datafinal:
+        while datainicial <= datafinal:
             # Calcula o saldo inicial e final do dia
-            saldo_inicial = Saldo.objects.filter(cliente=cliente, banco=banco, data=current_date - timedelta(days=1)).first()
+            saldo_inicial = Saldo.objects.filter(cliente=cliente, banco=banco,
+                                                 data=datetime.strptime(datainicial, "%Y-%m-%d") - timedelta(days=1)).first()
             saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
 
-
-            saldo_movimentacoes = MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=current_date).aggregate(total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
+            saldo_movimentacoes = \
+                MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=datainicial).aggregate(
+                    total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
             saldo_final = saldo_inicial + saldo_movimentacoes
 
             saldo_atualizacoes.append(Saldo(
-                data=current_date,
+                data=datainicial,
                 banco=BancosCliente.objects.get(id=banco.id),
                 cliente=cliente,
                 saldoinicial=saldo_inicial,
                 saldofinal=saldo_final
             ))
 
-            current_date += timedelta(days=1)  # Incrementa o dia
+            datainicial = str(datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=1))  # Incrementa o dia
 
         # Usando conexão direta com o banco de dados para executar SQL bruto
         if saldo_atualizacoes:
