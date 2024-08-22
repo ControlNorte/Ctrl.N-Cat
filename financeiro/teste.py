@@ -148,7 +148,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
             saldo_movimentacoes = \
                 MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=datainicial).aggregate(
                     total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
-            print(saldo_movimentacoes)
+
             saldo_final = saldo_inicial + saldo_movimentacoes
 
             saldo_atualizacoes.append(Saldo(
