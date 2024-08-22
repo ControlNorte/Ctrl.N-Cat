@@ -152,6 +152,8 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
             saldo_final = saldo_inicial + saldo_movimentacoes
 
+            print(f'SF: {saldo_final}, SI: {saldo_inicial}, Data: {datainicial}')
+
 
             saldo_atualizacoes.append(Saldo(
                 data=str(datainicial),
