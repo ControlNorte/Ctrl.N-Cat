@@ -1,6 +1,6 @@
 import pandas as pd
 import sqlite3
-from .models import Saldo, BancosCliente
+from .models import Saldo, BancosCliente, MovimentacoesCliente
 import numpy as np
 from datetime import datetime, timedelta
 from sqlalchemy import create_engine, Column, Integer, Date, Float, ForeignKey
@@ -16,7 +16,10 @@ import logging
 def saldodiario(banco, cliente, data):
     datainicial = datetime.strptime(data, '%Y-%m-%d').date()
     datainicialord = datainicial.toordinal() + 1
-    datafinal = datainicialord + 31
+
+    datafinal = MovimentacoesCliente.objects.filter(cliente=cliente.id, banco=banco).order_by('-data').first()
+    datafinal = datafinal.data if datafinal else datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=31)
+    datafinal = datafinal.toordinal()
 
     for data_ord in range(datainicialord, datafinal):
         # Configurar a string de conexão com o SQLAlchemy
