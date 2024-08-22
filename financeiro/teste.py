@@ -163,8 +163,6 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
             #     saldofinal=saldo_final
             # ))
 
-            datainicial += timedelta(days=1) # Incrementa o dia
-
         # # Usando conexão direta com o banco de dados para executar SQL bruto
         # if saldo_atualizacoes:
             with connection.cursor() as cursor:
@@ -183,6 +181,8 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
                     saldo_inicial,
                     saldo_final
                 ])
+
+            datainicial += timedelta(days=1)  # Incrementa o dia
 
     return print(f'Importação concluída. {conciliados} movimentações conciliadas.')  # Retorna uma mensagem de sucesso
 
