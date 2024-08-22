@@ -134,6 +134,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     if movimentacoes_to_create:
         datainicial = min(mov.data for mov in movimentacoes_to_create)  # Determina a menor data entre as movimentações
         datafinal = MovimentacoesCliente.objects.get(cliente=cliente, banco=banco).order_by('-data').first()  # Determina a maior data entre as movimentações
+        print(datafinal)
         datafinal = datafinal.data
 
         # Preparando a lista de atualizações de saldo
