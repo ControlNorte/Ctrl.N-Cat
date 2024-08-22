@@ -230,9 +230,9 @@ def save_data(request):
 
             while datainicial <= datafinal:
                 # Calcula o saldo inicial e final do dia
-                data_ant = datetime.strptime(datainicial, "%Y-%m-%d").date() - timedelta(days=1)
+
                 saldo_inicial = Saldo.objects.filter(cliente=cliente, banco=banco,
-                                                     data=data_ant).first()
+                                                     data=datetime.strptime(datainicial, "%Y-%m-%d %H:%M:%S").date() - timedelta(days=1)).first()
                 saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
 
                 saldo_movimentacoes = \
