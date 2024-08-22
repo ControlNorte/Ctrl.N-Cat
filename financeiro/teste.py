@@ -137,7 +137,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
         datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=31)  # Determina a maior data entre as movimentações
 
         # Preparando a lista de atualizações de saldo
-        saldo_atualizacoes = []
+        # saldo_atualizacoes = []
 
         while datainicial <= datafinal:
             # Calcula o saldo inicial e final do dia
@@ -155,18 +155,18 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
             print(f'SF: {saldo_final}, SI: {saldo_inicial}, Data: {datainicial}')
 
 
-            saldo_atualizacoes.append(Saldo(
-                data=str(datainicial),
-                banco=BancosCliente.objects.get(id=banco.id),
-                cliente=cliente,
-                saldoinicial=saldo_inicial,
-                saldofinal=saldo_final
-            ))
+            # saldo_atualizacoes.append(Saldo(
+            #     data=str(datainicial),
+            #     banco=BancosCliente.objects.get(id=banco.id),
+            #     cliente=cliente,
+            #     saldoinicial=saldo_inicial,
+            #     saldofinal=saldo_final
+            # ))
 
             datainicial += timedelta(days=1) # Incrementa o dia
 
-        # Usando conexão direta com o banco de dados para executar SQL bruto
-        if saldo_atualizacoes:
+        # # Usando conexão direta com o banco de dados para executar SQL bruto
+        # if saldo_atualizacoes:
             with connection.cursor() as cursor:
                 insert_query = """
                     INSERT INTO financeiro_saldo (cliente_id, banco_id, data, saldoinicial, saldofinal)
@@ -175,14 +175,14 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
                     DO UPDATE SET saldoinicial = EXCLUDED.saldoinicial, saldofinal = EXCLUDED.saldofinal;
                 """
 
-                for saldo_atualizacao in saldo_atualizacoes:
-                    cursor.execute(insert_query, [
-                        cliente.id,
-                        banco.id,
-                        saldo_atualizacao.data,
-                        saldo_atualizacao.saldoinicial,
-                        saldo_atualizacao.saldofinal
-                    ])
+                # for saldo_atualizacao in saldo_atualizacoes:
+                cursor.execute(insert_query, [
+                    cliente.id,
+                    banco.id,
+                    datainicial,
+                    saldo_inicial,
+                    saldo_final
+                ])
 
     return print(f'Importação concluída. {conciliados} movimentações conciliadas.')  # Retorna uma mensagem de sucesso
 
