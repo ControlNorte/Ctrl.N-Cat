@@ -141,6 +141,8 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
         while datainicial <= datafinal:
             # Calcula o saldo inicial e final do dia
+            data_ant = datainicial - timedelta(days=1)
+            print(data_ant)
             saldo_inicial = Saldo.objects.filter(cliente=cliente, banco=banco,
                                                  data=datainicial - timedelta(days=1)).first()
             saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
