@@ -247,7 +247,7 @@ def save_data(request):
                     saldofinal=saldo_final
                 ))
 
-                datainicial = str(datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=1))  # Incrementa o dia
+                datainicial = datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=1)  # Incrementa o dia
 
             # Usando conexão direta com o banco de dados para executar SQL bruto
             if saldo_atualizacoes:
