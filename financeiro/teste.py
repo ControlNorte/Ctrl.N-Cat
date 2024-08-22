@@ -152,10 +152,9 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
             saldo_final = saldo_inicial + saldo_movimentacoes
 
-            print(cliente.id, type(cliente.id), banco.id, type(banco.id), datainicial, type(datainicial), saldo_inicial, type(saldo_inicial), saldo_final, type(saldo_final))
 
             saldo_atualizacoes.append(Saldo(
-                data=datainicial,
+                data=str(datainicial),
                 banco=BancosCliente.objects.get(id=banco.id),
                 cliente=cliente,
                 saldoinicial=saldo_inicial,

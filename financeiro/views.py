@@ -238,8 +238,7 @@ def save_data(request):
                 MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=datainicial).aggregate(
                     total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
                 saldo_final = saldo_inicial + saldo_movimentacoes
-                print(cliente.id, type(cliente.id), banco, type(banco), datainicial, type(datainicial),
-                      saldo_inicial, type(saldo_inicial), saldo_final, type(saldo_final))
+
                 saldo_atualizacoes.append(Saldo(
                     data=datainicial,
                     banco=BancosCliente.objects.get(id=banco),
