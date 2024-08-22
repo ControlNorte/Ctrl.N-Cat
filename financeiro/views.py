@@ -20,6 +20,7 @@ from collections import defaultdict
 
 # Create your views here.
 
+
 @login_required
 def financeiro_view(request):
     clientes = cadastro_de_cliente.objects.filter(ativo=True)
