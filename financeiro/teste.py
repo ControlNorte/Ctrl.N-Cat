@@ -173,7 +173,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
                 """
 
                 for saldo_atualizacao in saldo_atualizacoes:
-                    print(saldo_atualizacao)
+                    print(saldo_atualizacao.cliente, saldo_atualizacao.banco, saldo_atualizacao.data, saldo_atualizacao.saldoinicial, saldo_atualizacao.saldofinal)
                     cursor.execute(insert_query, [
                         cliente.id,
                         banco.id,
