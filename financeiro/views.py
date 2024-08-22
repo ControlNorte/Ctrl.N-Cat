@@ -223,7 +223,7 @@ def save_data(request):
             datainicial = min(
                 mov.data for mov in movimentacoes_to_create)  # Determina a menor data entre as movimentações
             datafinal = MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco).order_by('-data').first()
-            datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=31) # Determina a maior data entre as movimentações
+            datafinal = str(datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=31)) # Determina a maior data entre as movimentações
 
             # Preparando a lista de atualizações de saldo
             saldo_atualizacoes = []
@@ -247,7 +247,7 @@ def save_data(request):
                     saldofinal=saldo_final
                 ))
 
-                datainicial = datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=1)  # Incrementa o dia
+                datainicial = str(datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=1))  # Incrementa o dia
 
             # Usando conexão direta com o banco de dados para executar SQL bruto
             if saldo_atualizacoes:
