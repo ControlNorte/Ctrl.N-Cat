@@ -85,8 +85,10 @@ def movimentacao(request, banco):
             if valor >= 0:
                 try:
                     datanova = datetime.strptime(dados.get('data'), '%d/%m/%Y').strftime('%Y-%m-%d')
+                    print('passou pelo try')
                 except:
                     datanova = dados.get('data')
+                    print('passou pelo except')
 
                 movimentacoes = MovimentacoesCliente.objects.create(cliente=dadoscliente,
                                                                     banco=BancosCliente.objects.get(id=bancoatual.id),
@@ -98,7 +100,7 @@ def movimentacao(request, banco):
                                                                     subcategoria=SubCategoria.objects.get(id=dados.get("subcategoria")),
                                                                     centrodecusto=CentroDeCusto.objects.get(id=dados.get("centrocusto")))
                 movimentacoes.save()
-                alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente, data=datanova)
+                alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente.id, data=datanova)
             else:
                 erroentrada = 'Valor de Entrada Tem que ser maior que 0'
 

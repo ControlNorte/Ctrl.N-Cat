@@ -1,5 +1,8 @@
 import pandas as pd
 import sqlite3
+
+from django.db.models import Sum
+
 from .models import Saldo, BancosCliente, MovimentacoesCliente
 import numpy as np
 from datetime import datetime, timedelta
@@ -8,7 +11,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import dask.dataframe as dd
 from datetime import datetime, timedelta
-from django.db import transaction
+from django.db import transaction, connection
 import psycopg2
 import logging
 
@@ -60,79 +63,43 @@ def saldodiario(banco, cliente, data):
         )
 
 
-logger = logging.getLogger(__name__)
+def alteracaosaldo(banco, cliente, data):
+    datainicial = data  # Determina a menor data entre as movimentações
+    datafinal = MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco).order_by('-data').first()
+    datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial,"%Y-%m-%d") + timedelta(days=31)  # Determina a maior data entre as movimentações
 
-def alteracaosaldo(banco, cliente, data, dias=0):
-    try:
-        logger.info(f"Iniciando alteracaosaldo para banco {banco}, cliente {cliente.id}, data {data}")
+    while datainicial <= datafinal:
+        # Calcula o saldo inicial e final do dia
+        saldo_inicial = Saldo.objects.get(cliente=cliente, banco=banco,
+                                          data=datainicial - timedelta(days=1))
 
-        # Conversão inicial da data
-        datainicial = datetime.strptime(data, '%Y-%m-%d').date()
-        datafinal = datainicial + timedelta(days=31 + dias)
+        saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
 
-        db_url = r"postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
-        engine = create_engine(db_url)
+        saldo_movimentacoes = \
+            MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=datainicial).aggregate(
+                total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
 
-        with engine.connect() as conexao:
-            # Filtrar as tabelas diretamente na consulta SQL
-            query_saldo = f"""
-            SELECT * FROM financeiro_saldo 
-            WHERE cliente_id = {cliente.id} 
-            AND banco_id = {int(banco)} 
-            AND data BETWEEN '{datainicial}' AND '{datafinal}'
-            """
-            logger.info(f"Executando query de saldo: {query_saldo}")
-            tabela_saldo = pd.read_sql(query_saldo, conexao)
+        saldo_final = saldo_inicial + saldo_movimentacoes
 
-            query_movimentacoes = f"""
-            SELECT * FROM financeiro_movimentacoescliente 
-            WHERE cliente_id = {cliente.id} 
-            AND banco_id = {int(banco)} 
-            AND data BETWEEN '{datainicial}' AND '{datafinal}'
-            """
-            logger.info(f"Executando query de movimentações: {query_movimentacoes}")
-            tabela_movimentacoes = pd.read_sql(query_movimentacoes, conexao)
+        print(f'SI: {saldo_inicial}, SF: {saldo_final}, data: {datainicial}')
 
-            current_date = datainicial
-            while current_date <= datafinal:
-                data_str = current_date.strftime('%Y-%m-%d')
-                data_anterior_str = (current_date - timedelta(days=1)).strftime('%Y-%m-%d')
+        with connection.cursor() as cursor:
+            insert_query = """
+                        INSERT INTO financeiro_saldo (cliente_id, banco_id, data, saldoinicial, saldofinal)
+                        VALUES (%s, %s, %s, %s, %s)
+                        ON CONFLICT (cliente_id, banco_id, data)
+                        DO UPDATE SET saldoinicial = EXCLUDED.saldoinicial, saldofinal = EXCLUDED.saldofinal;
+                    """
 
-                # Cálculo do saldo inicial
-                saldoinicial = tabela_saldo[
-                    (tabela_saldo['cliente_id'] == cliente.id) &
-                    (tabela_saldo['banco_id'] == int(banco)) &
-                    (tabela_saldo['data'] == data_anterior_str)
-                    ]
-                saldoinicial = saldoinicial['saldofinal'].sum() if not saldoinicial.empty else 0
+            cursor.execute(insert_query, [
+                cliente,
+                banco,
+                datainicial,
+                saldo_inicial,
+                saldo_final
+            ])
 
-                # Cálculo do saldo diário
-                saldodia = tabela_movimentacoes[
-                    (tabela_movimentacoes['cliente_id'] == cliente.id) &
-                    (tabela_movimentacoes['banco_id'] == int(banco)) &
-                    (tabela_movimentacoes['data'] == data_str)
-                    ]
-                saldodia = saldodia['valor'].sum() if not saldodia.empty else 0
+        datainicial += timedelta(days=1)  # Incrementa o dia
 
-                saldofinal = saldoinicial + saldodia
+    return print(f'deu certo :)')
 
-                # Log do saldo calculado
-                logger.info(f"Data: {data_str}, Saldo Inicial: {saldoinicial}, Saldo do Dia: {saldodia}, Saldo Final: {saldofinal}")
-
-                # Atualização do banco de dados Django
-                with transaction.atomic():
-                    saldo, criado = Saldo.objects.update_or_create(
-                        data=data_str,
-                        banco=BancosCliente.objects.get(id=banco),
-                        cliente=cliente,
-                        defaults={'saldoinicial': float(saldoinicial), 'saldofinal': float(saldofinal)},
-                    )
-                    logger.info(f"Saldo {'criado' if criado else 'atualizado'} no banco de dados para data {data_str}")
-
-                current_date += timedelta(days=1)
-
-        logger.info(f"Finalização de alteracaosaldo para banco {banco}, cliente {cliente.id}, data {data}")
-
-    except Exception as e:
-        logger.error(f"Erro ao executar alteracaosaldo para banco {banco}, cliente {cliente.id}, data {data}: {e}")
-        raise
