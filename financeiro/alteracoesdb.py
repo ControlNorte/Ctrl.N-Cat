@@ -83,6 +83,7 @@ def alteracaosaldo(banco, cliente, data):
         saldo_final = saldo_inicial + saldo_movimentacoes
 
         print(f'SI: {saldo_inicial}, SF: {saldo_final}, data: {datainicial}')
+
         print(type(datainicial))
 
         with connection.cursor() as cursor:
