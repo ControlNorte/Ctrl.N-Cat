@@ -95,7 +95,7 @@ def alteracaosaldo(banco, cliente, data):
             cursor.execute(insert_query, [
                 cliente,
                 banco,
-                datainicial,
+                str(datainicial),
                 saldo_inicial,
                 saldo_final
             ])
