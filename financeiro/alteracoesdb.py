@@ -21,7 +21,8 @@ def saldodiario(banco, cliente, data):
     datainicialord = datainicial.toordinal() + 1
 
     datafinal = MovimentacoesCliente.objects.filter(cliente=cliente.id, banco=banco).order_by('-data').first()
-    datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=31)
+    datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=31
+                                                                                                                             )
     datafinal = datafinal.toordinal()
 
     for data_ord in range(datainicialord, datafinal):
