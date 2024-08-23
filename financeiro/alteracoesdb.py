@@ -71,8 +71,8 @@ def alteracaosaldo(banco, cliente, data):
 
     while datainicial <= datafinal:
         # Calcula o saldo inicial e final do dia
-        saldo_inicial = Saldo.objects.get(cliente=cliente, banco=banco,
-                                          data=datainicial - timedelta(days=1))
+        saldo_inicial = Saldo.objects.filter(cliente=cliente, banco=banco,
+                                          data=datainicial - timedelta(days=1)).first()
 
         saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
 
