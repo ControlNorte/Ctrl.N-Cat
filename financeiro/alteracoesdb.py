@@ -64,9 +64,9 @@ def saldodiario(banco, cliente, data):
 
 
 def alteracaosaldo(banco, cliente, data):
-    datainicial = data  # Determina a menor data entre as movimentações
+    datainicial = datetime.strptime(data, "%Y-%m-%d")  # Determina a menor data entre as movimentações
     datafinal = MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco).order_by('-data').first()
-    datafinal = str(datafinal.data + timedelta(days=31)) if datafinal else str(datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=31))  # Determina a maior data entre as movimentações
+    datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial,"%Y-%m-%d") + timedelta(days=31)  # Determina a maior data entre as movimentações
 
     while datainicial <= datafinal:
         # Calcula o saldo inicial e final do dia
