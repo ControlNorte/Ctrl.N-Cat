@@ -149,6 +149,8 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
             saldo_final = saldo_inicial + saldo_movimentacoes
 
+            print(f'SI: {saldo_inicial}, SF: {saldo_final}, data: {datainicial}')
+
             with connection.cursor() as cursor:
                 insert_query = """
                     INSERT INTO financeiro_saldo (cliente_id, banco_id, data, saldoinicial, saldofinal)
