@@ -30,6 +30,7 @@ def extrato(cliente, banco, mes):
     # Filtrar e preparar a tabela
     tabela = tabela[(tabela['cliente_id'] == cliente.id) & (tabela['banco_id'] == banco)]
     tabela['data'] = pd.to_datetime(tabela['data'], format='ISO8601')
+    tabela['data'] = tabela['data'].dt.date
     tabela['mes'] = tabela['data'].dt.month
     tabela = tabela[tabela['mes'] == mes]
     tabela = tabela[['data', 'descricao', 'valor']].sort_values('data')
@@ -41,6 +42,7 @@ def extrato(cliente, banco, mes):
 
     # Preparar tabela0
     tabela0['data'] = pd.to_datetime(tabela0['data'], format='ISO8601')
+    tabela0['data'] = tabela0['data'].dt.date
     tabela0['mes'] = tabela0['data'].dt.month
     tabela0['ano'] = tabela0['data'].dt.year
     tabela0 = tabela0.sort_values('data')
