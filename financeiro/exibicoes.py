@@ -73,7 +73,7 @@ def extrato(cliente, banco, mes):
         datas.append(data)
         tabela0_filtered = tabela0[(tabela0['cliente_id'] == cliente.id) & (tabela0['banco_id'] == banco)]
         tabela0_filtered = tabela0_filtered.sort_values('data').set_index('data')
-        saldofinal = tabela0_filtered.at[str(data.date()), 'saldofinal']
+        saldofinal = tabela0_filtered.at[str(data), 'saldofinal']
         valor.append(float(saldofinal))
 
     adicionar = {'data': datas, 'descricao': descricao, 'valor': valor}
@@ -180,7 +180,7 @@ def gerar_grafico(cliente, banco, mes):
             datas.append(data)
             tabela0_filtered = tabela0[(tabela0['cliente_id'] == cliente.id) & (tabela0['banco_id'] == banco)]
             tabela0_filtered = tabela0_filtered.sort_values('data').set_index('data')
-            saldofinal = tabela0_filtered.at[str(data.date()), 'saldofinal']
+            saldofinal = tabela0_filtered.at[str(data), 'saldofinal']
             valor.append(float(saldofinal))
 
         # Criar tabela com saldo e transações
