@@ -102,7 +102,6 @@ def movimentacao(request, banco):
                 valor = float(dados.get('valor'))
             else:
                 valor = float(dados.get('valor')) * - 1.0
-            data = dados.get('data')
             movimentacoes = MovimentacoesCliente.objects.create(cliente=dadoscliente,
                                                                 banco=BancosCliente.objects.get(id=bancoatual.id, cliente=dadoscliente),
                                                                 data=dados.get('data'),
@@ -116,10 +115,9 @@ def movimentacao(request, banco):
                                                                 centrodecusto=CentroDeCusto.objects.get
                                                                 (id=dados.get("centrocusto"), cliente=dadoscliente))
             movimentacoes.save()
-            alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente, data=data)
+            alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente.id, data=dados.get('data'))
 
         elif dados.get('tipo') == 'transf':
-            data = dados.get('data')
             valor = float(dados.get('valor')) * -1.0
             saida = MovimentacoesCliente.objects.create(cliente=dadoscliente,
                                                         banco=BancosCliente.objects.get(id=bancoatual.id, cliente=dadoscliente),
@@ -131,7 +129,7 @@ def movimentacao(request, banco):
                                                         subcategoria=None,
                                                         centrodecusto=None)
             saida.save()
-            alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente, data=data)
+            alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente.id, data=dados.get('data'))
             entrada = MovimentacoesCliente.objects.create(cliente=dadoscliente,
                                                           banco=BancosCliente.objects.get(id=dados.get('bancoentrada'), cliente=dadoscliente),
                                                           data=dados.get('data'),
@@ -143,7 +141,7 @@ def movimentacao(request, banco):
                                                           centrodecusto=None)
             entrada.save()
             bancoentrada = BancosCliente.objects.get(id=dados.get('bancoentrada'), cliente=dadoscliente)
-            alteracaosaldo(banco=bancoentrada.id, cliente=dadoscliente, data=data)
+            alteracaosaldo(banco=bancoentrada.id, cliente=dadoscliente.id, data=dados.get('data'))
 
     categorias = Categoria.objects.filter(cliente=dadoscliente)
     subcategorias = SubCategoria.objects.filter(cliente=dadoscliente)
