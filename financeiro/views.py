@@ -217,7 +217,7 @@ def save_data(request):
                 mov.data for mov in movimentacoes_to_create)  # Determina a menor data entre as movimentações
             datafinal = MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco).order_by('-data').first()
             datafinal = str(datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=31)) # Determina a maior data entre as movimentações
-
+            print(datafinal)
             # Preparando a lista de atualizações de saldo
             saldo_atualizacoes = []
 
