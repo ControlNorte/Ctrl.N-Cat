@@ -340,7 +340,7 @@ def save_data_rule(request):
         MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
 
         for movimentacao in movimentacoes_to_create:
-            alteracaosaldo(banco=banco, cliente=dadoscliente, data=str(movimentacao.data))
+            alteracaosaldo(banco=banco, cliente=dadoscliente.id, data=str(movimentacao.data))
 
         TransicaoCliente.objects.get(id=id).delete()
 
@@ -388,7 +388,7 @@ def transf(request):
         ))
         MovimentacoesCliente.objects.bulk_create(saida_to_create)
         for movimentacao in saida_to_create:
-            alteracaosaldo(banco=banco, cliente=cliente, data=movimentacao.data)
+            alteracaosaldo(banco=banco, cliente=dadoscliente.id, data=movimentacao.data)
         valor = valor * -1.0
         nova_transf = MovimentacoesCliente.objects.filter(data=data, cliente=cliente, banco=bancodestino, valor=valor)
         if not nova_transf:
@@ -406,7 +406,7 @@ def transf(request):
         bancoentrada = BancosCliente.objects.get(id=bancodestino, cliente=dadoscliente)
         MovimentacoesCliente.objects.bulk_create(entrada_to_create)
         for movimentacao in entrada_to_create:
-            alteracaosaldo(banco=bancodestino, cliente=cliente, data=movimentacao.data)
+            alteracaosaldo(banco=bancodestino, cliente=dadoscliente.id, data=movimentacao.data)
         TransicaoCliente.objects.get(id=id).delete()
 
         return JsonResponse({'success': True})
@@ -888,7 +888,7 @@ def edit_movimentacao(request):
             data=str(data_ant)
 
         movimentacao.save()
-        alteracaosaldo(banco=banco_id, cliente=dadoscliente, data=data)
+        alteracaosaldo(banco=banco_id, cliente=dadoscliente.id, data=data)
     
     return JsonResponse({'success': False})
 
