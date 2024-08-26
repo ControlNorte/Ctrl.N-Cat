@@ -167,6 +167,47 @@ Financeiro | {{ dadoscliente }}
         </div>
         <hr>
         <br>
+        <form>
+            {% csrf_token %}
+            <div class="flex flex-nowrap- justify -between">
+                <div>
+                    <label>Id</label>
+                    <input>
+                </div>
+                <div>
+                    <label>Data</label>
+                    <input>
+                </div>
+                <div>
+                    <label>Descrição</label>
+                    <input>
+                </div>
+                <div>
+                    <label>Detalhe</label>
+                    <input>
+                </div>
+                <div>
+                    <label>Banco</label>
+                    <input>
+                </div>
+                <div>
+                    <label>Centro de Custo</label>
+                    <input>
+                </div>
+                <div>
+                    <label>Categoria</label>
+                    <input>
+                </div>
+                <div>
+                    <label>Sub-Categoria</label>
+                    <input>
+                </div>
+                <div>
+                    <label>Valor</label>
+                    <input>
+                </div>
+            </div>
+        </form>
         <div id="main">
             <table id="movimentacoesTable">
                 <thead>
