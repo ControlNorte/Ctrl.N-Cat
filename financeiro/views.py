@@ -894,6 +894,11 @@ def edit_movimentacao(request):
 
 
 def delete_movimentacao(request, id):
+    pk = request.session.get('dadoscliente')
+    if not pk:
+        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+
+    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     if request.method == 'POST':
         try:
             movimentacao = MovimentacoesCliente.objects.get(pk=id)
@@ -901,7 +906,7 @@ def delete_movimentacao(request, id):
             cliente = movimentacao.cliente
             banco = movimentacao.banco
             movimentacao.delete()
-            alteracaosaldo(banco=banco.id, cliente=cliente, data=str(data))
+            alteracaosaldo(banco=banco.id, cliente=dadoscliente.id, data=str(data))
             return JsonResponse({'success': True})
         except MovimentacoesCliente.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Movimentação não encontrada'}, status=404)
