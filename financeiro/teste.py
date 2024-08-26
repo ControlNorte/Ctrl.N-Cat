@@ -80,6 +80,12 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
     dados_dict = dados.to_dict('records')
 
+    for dado in dados_dict:
+        movi = list(
+            MovimentacoesCliente.objects.filter(data=dado['Data'], descricao=dado['Descrição'], valor=dado['Valor']))
+        if len(movi) > 0:
+            del dados_dict[dado]
+
     # Criar o autômato Aho-Corasick
     A = ahocorasick.Automaton()
     regras = Regra.objects.filter(cliente=cliente).select_related('categoria', 'subcategoria', 'centrodecusto')
