@@ -73,8 +73,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     # Carregar e processar os dados do Excel
     dados = pd.read_excel(arquivo_upload, dtype={'Descrição': str, 'Data': str, 'Valor': float})
     dados['Data'] = pd.to_datetime(dados['Data'], errors='coerce')  # Converte as datas para o formato datetime
-    dados['Data'] = pd.to_datetime(dados['Data']).strftime('%Y-%m-%d')
-
+    dados['Data'] = dados['Data'].dt.strftime('%Y-%m-%d')
     print(len(dados))
 
     # Itera sobre cada linha do DataFrame
