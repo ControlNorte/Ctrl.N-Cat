@@ -80,7 +80,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
     # Filtrar as entradas existentes no banco de dados
     existentes = MovimentacoesCliente.objects.filter(query)
-
+    print(existentes)
     # Transformar os objetos retornados em um DataFrame
     existentes_df = pd.DataFrame(list(existentes.values('descricao', 'data', 'valor')))
 
