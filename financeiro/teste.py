@@ -78,7 +78,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     conditions = []
     print(dados)
     for dado in dados:
-        print(dado)
+        print(dado.Data)
 
     # Itera sobre cada linha do DataFrame
     for index, row in dados.iterrows():
@@ -89,7 +89,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     if conditions:
         query = conditions.pop(0)
         for condition in conditions:
-            query |= condition
+            query = condition
 
     # Filtrar as entradas existentes no banco de dados
     existentes = MovimentacoesCliente.objects.filter(query)
