@@ -76,8 +76,18 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     dados['Data'] = dados['Data'].dt.strftime('%Y-%m-%d')
     print(len(dados))
     query = Q()
+    conditions = []
+
+    # Itera sobre cada linha do DataFrame
     for index, row in dados.iterrows():
-        query |= Q(data=row['Data'], descricao=row['Descrição'], valor=row['Valor'])
+        # Cria uma condição Q para cada linha
+        conditions.append(Q(data=row['Data'], descricao=row['Descrição'], valor=row['Valor']))
+
+    # Combina todas as condições usando OR
+    if conditions:
+        query = conditions.pop(0)
+        for condition in conditions:
+            query |= condition
     print(query)
     # Filtrar as entradas existentes no banco de dados
     existentes = MovimentacoesCliente.objects.filter(query)
