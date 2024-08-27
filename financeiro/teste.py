@@ -80,8 +80,9 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
     for index, row in dados.iterrows():
         # Cria uma condição Q para cada linha
+        data_formatada = pd.to_datetime(row['Data']).strftime('%Y-%m-%d')
         print(row['Data'], row['Descrição'], row['Valor'])
-        if MovimentacoesCliente.objects.filter(data=row['Data'].date(), descricao=row['Descrição'],
+        if MovimentacoesCliente.objects.filter(data=data_formatada, descricao=row['Descrição'],
                                                valor=row['Valor']).exists():
             indices_para_remover.append(index)
 
