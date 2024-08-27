@@ -76,14 +76,11 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     print(len(dados))
     query = Q()
     conditions = []
-    print(dados)
-    for dado in dados:
-        print(dado.Data)
 
     # Itera sobre cada linha do DataFrame
     for index, row in dados.iterrows():
         # Cria uma condição Q para cada linha
-        conditions.append(Q(data=row['Data'], descricao=row['Descrição'], valor=row['Valor']))
+        print(row['Data'], row['Descrição'], row['Valor'])
 
     # Combina todas as condições usando OR
     if conditions:
