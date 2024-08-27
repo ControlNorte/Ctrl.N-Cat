@@ -118,7 +118,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
             movimentacoes_to_create.append(MovimentacoesCliente(
                 cliente=cliente,
                 banco=banco,
-                data=dado['Data'].date(),
+                data=dado['Data'],
                 descricao=descricao,
                 detalhe='Sem Detalhe',
                 valor=dado['Valor'],
@@ -134,7 +134,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
             transicoes_to_create.append(TransicaoCliente(
                 cliente=cliente,
                 banco=banco,
-                data=dado['Data'].date(),
+                data=dado['Data'],
                 descricao=descricao,
                 valor=dado['Valor']
             ))
