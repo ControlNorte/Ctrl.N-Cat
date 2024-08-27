@@ -83,9 +83,9 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     for idx, row in dados.iterrows():
         data_formatada = pd.to_datetime(row['Data']).date()
         print(idx, row)
-        if MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=data_formatada,
-                                               descricao=row['Descrição'], valor=float(row['Valor'])).exists():
-            dados.drop(idx, inplace=True)
+        movi = MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=data_formatada,
+                                               descricao=row['Descrição'], valor=float(row['Valor']))
+        print(len(movi))
 
     print(len(dados))
 
