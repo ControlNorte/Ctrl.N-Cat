@@ -78,8 +78,8 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     query = Q()
     conditions = []
 
-    for data, descricao, valor in dados:
-        print(data, descricao, valor)
+    for dado in dados:
+        print(dado)
 
     # Itera sobre cada linha do DataFrame
     for index, row in dados.iterrows():
