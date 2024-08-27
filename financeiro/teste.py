@@ -73,11 +73,10 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     # Carregar e processar os dados do Excel
     dados = pd.read_excel(arquivo_upload, dtype={'Descrição': str, 'Data': str, 'Valor': float})
     dados['Data'] = pd.to_datetime(dados['Data'], errors='coerce')  # Converte as datas para o formato datetime
-    dados['Data'] = dados['Data'].dt.strftime('%Y-%m-%d')
     print(len(dados))
     query = Q()
     conditions = []
-
+    print(dados)
     for dado in dados:
         print(dado)
 
@@ -91,11 +90,9 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
         query = conditions.pop(0)
         for condition in conditions:
             query |= condition
-    print(query)
+
     # Filtrar as entradas existentes no banco de dados
     existentes = MovimentacoesCliente.objects.filter(query)
-
-    print(len(existentes))
 
     # Transformar os objetos retornados em um DataFrame
     existentes_df = pd.DataFrame(list(existentes.values('data', 'descricao', 'valor')))
