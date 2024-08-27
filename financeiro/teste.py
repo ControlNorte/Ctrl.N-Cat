@@ -76,13 +76,15 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     print(len(dados))
     query = Q()
     for index, row in dados.iterrows():
-        query |= Q(descricao=row['Descrição'], data=row['Data'], valor=row['Valor'])
+        query |= Q(data=row['Data'], descricao=row['Descrição'], valor=row['Valor'])
 
     # Filtrar as entradas existentes no banco de dados
     existentes = MovimentacoesCliente.objects.filter(query)
-    print(existentes)
+
+    print(existente for existente in existentes)
+
     # Transformar os objetos retornados em um DataFrame
-    existentes_df = pd.DataFrame(list(existentes.values('descricao', 'data', 'valor')))
+    existentes_df = pd.DataFrame(list(existentes.values('Data', 'Descrição', 'Valor')))
 
     # Renomear as colunas para corresponder ao DataFrame original
     existentes_df.columns = ['Descrição', 'Data', 'Valor']
