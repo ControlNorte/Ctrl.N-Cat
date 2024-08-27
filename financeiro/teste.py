@@ -81,8 +81,10 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
         return print("Erro: Algumas datas não puderam ser convertidas. Verifique o formato das datas no arquivo Excel.")
 
     for idx, row in dados.iterrows():
-        if MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=row['Data'],
-                                               descricao=row['Descrição'], valor=row['Valor']).exists():
+        data_formatada = pd.to_datetime(row['Data']).date()
+        print(idx, row)
+        if MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=data_formatada,
+                                               descricao=row['Descrição'], valor=float(row['Valor'])).exists():
             dados.drop(idx, inplace=True)
 
     print(len(dados))
