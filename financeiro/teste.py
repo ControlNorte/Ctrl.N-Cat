@@ -84,8 +84,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
         print(data_formatada, row['Descrição'], row['Valor'])
         if len(MovimentacoesCliente.objects.filter(data=data_formatada, descricao=row['Descrição'],
                                                valor=float(row['Valor']))) > 0:
-            indices_para_remover.append(index)
-            print((indices_para_remover))
+            print('sim')
 
     # Remove as linhas após a iteração
     dados = dados.drop(indices_para_remover)
