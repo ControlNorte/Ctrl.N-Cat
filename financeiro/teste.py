@@ -6,7 +6,7 @@ from .models import *
 from django.db import connection
 from .alteracoesdb import *
 import ahocorasick
-from django.db.models import Sum
+from django.db.models import Sum, Q
 
 
 register = template.Library()
@@ -73,19 +73,32 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     # Carregar e processar os dados do Excel
     dados = pd.read_excel(arquivo_upload, dtype={'Descrição': str, 'Data': str, 'Valor': float})
     dados['Data'] = pd.to_datetime(dados['Data'], errors='coerce')  # Converte as datas para o formato datetime
+    print(len(dados))
+    query = Q()
+    for index, row in dados.iterrows():
+        query |= Q(descricao=row['Descrição'], data=row['Data'], valor=row['Valor'])
+
+    # Filtrar as entradas existentes no banco de dados
+    existentes = MovimentacoesCliente.objects.filter(query)
+
+    # Transformar os objetos retornados em um DataFrame
+    existentes_df = pd.DataFrame(list(existentes.values('descricao', 'data', 'valor')))
+
+    # Renomear as colunas para corresponder ao DataFrame original
+    existentes_df.columns = ['Descrição', 'Data', 'Valor']
+
+    # Remover as linhas do DataFrame original que já existem no banco de dados
+    dados = dados[~dados.set_index(['Descrição', 'Data', 'Valor']).index.isin(
+        existentes_df.set_index(['Descrição', 'Data', 'Valor']).index)]
+
+    print(len(dados))
 
     # Verificar se há valores NaT
     if dados['Data'].isna().any():
         return print("Erro: Algumas datas não puderam ser convertidas. Verifique o formato das datas no arquivo Excel.")
 
     dados_dict = dados.to_dict('records')
-    print(len(dados_dict))
-    for dado in dados_dict:
-        movi = list(
-            MovimentacoesCliente.objects.filter(data=dado['Data'], descricao=dado['Descrição'], valor=dado['Valor']))
-        if len(movi) > 0:
-            del dados_dict[dado]
-    print(len(dados_dict))
+
     # Criar o autômato Aho-Corasick
     A = ahocorasick.Automaton()
     regras = Regra.objects.filter(cliente=cliente).select_related('categoria', 'subcategoria', 'centrodecusto')
