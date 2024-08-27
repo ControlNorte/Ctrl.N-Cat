@@ -80,15 +80,6 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     if dados['Data'].isna().any():
         return print("Erro: Algumas datas não puderam ser convertidas. Verifique o formato das datas no arquivo Excel.")
 
-    for idx, row in dados.iterrows():
-        data_formatada = pd.to_datetime(row['Data']).date()
-        print(idx, row)
-        movi = MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=data_formatada,
-                                               descricao=row['Descrição'], valor=float(row['Valor']))
-        print(len(movi))
-
-    print(len(dados))
-
     dados_dict = dados.to_dict('records')
 
     # Criar o autômato Aho-Corasick
@@ -105,6 +96,12 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     # Processamento das transações
     for dado in dados_dict:
         descricao = dado['Descrição'].upper()
+
+        # Verifica se já existe uma movimentação com a mesma data, descrição e valor
+        if MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=dado['Data'], descricao=descricao,
+                                               valor=dado['Valor']).exists():
+            continue  # Pula para o próximo dado se já existir uma movimentação igual
+
         matched = False  # Indicador de correspondência
 
         # Itera pelas correspondências usando o autômato
