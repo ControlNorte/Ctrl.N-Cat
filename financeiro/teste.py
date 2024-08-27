@@ -77,7 +77,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     query = Q()
     for index, row in dados.iterrows():
         query |= Q(data=row['Data'], descricao=row['Descrição'], valor=row['Valor'])
-
+    print(query)
     # Filtrar as entradas existentes no banco de dados
     existentes = MovimentacoesCliente.objects.filter(query)
 
