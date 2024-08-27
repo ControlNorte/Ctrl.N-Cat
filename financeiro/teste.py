@@ -73,7 +73,6 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     # Carregar e processar os dados do Excel
     dados = pd.read_excel(arquivo_upload, dtype={'Descrição': str, 'Data': str, 'Valor': float})
     dados['Data'] = pd.to_datetime(dados['Data'], errors='coerce')  # Converte as datas para o formato datetime
-    dados['Data'] = dados['Data'].dt.strftime('%Y-%m-%d')
     print(len(dados))
 
     # Itera sobre cada linha do DataFrame
@@ -81,10 +80,15 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
     for index, row in dados.iterrows():
         # Cria uma condição Q para cada linha
-        print(row['Data'], row['Descrição'], row['Valor'])
-        if MovimentacoesCliente.objects.filter(data=row['Data'], descricao=row['Descrição'],
-                                               valor=row['Valor']).exists():
-            dados = dados.drop(row)
+        data_formatada = pd.to_datetime(row['Data']).strftime('%Y-%m-%d')
+        print(data_formatada, row['Descrição'], row['Valor'])
+        if MovimentacoesCliente.objects.filter(data=data_formatada, descricao=row['Descrição'],
+                                               valor=row['Valor']) > 0:
+            indices_para_remover.append(index)
+            print((indices_para_remover))
+
+    # Remove as linhas após a iteração
+    dados = dados.drop(indices_para_remover)
 
     print(len(dados))
 
@@ -115,7 +119,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
             movimentacoes_to_create.append(MovimentacoesCliente(
                 cliente=cliente,
                 banco=banco,
-                data=dado['Data'],
+                data=dado['Data'].date(),
                 descricao=descricao,
                 detalhe='Sem Detalhe',
                 valor=dado['Valor'],
@@ -131,7 +135,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
             transicoes_to_create.append(TransicaoCliente(
                 cliente=cliente,
                 banco=banco,
-                data=dado['Data'],
+                data=dado['Data'].date(),
                 descricao=descricao,
                 valor=dado['Valor']
             ))
