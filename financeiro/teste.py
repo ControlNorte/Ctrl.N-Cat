@@ -73,28 +73,19 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     # Carregar e processar os dados do Excel
     dados = pd.read_excel(arquivo_upload, dtype={'Descrição': str, 'Data': str, 'Valor': float})
     dados['Data'] = pd.to_datetime(dados['Data'], errors='coerce')  # Converte as datas para o formato datetime
-    print(len(dados))
-
-    # Itera sobre cada linha do DataFrame
-    indices_para_remover = []
-
-    for index, row in dados.iterrows():
-        # Cria uma condição Q para cada linha
-        data_formatada = pd.to_datetime(row['Data']).date()
-        valor = float(row['Valor'])
-        print(type(data_formatada), type(row['Descrição']), type(row['Valor']))
-        if len(MovimentacoesCliente.objects.filter(data=data_formatada, descricao=row['Descrição'],
-                                               valor=valor)) > 0:
-            print('sim')
-
-    # Remove as linhas após a iteração
-    dados = dados.drop(indices_para_remover)
 
     print(len(dados))
 
     # Verificar se há valores NaT
     if dados['Data'].isna().any():
         return print("Erro: Algumas datas não puderam ser convertidas. Verifique o formato das datas no arquivo Excel.")
+
+    for idx, row in dados.iterrows():
+        if MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=row['Data'],
+                                               descricao=row['Descrição'], valor=row['Valor']).exists():
+            dados.drop(idx, inplace=True)
+
+    print(len(dados))
 
     dados_dict = dados.to_dict('records')
 
@@ -189,7 +180,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
     return print(f'Importação concluída. {conciliados} movimentações conciliadas.')  # Retorna uma mensagem de sucesso
 
-
+MovimentacoesCliente
 class UploadFileForm(forms.ModelForm):
     class Meta:
         model = UploadedFile
