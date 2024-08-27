@@ -74,32 +74,19 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     dados = pd.read_excel(arquivo_upload, dtype={'Descrição': str, 'Data': str, 'Valor': float})
     dados['Data'] = pd.to_datetime(dados['Data'], errors='coerce')  # Converte as datas para o formato datetime
     print(len(dados))
-    query = Q()
-    conditions = []
 
     # Itera sobre cada linha do DataFrame
+    indices_para_remover = []
+
     for index, row in dados.iterrows():
         # Cria uma condição Q para cada linha
         print(row['Data'], row['Descrição'], row['Valor'])
+        if MovimentacoesCliente.objects.filter(data=row['Data'].dt.strftime('%Y-%m-%d'), descricao=row['Descrição'],
+                                               valor=row['Valor']).exists():
+            indices_para_remover.append(index)
 
-    # Combina todas as condições usando OR
-    if conditions:
-        query = conditions.pop(0)
-        for condition in conditions:
-            query = condition
-
-    # Filtrar as entradas existentes no banco de dados
-    existentes = MovimentacoesCliente.objects.filter(query)
-
-    # Transformar os objetos retornados em um DataFrame
-    existentes_df = pd.DataFrame(list(existentes.values('data', 'descricao', 'valor')))
-
-    # Renomear as colunas para corresponder ao DataFrame original
-    existentes_df.columns = ['Descrição', 'Data', 'Valor']
-
-    # Remover as linhas do DataFrame original que já existem no banco de dados
-    dados = dados[~dados.set_index(['Descrição', 'Data', 'Valor']).index.isin(
-        existentes_df.set_index(['Descrição', 'Data', 'Valor']).index)]
+    # Remove as linhas após a iteração
+    dados = dados.drop(indices_para_remover)
 
     print(len(dados))
 
