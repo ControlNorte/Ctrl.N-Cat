@@ -82,8 +82,8 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
         # Cria uma condição Q para cada linha
         data_formatada = pd.to_datetime(row['Data']).strftime('%Y-%m-%d')
         print(data_formatada, row['Descrição'], row['Valor'])
-        if MovimentacoesCliente.objects.filter(data=data_formatada, descricao=row['Descrição'],
-                                               valor=row['Valor']) > 0:
+        if len(MovimentacoesCliente.objects.filter(data=data_formatada, descricao=row['Descrição'],
+                                               valor=row['Valor'])) > 0:
             indices_para_remover.append(index)
             print((indices_para_remover))
 
