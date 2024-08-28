@@ -51,7 +51,7 @@ class Ramo(models.Model):
 
 
 class cadastro_de_cliente(models.Model):
-    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
+    tenant = models.ForeignKey(Tenant, null=True, on_delete=models.CASCADE)
     razao_social = models.CharField(max_length=100, null=True, blank=True)
     cnpj = models.CharField(max_length=100, null=True, blank=True)
     logadouro = models.CharField(max_length=100, null=True, blank=True)
