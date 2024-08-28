@@ -636,7 +636,7 @@ def editarsubcategoria(request, id):
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     subcategoriaeditada = SubCategoria.objects.get(cliente=dadoscliente, id=id)
     if request.method == 'POST':
-        subcategoriaeditada.categoria = Categoria.objects.get(nome=request.POST.get('categoria'))
+        subcategoriaeditada.categoria = Categoria.objects.get(nome=request.POST.get('categoria'), cliente=dadoscliente)
         subcategoriaeditada.nome = request.POST.get('nome')
 
         subcategoriaeditada.save()
