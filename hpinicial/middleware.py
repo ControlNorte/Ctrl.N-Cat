@@ -7,6 +7,6 @@ class TenantMiddleware(MiddlewareMixin):
     def process_request(self, request):
         subdomain = request.get_host().split('.')[0]
         try:
-            request.tenant = Tenant.objects.get(subdomain=subdomain)
+            request.tenant = Tenant.objects.get(subdomain=None)
         except Tenant.DoesNotExist:
             request.tenant = None
