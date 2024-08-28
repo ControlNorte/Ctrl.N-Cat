@@ -23,7 +23,7 @@ from collections import defaultdict
 
 @login_required
 def financeiro_view(request):
-    clientes = cadastro_de_cliente.objects.filter(ativo=True)
+    clientes = cadastro_de_cliente.objects.for_tenant(request.tenant)
     context = {'object_list': clientes}
     return render(request, 'homepagefinanceiro.html', context)
 

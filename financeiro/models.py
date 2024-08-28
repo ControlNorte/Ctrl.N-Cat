@@ -11,7 +11,6 @@ class BancosCliente(models.Model):
     digito = models.IntegerField()
     ativo = models.BooleanField(null=True, blank=True)
 
-
     def __str__(self):
         return f"{self.banco}, Cliente: {self.cliente} Ativo: {self.ativo}"
 
