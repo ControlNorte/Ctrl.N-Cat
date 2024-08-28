@@ -62,9 +62,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'financeiro.middleware.ClienteMiddleware',
-    'hpinicial.middleware.TenantMiddleware',
-]
+    'financeiro.middleware.ClienteMiddleware',]
+    # 'hpinicial.middleware.TenantMiddleware',
+
 
 ROOT_URLCONF = 'ControlNorte.urls'
 
