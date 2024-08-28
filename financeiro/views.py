@@ -533,10 +533,17 @@ def editarbanco(request, id):
     bancoeditado = BancosCliente.objects.get(cliente=dadoscliente, id=id)
     bancos = BancosCliente.objects.filter(cliente=dadoscliente)
     if request.method == 'POST':
-        dados = request.POST.dict()
-        BancosCliente.objects.filter(id=pk, cliente=dadoscliente).update(cliente=dadoscliente, banco=dados.get("banco"),
-                                                   agencia=dados.get("agencia"), conta=dados.get("conta"),
-                                                   digito=dados.get("digito"), ativo=dados.get("ativo"))
+        bancoeditado.banco = request.POST.get('banco')
+        bancoeditado.agencia = request.POST.get('agencia')
+        bancoeditado.conta = request.POST.get('conta')
+        bancoeditado.digito = request.POST.get('digito')
+
+        # Verifica o checkbox
+        bancoeditado.ativo = True if request.POST.get('ativo') else False
+
+        # Salva as alterações no banco de dados
+        bancoeditado.save()
+
         return redirect('financeiro:banco')
     context = {'dadoscliente': dadoscliente, 'bancos': bancos, 'bancoeditado': bancoeditado}
     return render(request, 'editarbanco.html', context)
