@@ -176,14 +176,14 @@ Financeiro | {{ dadoscliente }}
                                         </svg>
                                     </a>
                                 </button>
-                                <form method="POST" action="{% url 'financeiro:excluirbanco' banco.pk %}">
+                                <a href="{% url 'financeiro:editarbanco' banco.pk %}">
                                     {% csrf_token %}
                                     <button type="submit" class="bg-transparent text-red-700 hover:text-black px-4">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
                                             <path d="M2.5 1a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v1h2a.5.5 0 0 1 0 1h-1v11a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3H0a.5.5 0 0 1 0-1h2V1zm1 1a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-.5-.5h-9zM5.5 5.5a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm4 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7z"/>
                                         </svg>
                                     </button>
-                                </form>
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}
