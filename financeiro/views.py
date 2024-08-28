@@ -585,10 +585,11 @@ def editarcategoria(request, id):
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     categoriaeditada = Categoria.objects.get(cliente=dadoscliente, id=id)
     if request.method == 'POST':
-        dados = request.POST.dict()
-        Categoria.objects.filter(id=pk, cliente=dadoscliente).update(cliente=dadoscliente,
-                                               categoriamae=CategoriaMae.objects.get(nome=dados.get("categoriamae")),
-                                               nome=dados.get("nome"))
+        categoriaeditada.categoriamae = CategoriaMae.objects.get(nome=request.POST.get('categoriamae'))
+        categoriaeditada.nome = request.POST.get('nome')
+
+        categoriaeditada.save()
+
         return redirect('financeiro:categoria')
     categoriasmae = CategoriaMae.objects.all()
     categorias = Categoria.objects.filter(cliente=dadoscliente)
@@ -635,11 +636,11 @@ def editarsubcategoria(request, id):
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     subcategoriaeditada = SubCategoria.objects.get(cliente=dadoscliente, id=id)
     if request.method == 'POST':
-        dados = request.POST.dict()
-        SubCategoria.objects.filter(id=pk, cliente=dadoscliente).update(cliente=dadoscliente,
-                                                  categoria=Categoria.objects.get(nome=dados.get("categoria"),
-                                                                                  cliente=dadoscliente),
-                                                  nome=dados.get("nome"))
+        subcategoriaeditada.categoria = Categoria.objects.get(nome=request.POST.get('categoria'))
+        subcategoriaeditada.nome = request.POST.get('nome')
+
+        subcategoriaeditada.save()
+
         return redirect('financeiro:subcategoria')
     categoriasmae = CategoriaMae.objects.all()
     categorias = Categoria.objects.filter(cliente=dadoscliente)
@@ -680,9 +681,11 @@ def editarcentrocusto(request, id):
     dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
     centrocustoeditado = CentroDeCusto.objects.get(cliente=dadoscliente, id=id)
     if request.method == 'POST':
-        dados = request.POST.dict()
-        CentroDeCusto.objects.filter(id=pk, cliente=dadoscliente).update(cliente=dadoscliente, nome=dados.get("nome"),
-                                                   ativo=dados.get("ativo"))
+        centrocustoeditado.nome = request.POST.get('nome')
+        centrocustoeditado.ativo = True if request.POST.get('ativo') else False
+
+        centrocustoeditado.save()
+
         return redirect('financeiro:centrocusto')
     centrocustos = CentroDeCusto.objects.filter(cliente=dadoscliente)
     context = {'dadoscliente': dadoscliente, 'centrocustos': centrocustos, 'centrocustoeditado': centrocustoeditado}

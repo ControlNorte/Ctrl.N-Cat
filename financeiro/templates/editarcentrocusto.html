@@ -46,8 +46,13 @@ Financeiro | {{ dadoscliente }}
                                 <label for="nomecdc">Nome: </label>
                                 <input type="text" id="nomecdc" name="nome" class="form-control" value="{{ centrocustoeditado.nome }}">
                                 <br>
-                                <label for="ativobanco">Ativo: </label>
-                                <input type="checkbox" id="ativobanco" name="ativo" value="True">
+                                <label for="ativo">Ativo: </label>
+                                <input
+                                    type="checkbox"
+                                    id="ativo"
+                                    name="ativo"
+                                    value="True"
+                                    {% if centrocustoeditado.ativo %} checked {% endif %}>
                             </div>
                             <div class="col-start-3 flex justify-end">
                                 <button class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md" type="submit">Salvar</button>
