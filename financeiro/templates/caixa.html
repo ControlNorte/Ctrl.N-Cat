@@ -151,8 +151,11 @@ Financeiro | {{ dadoscliente }}
                         <div class="text-xl text-violet-900 p-2">Conciliação</div>
                         <br>
                         <form method="post" enctype="multipart/form-data">
-                            <input type="hidden" name="tipo" value="import">
                             {% csrf_token %}
+                            <input type="hidden"
+                                   name="tipo"
+                                   value="import">
+
                             <div class="flex flex-nowrap justify-between items-center">
                                 {{ form.as_p }}
                                 <button class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md" type="submit">
@@ -212,35 +215,45 @@ Financeiro | {{ dadoscliente }}
                                                     <div class="content-start p-2">
                                                         <div class="flex flex-nowrap">
                                                             <label class="p-2">Categoria:</label>
-                                                            <select name="categoria" class="selectconci">
+                                                            <select name="categoria"
+                                                                    class="selectconci"
+                                                                    required>
                                                                     <option selected></option>
-                                                                {% for categoria in categorias %}
+                                                                    {% for categoria in categorias %}
                                                                     <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
-                                                                {% endfor %}
+                                                                    {% endfor %}
                                                             </select>
                                                         </div>
                                                         <div class="flex flex-nowrap pt-2">
                                                             <label class="p-2">Descrição:</label>
-                                                            <input type="text" name="descricao" class="text-gray-700 " value="{{ transicao.descricao }}">
+                                                            <input type="text"
+                                                                   name="descricao"
+                                                                   class="text-gray-700 "
+                                                                   value="{{ transicao.descricao }}"
+                                                                   required>
                                                         </div>
                                                     </div>
                                                     <div class="w-5/5 grid justify-items-end p-2">
                                                         <div class="flex flex-nowrap">
                                                             <label class="p-2">Sub-Categoria:</label>
-                                                            <select name="subcategoria" class="selectconci">
-                                                                <option selected></option>
-                                                                {% for subcategoria in subcategorias %}
+                                                            <select name="subcategoria"
+                                                                    class="selectconci"
+                                                                    required>
+                                                                    <option selected></option>
+                                                                    {% for subcategoria in subcategorias %}
                                                                     <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
-                                                                {% endfor %}
+                                                                    {% endfor %}
                                                             </select>
                                                         </div>
                                                         <div class="flex flex-nowrap pt-2">
                                                             <label class="p-2">Centro de Custo:</label>
-                                                            <select name="centrocusto" class="selectconci">
-                                                                <option selected></option>
-                                                                {% for centrodecusto in centrodecustos %}
+                                                            <select name="centrocusto"
+                                                                    class="selectconci"
+                                                                    required>
+                                                                    <option selected></option>
+                                                                    {% for centrodecusto in centrodecustos %}
                                                                     <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
-                                                                {% endfor %}
+                                                                    {% endfor %}
                                                             </select>
                                                         </div>
                                                     </div>
@@ -311,11 +324,13 @@ Financeiro | {{ dadoscliente }}
                                                     <div class="content-start p-2">
                                                         <div class="flex flex-nowrap">
                                                             <label class="p-2">Banco Destino:</label>
-                                                            <select name="bancodestino" class="selectconci">
-                                                                <option selected></option>
-                                                                {% for bancodestino in bancodestinos %}
+                                                            <select name="bancodestino"
+                                                                    class="selectconci"
+                                                                    required>
+                                                                    <option selected></option>
+                                                                    {% for bancodestino in bancodestinos %}
                                                                     <option value="{{ bancodestino.id }}">{{ bancodestino.banco }}</option>
-                                                                {% endfor %}
+                                                                    {% endfor %}
                                                             </select>
                                                         </div>
                                                         <div class="flex flex-nowrap pt-2">
@@ -325,7 +340,8 @@ Financeiro | {{ dadoscliente }}
                                                                 name="descricao"
                                                                 class="text-gray-700"
                                                                 value="{{ transicao.descricao }}"
-                                                                id="descricaoInput">
+                                                                id="descricaoInput"
+                                                                required>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -361,43 +377,67 @@ Financeiro | {{ dadoscliente }}
                             <div class="py-2 px-4 text-2xl text-violet-900 text-center">Nova Entrada - {{ banco.banco }}</div>
                             {% if erroentrada %}{{ erroentrada }}{% endif %}
                             <form method="POST">
-                                <input type="hidden" name='tipo' value="entrada">
                                 {% csrf_token %}
+                                <input type="hidden"
+                                       name='tipo'
+                                       value="entrada">
+
                                 <div class="text-violet-800">
                                     <div class="col-md-3 pb-2">
                                         <label class="p-2">Data:</label>
-                                        <input type="date" name="data" class="form-control">
+                                        <input type="date"
+                                               name="data"
+                                               class="form-control"
+                                               required>
                                     </div>
                                     <div class="row g-3 grid grid-cols-3">
                                         <div>
                                             <label class="p-2">Descrição:</label>
-                                            <input type="text" name="descricao" placeholder="Descrição" class="form-control">
+                                            <input type="text"
+                                                   name="descricao"
+                                                   placeholder="Descrição"
+                                                   class="form-control"
+                                                   required>
                                             <label class="p-2">Detalhes:</label>
-                                            <input type="text" name="detalhe" placeholder="Detalhes" class="form-control">
+                                            <input type="text"
+                                                   name="detalhe"
+                                                   placeholder="Detalhes"
+                                                   class="form-control">
                                         </div>
                                         <div>
                                             <label class="p-2">Categoria:</label>
-                                            <select name="categoria" class="form-control">
-                                                {% for categoria in categorias %}
-                                                <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
-                                                {% endfor %}
+                                            <select name="categoria"
+                                                    class="form-control"
+                                                    required>
+                                                    {% for categoria in categorias %}
+                                                    <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                                                    {% endfor %}
                                             </select>
                                             <label class="p-2">Sub-Categoria:</label>
-                                            <select name="subcategoria" class="form-control">
-                                                {% for subcategoria in subcategorias %}
-                                                <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
-                                                {% endfor %}
+                                            <select name="subcategoria"
+                                                    class="form-control"
+                                                    required>
+                                                    {% for subcategoria in subcategorias %}
+                                                    <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
+                                                    {% endfor %}
                                             </select>
                                         </div>
                                         <div>
                                             <label class="p-2">Centro de Custo:</label>
-                                            <select name="centrocusto" class="form-control">
-                                                {% for centrodecusto in centrodecustos %}
-                                                <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
-                                                {% endfor %}
+                                            <select name="centrocusto"
+                                                    class="form-control"
+                                                    required>
+                                                    {% for centrodecusto in centrodecustos %}
+                                                    <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
+                                                    {% endfor %}
                                             </select>
                                             <label class="p-2">Valor:</label>
-                                            <input type="number" step="0.010" name="valor" placeholder="Valor" class="form-control">
+                                            <input type="number"
+                                                   step="0.010"
+                                                   name="valor"
+                                                   placeholder="Valor"
+                                                   class="form-control"
+                                                   required>
                                         </div>
                                         <div class="col-start-3 flex justify-end">
                                             <button
@@ -416,43 +456,65 @@ Financeiro | {{ dadoscliente }}
                         <div class="container w-4/5 p-4 bg-violet-100 rounded">
                             <div class="py-2 px-4 text-2xl text-violet-900 text-center">Nova Saída - {{ banco.banco }}</div>
                             <form method="POST">
-                                <input type="hidden" name='tipo' value="saida">
                                 {% csrf_token %}
+                                <input type="hidden" name='tipo' value="saida">
+
                                 <div class="text-violet-800">
                                     <div class="col-md-3 pb-2">
                                         <label class="p-2">Data:</label>
-                                        <input type="date" name="data" class="form-control">
+                                        <input type="date"
+                                               name="data"
+                                               class="form-control"
+                                               required>
                                     </div>
                                     <div class="row g-3 grid grid-cols-3">
                                         <div>
                                             <label class="p-2">Descrição:</label>
-                                            <input type="text" name="descricao" placeholder="Descrição" class="form-control">
+                                            <input type="text"
+                                                   name="descricao"
+                                                   placeholder="Descrição"
+                                                   class="form-control"
+                                                   required>
                                             <label class="p-2">Detalhes:</label>
-                                            <input type="text" name="detalhe" placeholder="Detalhes" class="form-control">
+                                            <input type="text"
+                                                   name="detalhe"
+                                                   placeholder="Detalhes"
+                                                   class="form-control">
                                         </div>
                                         <div>
                                             <label class="p-2">Categoria:</label>
-                                            <select name="categoria" class="form-control">
-                                                {% for categoria in categorias %}
-                                                <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
-                                                {% endfor %}
+                                            <select name="categoria"
+                                                    class="form-control"
+                                                    required>
+                                                    {% for categoria in categorias %}
+                                                    <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                                                    {% endfor %}
                                             </select>
                                             <label class="p-2">Sub-Categoria:</label>
-                                            <select name="subcategoria" class="form-control">
-                                                {% for subcategoria in subcategorias %}
-                                                <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
-                                                {% endfor %}
+                                            <select name="subcategoria"
+                                                    class="form-control"
+                                                    required>
+                                                    {% for subcategoria in subcategorias %}
+                                                    <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
+                                                    {% endfor %}
                                             </select>
                                         </div>
                                         <div>
                                             <label class="p-2">Centro de Custo:</label>
-                                            <select name="centrocusto" class="form-control">
-                                                {% for centrodecusto in centrodecustos %}
-                                                <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
-                                                {% endfor %}
+                                            <select name="centrocusto"
+                                                    class="form-control"
+                                                    required>
+                                                    {% for centrodecusto in centrodecustos %}
+                                                    <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
+                                                    {% endfor %}
                                             </select>
                                             <label class="p-2">Valor:</label>
-                                            <input type="number" name="valor" step="0.010" placeholder="Valor" class="form-control">
+                                            <input type="number"
+                                                   name="valor"
+                                                   step="0.010"
+                                                   placeholder="Valor"
+                                                   class="form-control"
+                                                   required>
                                         </div>
                                         <div class="col-start-3 flex justify-end">
                                             <button
@@ -471,27 +533,40 @@ Financeiro | {{ dadoscliente }}
                         <div class="container w-4/5 p-4 bg-violet-100 rounded">
                             <div class="py-2 px-4 text-2xl text-violet-900 text-center">Nova Transferência - {{ banco.banco }}</div>
                             <form method="POST">
-                                <input type="hidden" name='tipo' value="transf">
                                 {% csrf_token %}
+                                <input type="hidden" name='tipo' value="transf">
+
                                 <div class="text-violet-800">
                                     <div class="col-md-3 pb-2">
                                         <label class="p-2">Data:</label>
-                                        <input type="date" name="data" class="form-control">
+                                        <input type="date"
+                                               name="data"
+                                               class="form-control"
+                                               required>
                                         <label class="p-2">Banco Destino:</label>
-                                        <select name="bancoentrada" class="form-control">
-                                            {% for item in bancos %}
-                                            <option value="{{ item.id }}">{{ item.banco }}</option>
-                                            {% endfor %}
+                                        <select name="bancoentrada"
+                                                class="form-control"
+                                                required>
+                                                {% for item in bancos %}
+                                                <option value="{{ item.id }}">{{ item.banco }}</option>
+                                                {% endfor %}
                                         </select>
                                     </div>
                                     <div class="flex flex-nowrap gap-2">
                                         <div>
                                             <label class="p-2">Descrição:</label>
-                                            <input type="text" name="descricao" placeholder="Descrição" class="form-control">
+                                            <input type="text"
+                                                   name="descricao"
+                                                   placeholder="Descrição"
+                                                   class="form-control"
+                                                   required>
                                         </div>
                                         <div>
                                             <label class="p-2">Valor:</label>
-                                            <input type="number" name="valor" placeholder="Valor" class="form-control">
+                                            <input type="number"
+                                                   name="valor"
+                                                   placeholder="Valor"
+                                                   class="form-control">
                                         </div>
                                     </div>
                                     <div class="col-start-3 flex justify-end">

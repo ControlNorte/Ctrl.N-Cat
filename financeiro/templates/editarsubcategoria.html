@@ -44,14 +44,21 @@ Financeiro | {{ dadoscliente }}
                             <div class="row g-3">
                             <div>
                                 <label for="nomesubcat">Nome: </label>
-                                <input type="text" id="nomesubcat" name="nome" class="form-control"
-                                value="{{ subcategoriaeditada.nome }}">
+                                <input type="text"
+                                       id="nomesubcat"
+                                       name="nome"
+                                       class="form-control"
+                                       value="{{ subcategoriaeditada.nome }}"
+                                       required>
                                 <label for="catsubcat">Categoria: </label>
-                                <select name="categoria" id="catsubcat" class="form-control">
+                                <select name="categoria"
+                                        id="catsubcat"
+                                        class="form-control"
+                                        required>
                                         <option selected>{{ subcategoriaeditada.categoria }}</option>
-                                    {% for categoria in categorias %}
+                                        {% for categoria in categorias %}
                                         <option value="{{ categoria.nome }}">{{ categoria.nome }}</option>
-                                    {% endfor %}
+                                        {% endfor %}
                                 </select>
                             </div>
                             <div class="col-start-3 flex justify-end">

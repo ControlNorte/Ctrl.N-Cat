@@ -41,31 +41,44 @@ Financeiro | {{ dadoscliente }}
                             <div class="row g-3">
                             <div>
                                 <label>Descrição: </label>
-                                <input type="text" id="descricao" name="descricao" class="form-control" placeholder="Descrição" required>
+                                <input type="text"
+                                       id="descricao"
+                                       name="descricao"
+                                       class="form-control"
+                                       placeholder="Descrição"
+                                       required>
                                 <br>
                                 <label>Categoria: </label>
-                                <select name="categoria" class="form-control">
-                                            {% for categoria in categorias %}
-                                                <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
-                                            {% endfor %}
-                                        </select>
+                                <select name="categoria"
+                                        class="form-control"
+                                        required>
+                                        {% for categoria in categorias %}
+                                        <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                                        {% endfor %}
+                                </select>
                                 <br>
                                 <label>Sub-Categoria: </label>
-                                <select name="subcategoria" class="form-control">
-                                            {% for subcategoria in subcategorias %}
-                                                <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
-                                            {% endfor %}
-                                        </select>
+                                <select name="subcategoria"
+                                        class="form-control"
+                                        required>
+                                        {% for subcategoria in subcategorias %}
+                                        <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
+                                        {% endfor %}
+                                </select>
                                 <br>
                                 <label>Centro de Custo: </label>
-                                <select name="centrodecusto" class="form-control">
-                                            {% for centrodecusto in centrodecustos %}
-                                                <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
-                                            {% endfor %}
-                                        </select>
+                                <select name="centrodecusto"
+                                        class="form-control"
+                                        required>
+                                        {% for centrodecusto in centrodecustos %}
+                                        <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
+                                        {% endfor %}
+                                </select>
                                 <br>
                                 <label>Ativo: </label>
-                                <input type="checkbox" name="ativo" value="True">
+                                <input type="checkbox"
+                                       name="ativo"
+                                       value="True">
                             </div>
                             <div class="col-start-3 flex justify-end">
                                 <button class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md" type="submit">Salvar</button>

@@ -44,7 +44,12 @@ Financeiro | {{ dadoscliente }}
                             <div class="row g-3">
                             <div>
                                 <label for="nomecdc">Nome: </label>
-                                <input type="text" id="nomecdc" name="nome" class="form-control" value="{{ centrocustoeditado.nome }}">
+                                <input type="text"
+                                       id="nomecdc"
+                                       name="nome"
+                                       class="form-control"
+                                       value="{{ centrocustoeditado.nome }}"
+                                       required>
                                 <br>
                                 <label for="ativo">Ativo: </label>
                                 <input
