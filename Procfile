@@ -1,1 +1,1 @@
-web: python manage.py migrate cliente 0004 && gunicorn ControlNorte.wsgi --log-file - --timeout 300 --workers=3
+web: python manage.py makemigrations cliente 0004 && python manage.py migrate cliente 0004 && gunicorn ControlNorte.wsgi --log-file - --timeout 300 --workers=3
