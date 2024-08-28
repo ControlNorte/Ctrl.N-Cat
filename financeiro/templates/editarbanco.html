@@ -4,6 +4,65 @@
 Financeiro | {{ dadoscliente }}
 {% endblock %}
 
+{% block head %}
+<script>
+    const bancoInput = document.getElementById('banco');
+
+    // Restore value if it exists in localStorage
+    if (localStorage.getItem('banco')) {
+        bancoInput.value = localStorage.getItem('banco');
+    }
+
+    bancoInput.addEventListener('input', function() {
+        localStorage.setItem('banco', this.value);
+    });
+
+    const agenciaInput = document.getElementById('agencia');
+
+    // Restore value if it exists in localStorage
+    if (localStorage.getItem('agencia')) {
+        agenciaInput.value = localStorage.getItem('agencia');
+    }
+
+    agenciaInput.addEventListener('input', function() {
+        localStorage.setItem('agencia', this.value);
+    });
+
+    const contaInput = document.getElementById('conta');
+
+    // Restore value if it exists in localStorage
+    if (localStorage.getItem('conta')) {
+        contaInput.value = localStorage.getItem('conta');
+    }
+
+    contaInput.addEventListener('input', function() {
+        localStorage.setItem('conta', this.value);
+    });
+
+    const digitoInput = document.getElementById('digito');
+
+    // Restore value if it exists in localStorage
+    if (localStorage.getItem('digito')) {
+        digitoInput.value = localStorage.getItem('digito');
+    }
+
+    digitoInput.addEventListener('input', function() {
+        localStorage.setItem('digito', this.value);
+    });
+
+    const ativoInput = document.getElementById('ativo');
+
+    // Restore value if it exists in localStorage
+    if (localStorage.getItem('ativo')) {
+        ativoInput.value = "False";
+    }
+
+    ativoInput.addEventListener('input', function() {
+        localStorage.setItem('ativo', this.value);
+    });
+</script>
+{% endblock %}
+
 {% block content %}
 <main class="py-20 px-10">
 
@@ -44,24 +103,54 @@ Financeiro | {{ dadoscliente }}
                         <div class="text-violet-800">
                             <div class="row g-3">
                             <div>
-                                <label for="nomebanco">Banco: </label>
-                                <input type="text" id="nomebanco" name="banco" class="form-control" placeholder="Banco"
-                                       value="{{ bancoeditado.banco }}" required>
+                                <label for="banco">Banco: </label>
+                                <input
+                                    type="text"
+                                    id="banco"
+                                    name="banco"
+                                    class="form-control"
+                                    placeholder="Banco"
+                                    value="{{ bancoeditado.banco }}"
+                                    required>
+
                                 <br>
-                                <label for="agenciabanco">Agência: </label>
-                                <input type="number" id="agenciabanco" name="agencia" class="form-control"
-                                       placeholder="Agência" value="{{ bancoeditado.agencia }}" required>
+                                <label for="agencia">Agência: </label>
+                                <input
+                                    type="number"
+                                    id="agencia"
+                                    name="agencia"
+                                    class="form-control"
+                                    placeholder="Agência"
+                                    value="{{ bancoeditado.agencia }}"
+                                    required>
                                 <br>
-                                <label for="contabanco">Conta: </label>
-                                <input type="number" id="contabanco" name="conta" class="form-control"
-                                       placeholder="Conta" value="{{ bancoeditado.conta }}" required>
+                                <label for="conta">Conta: </label>
+                                <input
+                                    type="number"
+                                    id="conta"
+                                    name="conta"
+                                    class="form-control"
+                                    placeholder="Conta"
+                                    value="{{ bancoeditado.conta }}"
+                                    required>
                                 <br>
-                                <label for="digitobanco">Dígito: </label>
-                                <input type="number" id="digitobanco" name="digito" class="form-control"
-                                       value="{{ bancoeditado.digito }}" placeholder="Dígito" required>
+                                <label for="digito">Dígito: </label>
+                                <input
+                                    type="number"
+                                    id="digito"
+                                    name="digito"
+                                    class="form-control"
+                                    placeholder="Dígito"
+                                    value="{{ bancoeditado.digito }}"
+                                    required>
                                 <br>
-                                <label for="ativobanco">Ativo: </label>
-                                <input type="checkbox" id="ativobanco" name="ativo" value="True">
+                                <label for="ativo">Ativo: </label>
+                                <input
+                                    type="checkbox"
+                                    id="ativo"
+                                    name="ativo"
+                                    value="True"
+                                    required>
                             </div>
                             <div class="col-start-3 flex justify-end">
                                 <button class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md" type="submit">Salvar</button>
