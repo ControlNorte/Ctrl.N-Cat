@@ -1,1 +1,1 @@
-web: python manage.py makemigrations financeiro --empty --name remove_duplicate_constraint && python manage.py migrate && gunicorn ControlNorte.wsgi --log-file - --timeout 300 --workers=3
+web: gunicorn ControlNorte.wsgi --log-file - --timeout 300 --workers=3
