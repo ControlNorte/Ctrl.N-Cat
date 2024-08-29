@@ -6,7 +6,7 @@ from hpinicial.managers import TenantManager
 
 
 class BancosCliente(models.Model):
-    tenant = models.ForeignKey(Tenant, null=True, on_delete=models.CASCADE)
+
     cliente = models.ForeignKey(cadastro_de_cliente, on_delete=models.CASCADE)
     banco = models.CharField(max_length=100)
     agencia = models.IntegerField()
@@ -28,7 +28,7 @@ class CategoriaMae(models.Model):
 
 
 class Categoria(models.Model):
-    tenant = models.ForeignKey(Tenant, null=True, on_delete=models.CASCADE)
+
     cliente = models.ForeignKey(cadastro_de_cliente, on_delete=models.CASCADE)
     categoriamae = models.ForeignKey(CategoriaMae, null=True, on_delete=models.SET_NULL)
     nome = models.CharField(max_length=100)
@@ -40,7 +40,7 @@ class Categoria(models.Model):
 
 
 class SubCategoria(models.Model):
-    tenant = models.ForeignKey(Tenant, null=True, on_delete=models.CASCADE)
+
     cliente = models.ForeignKey(cadastro_de_cliente, on_delete=models.CASCADE)
     categoria = models.ForeignKey(Categoria, null=True, on_delete=models.SET_NULL)
     nome = models.CharField(max_length=100)
@@ -52,7 +52,7 @@ class SubCategoria(models.Model):
 
 
 class CentroDeCusto(models.Model):
-    tenant = models.ForeignKey(Tenant, null=True, on_delete=models.CASCADE)
+
     cliente = models.ForeignKey(cadastro_de_cliente, on_delete=models.CASCADE)
     nome = models.CharField(max_length=100)
     ativo = models.BooleanField(null=True, blank=True)
@@ -64,7 +64,7 @@ class CentroDeCusto(models.Model):
 
 
 class MovimentacoesCliente(models.Model):
-    tenant = models.ForeignKey(Tenant, null=True, on_delete=models.CASCADE)
+
     categoria = models.ForeignKey(Categoria, null=True, on_delete=models.SET_NULL)
     subcategoria = models.ForeignKey(SubCategoria, null=True, on_delete=models.SET_NULL)
     centrodecusto = models.ForeignKey(CentroDeCusto, null=True, on_delete=models.SET_NULL)
@@ -79,7 +79,7 @@ class MovimentacoesCliente(models.Model):
 
 
 class TransicaoCliente(models.Model):
-    tenant = models.ForeignKey(Tenant, null=True, on_delete=models.CASCADE)
+
     cliente = models.ForeignKey(cadastro_de_cliente, on_delete=models.CASCADE)
     banco = models.ForeignKey(BancosCliente, null=True, on_delete=models.SET_NULL)
     data = models.DateField()
@@ -89,9 +89,8 @@ class TransicaoCliente(models.Model):
     objects = TenantManager()
 
 
-
 class Regra(models.Model):
-    tenant = models.ForeignKey(Tenant, null=True, on_delete=models.CASCADE)
+
     categoria = models.ForeignKey(Categoria, null=True, on_delete=models.SET_NULL)
     subcategoria = models.ForeignKey(SubCategoria, null=True, on_delete=models.SET_NULL)
     centrodecusto = models.ForeignKey(CentroDeCusto, null=True, on_delete=models.SET_NULL)
@@ -103,7 +102,7 @@ class Regra(models.Model):
 
 
 class Saldo(models.Model):
-    tenant = models.ForeignKey(Tenant, null=True, on_delete=models.CASCADE)
+
     banco = models.ForeignKey(BancosCliente, null=True, on_delete=models.CASCADE)
     cliente = models.ForeignKey(cadastro_de_cliente, on_delete=models.CASCADE)
     data = models.DateField()
