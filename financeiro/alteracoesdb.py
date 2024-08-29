@@ -16,11 +16,11 @@ import psycopg2
 import logging
 
 
-def saldodiario(banco, cliente, data):
+def saldodiario(banco, cliente, data, request):
     datainicial = datetime.strptime(data, '%Y-%m-%d').date()
     datainicialord = datainicial.toordinal() + 1
 
-    datafinal = MovimentacoesCliente.objects.filter(cliente=cliente.id, banco=banco).order_by('-data').first()
+    datafinal = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente.id, banco=banco).order_by('-data').first()
     datafinal = datafinal.data + timedelta(days=31) if datafinal else datainicial + timedelta(days=31)
     datafinal = datafinal.toordinal()
 
@@ -53,8 +53,9 @@ def saldodiario(banco, cliente, data):
         saldofinal = saldoinicial + saldodia
 
         Saldo.objects.update_or_create(
+            tenant=request.tenat,
             data=data,
-            banco=BancosCliente.objects.get(id=banco),
+            banco=BancosCliente.objects.for_tenant(request.tenant).get(id=banco),
             cliente=cliente,
             defaults={
                 'saldoinicial': float(saldoinicial),
@@ -63,27 +64,23 @@ def saldodiario(banco, cliente, data):
         )
 
 
-def alteracaosaldo(banco, cliente, data):
+def alteracaosaldo(banco, cliente, data, request):
     datainicial = datetime.strptime(data, "%Y-%m-%d").date()  # Determina a menor data entre as movimentações
-    datafinal = MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco).order_by('-data').first()
+    datafinal = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco).order_by('-data').first()
     datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial,"%Y-%m-%d") + timedelta(days=31)  # Determina a maior data entre as movimentações
 
     while datainicial <= datafinal:
         # Calcula o saldo inicial e final do dia
-        saldo_inicial = Saldo.objects.filter(cliente=cliente, banco=banco,
+        saldo_inicial = Saldo.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco,
                                           data=datainicial - timedelta(days=1)).first()
 
         saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
 
         saldo_movimentacoes = \
-            MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=datainicial).aggregate(
+            MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco, data=datainicial).aggregate(
                 total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
 
         saldo_final = saldo_inicial + saldo_movimentacoes
-
-        print(f'SI: {saldo_inicial}, SF: {saldo_final}, data: {datainicial}')
-
-        print(type(datainicial))
 
         with connection.cursor() as cursor:
             insert_query = """
@@ -103,5 +100,5 @@ def alteracaosaldo(banco, cliente, data):
 
         datainicial += timedelta(days=1)  # Incrementa o dia
 
-    return print(f'deu certo :)')
+    return print('Saldo Alterado com Sucesso!')
 

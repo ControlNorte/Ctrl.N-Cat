@@ -26,13 +26,13 @@ def financeiro_view(request):
     if request.tenant:
         clientes = cadastro_de_cliente.objects.for_tenant(request.tenant)
     else:
-        clientes = cadastro_de_cliente.objects.filter(ativo=True)
+        clientes = "Sem Clientes Cadastrados"
     context = {'object_list': clientes}
     return render(request, 'homepagefinanceiro.html', context)
 
 
 def financeirocliente(request, pk):
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     request.session['dadoscliente'] = pk  # Armazena o pk na sessão
     if request.method == 'GET':
         dreresumo = dreresumida(cliente=dadoscliente)
@@ -45,8 +45,8 @@ def caixa(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
-    bancos = BancosCliente.objects.filter(ativo='True', cliente=dadoscliente)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
+    bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente)
     context = {'dadoscliente': dadoscliente, 'bancos': bancos}
     return render(request, 'caixa.html', context)
 
@@ -57,9 +57,9 @@ def movimentacao(request, banco):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
-    bancos = BancosCliente.objects.filter(ativo='True', cliente=dadoscliente)
-    bancoatual = BancosCliente.objects.get(ativo='True', cliente=dadoscliente, banco=banco)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
+    bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente)
+    bancoatual = BancosCliente.objects.for_tenant(request.tenant).get(ativo='True', cliente=dadoscliente, banco=banco)
     request.session['bancoatual'] = bancoatual.id
     mesatual = datetime.now().month
     mesatual = mes(mesatual)
@@ -86,7 +86,8 @@ def movimentacao(request, banco):
         elif dados.get('tipo') == 'entrada':
             valor = float(dados.get('valor').replace('.', '').replace(',', '.'))
             if valor >= 0:
-                movimentacoes = MovimentacoesCliente.objects.create(cliente=dadoscliente,
+                movimentacoes = MovimentacoesCliente.objects.create(tenant=request.tenant,
+                                                                    cliente=dadoscliente,
                                                                     banco=BancosCliente.objects.get(id=bancoatual.id),
                                                                     data=dados.get('data'),
                                                                     descricao=dados.get('descricao'),
@@ -96,7 +97,7 @@ def movimentacao(request, banco):
                                                                     subcategoria=SubCategoria.objects.get(id=dados.get("subcategoria")),
                                                                     centrodecusto=CentroDeCusto.objects.get(id=dados.get("centrocusto")))
                 movimentacoes.save()
-                alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente.id, data=dados.get('data'))
+                alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente.id, data=dados.get('data'), request=request)
             else:
                 erroentrada = 'Valor de Entrada Tem que ser maior que 0'
 
@@ -105,7 +106,8 @@ def movimentacao(request, banco):
                 valor = float(dados.get('valor'))
             else:
                 valor = float(dados.get('valor')) * - 1.0
-            movimentacoes = MovimentacoesCliente.objects.create(cliente=dadoscliente,
+            movimentacoes = MovimentacoesCliente.objects.create(tenant=request.tenant,
+                                                                cliente=dadoscliente,
                                                                 banco=BancosCliente.objects.get(id=bancoatual.id, cliente=dadoscliente),
                                                                 data=dados.get('data'),
                                                                 descricao=dados.get('descricao'),
@@ -118,11 +120,12 @@ def movimentacao(request, banco):
                                                                 centrodecusto=CentroDeCusto.objects.get
                                                                 (id=dados.get("centrocusto"), cliente=dadoscliente))
             movimentacoes.save()
-            alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente.id, data=dados.get('data'))
+            alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente.id, data=dados.get('data'), request=request)
 
         elif dados.get('tipo') == 'transf':
             valor = float(dados.get('valor')) * -1.0
-            saida = MovimentacoesCliente.objects.create(cliente=dadoscliente,
+            saida = MovimentacoesCliente.objects.create(tenant=request.tenant,
+                                                        cliente=dadoscliente,
                                                         banco=BancosCliente.objects.get(id=bancoatual.id, cliente=dadoscliente),
                                                         data=dados.get('data'),
                                                         descricao=dados.get('descricao'),
@@ -132,8 +135,9 @@ def movimentacao(request, banco):
                                                         subcategoria=None,
                                                         centrodecusto=None)
             saida.save()
-            alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente.id, data=dados.get('data'))
-            entrada = MovimentacoesCliente.objects.create(cliente=dadoscliente,
+            alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente.id, data=dados.get('data'), request=request)
+            entrada = MovimentacoesCliente.objects.create(tenant=request.tenant,
+                                                          cliente=dadoscliente,
                                                           banco=BancosCliente.objects.get(id=dados.get('bancoentrada'), cliente=dadoscliente),
                                                           data=dados.get('data'),
                                                           descricao=dados.get('descricao'),
@@ -143,14 +147,14 @@ def movimentacao(request, banco):
                                                           subcategoria=None,
                                                           centrodecusto=None)
             entrada.save()
-            bancoentrada = BancosCliente.objects.get(id=dados.get('bancoentrada'), cliente=dadoscliente)
-            alteracaosaldo(banco=bancoentrada.id, cliente=dadoscliente.id, data=dados.get('data'))
+            bancoentrada = BancosCliente.objects.for_tenant(request.tenant).get(id=dados.get('bancoentrada'), cliente=dadoscliente)
+            alteracaosaldo(banco=bancoentrada.id, cliente=dadoscliente.id, data=dados.get('data'), request=request)
 
-    categorias = Categoria.objects.filter(cliente=dadoscliente)
-    subcategorias = SubCategoria.objects.filter(cliente=dadoscliente)
-    centrodecustos = CentroDeCusto.objects.filter(cliente=dadoscliente)
-    transicoes = TransicaoCliente.objects.filter(cliente=dadoscliente, banco=bancoatual)
-    bancodestinos = BancosCliente.objects.filter(cliente=dadoscliente, ativo=True)
+    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    transicoes = TransicaoCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente, banco=bancoatual)
+    bancodestinos = BancosCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente, ativo=True)
 
     context = {'dadoscliente': dadoscliente, 'banco': bancoatual, 'categorias': categorias,
                'subcategorias': subcategorias, 'centrodecustos': centrodecustos, 'bancos': bancos, 'mesatual': mesatual,
@@ -166,13 +170,13 @@ def save_data(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
     bancoatual = request.session.get('bancoatual')
     if not bancoatual:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    bancoatual = BancosCliente.objects.get(pk=bancoatual)
+    bancoatual = BancosCliente.objects.for_tenant(request.tenant).get(pk=bancoatual)
 
     movimentacoes_to_create = []
     if request.method == 'POST':
@@ -191,6 +195,7 @@ def save_data(request):
 
         try:
             movimentacoes_to_create.append(MovimentacoesCliente(
+                        tenant=request.tenant,
                         cliente=cliente,
                         banco=BancosCliente.objects.get(id=banco),
                         data=data,
@@ -203,6 +208,7 @@ def save_data(request):
             ))
         except:
             movimentacoes_to_create.append(MovimentacoesCliente(
+                            tenant=request.tenant,
                             cliente=cliente,
                             banco=BancosCliente.objects.get(id=banco),
                             data=data,
@@ -217,8 +223,8 @@ def save_data(request):
         MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
         if movimentacoes_to_create:
             for movimentacao in movimentacoes_to_create:
-                alteracaosaldo(banco=banco, cliente=dadoscliente.id, data=movimentacao.data)
-        TransicaoCliente.objects.get(id=id).delete()
+                alteracaosaldo(banco=banco, cliente=dadoscliente.id, data=movimentacao.data, request=request)
+        TransicaoCliente.objects.for_tenant(request.tenant).get(id=id).delete()
 
         return JsonResponse({'success': True})
 
@@ -228,7 +234,7 @@ def save_data(request):
 def delete(request):
     if request.method == 'POST':
         id = request.POST.get('id')
-        TransicaoCliente.objects.get(id=id).delete()
+        TransicaoCliente.objects.for_tenant(request.tenant).get(id=id).delete()
 
         return JsonResponse({'success': True})
 
@@ -240,13 +246,13 @@ def save_data_rule(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
     bancoatual = request.session.get('bancoatual')
     if not bancoatual:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    bancoatual = BancosCliente.objects.get(pk=bancoatual)
+    bancoatual = BancosCliente.objects.for_tenant(request.tenant).get(pk=bancoatual)
 
     movimentacoes_to_create = []
     if request.method == 'POST':
@@ -261,13 +267,14 @@ def save_data_rule(request):
         centrocusto = request.POST.get('centrocusto')
         valor = request.POST.get('valor')
         valor = float(valor.replace('.', '').replace(',', '.'))
-        regras = Regra.objects.create(cliente=dadoscliente, categoria=Categoria.objects.get(id=categoria, cliente=dadoscliente),
+        regras = Regra.objects.create(tenant=request.tenant, cliente=dadoscliente, categoria=Categoria.objects.get(id=categoria, cliente=dadoscliente),
                                       subcategoria=SubCategoria.objects.get(id=subcategoria, cliente=dadoscliente),
                                       centrodecusto=CentroDeCusto.objects.get(id=centrocusto, cliente=dadoscliente),
                                       descricao=descricao, ativo=True)
         regras.save()
         try:
             movimentacoes_to_create.append(MovimentacoesCliente(
+                        tenant=request.tenant,
                         cliente=dadoscliente,
                         banco=BancosCliente.objects.get(id=banco),
                         data=data,
@@ -280,6 +287,7 @@ def save_data_rule(request):
             ))
         except:
             movimentacoes_to_create.append(MovimentacoesCliente(
+                            tenant=request.tenant,
                             cliente=dadoscliente,
                             banco=BancosCliente.objects.get(id=banco),
                             data=data,
@@ -294,9 +302,9 @@ def save_data_rule(request):
         MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
 
         for movimentacao in movimentacoes_to_create:
-            alteracaosaldo(banco=banco, cliente=dadoscliente.id, data=str(movimentacao.data))
+            alteracaosaldo(banco=banco, cliente=dadoscliente.id, data=str(movimentacao.data), request=request)
 
-        TransicaoCliente.objects.get(id=id).delete()
+        TransicaoCliente.objects.for_tenant(request.tenant).get(id=id).delete()
 
         return JsonResponse({'success': True})
 
@@ -308,13 +316,13 @@ def transf(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
     bancoatual = request.session.get('bancoatual')
     if not bancoatual:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    bancoatual = BancosCliente.objects.get(pk=bancoatual)
+    bancoatual = BancosCliente.objects.for_tenant(request.tenant).get(pk=bancoatual)
 
     saida_to_create = []
     entrada_to_create = []
@@ -330,6 +338,7 @@ def transf(request):
         valor = request.POST.get('valor')
         valor = float(valor.replace('.', '').replace(',', '.'))
         saida_to_create.append(MovimentacoesCliente(
+                        tenant=request.tenant,
                         cliente=cliente,
                         banco=BancosCliente.objects.get(id=banco),
                         data=data,
@@ -342,11 +351,12 @@ def transf(request):
         ))
         MovimentacoesCliente.objects.bulk_create(saida_to_create)
         for movimentacao in saida_to_create:
-            alteracaosaldo(banco=banco, cliente=dadoscliente.id, data=movimentacao.data)
+            alteracaosaldo(banco=banco, cliente=dadoscliente.id, data=movimentacao.data, request=request)
         valor = valor * -1.0
-        nova_transf = MovimentacoesCliente.objects.filter(data=data, cliente=cliente, banco=bancodestino, valor=valor)
+        nova_transf = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(data=data, cliente=cliente, banco=bancodestino, valor=valor)
         if not nova_transf:
             entrada_to_create.append(MovimentacoesCliente(
+                            tenant=request.tenant,
                             cliente=cliente,
                             banco=BancosCliente.objects.get(id=bancodestino),
                             data=data,
@@ -357,11 +367,11 @@ def transf(request):
                             subcategoria=None,
                             centrodecusto=None
             ))
-        bancoentrada = BancosCliente.objects.get(id=bancodestino, cliente=dadoscliente)
+
         MovimentacoesCliente.objects.bulk_create(entrada_to_create)
         for movimentacao in entrada_to_create:
-            alteracaosaldo(banco=bancodestino, cliente=dadoscliente.id, data=movimentacao.data)
-        TransicaoCliente.objects.get(id=id).delete()
+            alteracaosaldo(banco=bancodestino, cliente=dadoscliente.id, data=movimentacao.data, request=request)
+        TransicaoCliente.objects.for_tenant(request.tenant).get(id=id).delete()
 
         return JsonResponse({'success': True})
 
@@ -373,7 +383,7 @@ def dre(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     cdcseleted = ''
     cdcseleted2 = ''
     anos = []
@@ -402,7 +412,7 @@ def dre(request):
                     centrodecusto = None
                 else:
                     centrodecusto = dados.get('centrodecusto')
-                    cdcseleted2 = CentroDeCusto.objects.get(id=dados.get('centrodecusto'), cliente=dadoscliente)
+                    cdcseleted2 = CentroDeCusto.objects.for_tenant(request.tenant).get(id=dados.get('centrodecusto'), cliente=dadoscliente)
                 totcatmaeexb = drecomp(mes1=mes1num, ano1=dados.get('ano1'), mes2=mes2num,
                                          ano2=dados.get('ano2'), cliente=dadoscliente, centrocusto=centrodecusto)
 
@@ -410,11 +420,11 @@ def dre(request):
             if dados.get('centrodecusto') == 'None':
                 dreexb = dreprincipal(cliente=dadoscliente, ano=dados.get('ano'))
             else:
-                cdcseleted = CentroDeCusto.objects.get(id=dados.get('centrodecusto'), cliente=dadoscliente)
+                cdcseleted = CentroDeCusto.objects.for_tenant(request.tenant).get(id=dados.get('centrodecusto'), cliente=dadoscliente)
                 dreexb = dreprincipal(cliente=dadoscliente, ano=dados.get('ano'),
                                       centrocusto=dados.get('centrodecusto'))
 
-    centrodecustos = CentroDeCusto.objects.filter(cliente=dadoscliente)
+    centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
 
     context = {'dadoscliente': dadoscliente, 'totcatmaeexb': totcatmaeexb, 'anos': anos, 'mes1': mes1, 'ano1': ano1,
                'mes2': mes2, 'ano2': ano2, 'dreexb': dreexb, 'centrodecustos': centrodecustos, 'cdcseleted': cdcseleted,
@@ -428,7 +438,7 @@ def dashboard(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     context = {'dadoscliente': dadoscliente}
     return render(request, 'dashboard.html', context)
 
@@ -438,7 +448,7 @@ def orcamento(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     context = {'dadoscliente': dadoscliente}
     return render(request, 'orcamento.html', context)
 
@@ -448,7 +458,7 @@ def cadastrarorcamento(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     context = {'dadoscliente': dadoscliente}
     return render(request, 'cadastrarorcamento.html', context)
 
@@ -458,15 +468,15 @@ def contas(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
-    movimentacoes = MovimentacoesCliente.objects.filter(cliente=dadoscliente).order_by('id')
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
+    movimentacoes = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('id')
     paginator = Paginator(movimentacoes, 100)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    categorias = Categoria.objects.filter(cliente=dadoscliente)
-    subcategorias = SubCategoria.objects.filter(cliente=dadoscliente)
-    centrodecustos = CentroDeCusto.objects.filter(cliente=dadoscliente)
-    bancos = BancosCliente.objects.filter(ativo='True', cliente=dadoscliente)
+    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente)
     context = {'dadoscliente': dadoscliente, 'movimentacoes': movimentacoes, 'page_obj':page_obj, 'categorias': categorias, 
                'subcategorias': subcategorias, 'centrodecustos': centrodecustos, 'bancos': bancos}
     return render(request, 'contas.html', context)
@@ -477,7 +487,7 @@ def maisopicoes(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     context = {'dadoscliente': dadoscliente}
     return render(request, 'maisopicoes.html', context)
 
@@ -487,16 +497,16 @@ def banco(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     if request.method == 'POST':
         dados = request.POST.dict()
-        banco = BancosCliente.objects.create(cliente=dadoscliente, banco=dados.get("banco"),
+        banco = BancosCliente.objects.create(tenant=request.tenant, cliente=dadoscliente, banco=dados.get("banco"),
                                              agencia=dados.get("agencia"),
                                              conta=dados.get("conta"), digito=dados.get("digito"),
                                              ativo=dados.get("ativo"))
         banco.save()
         return redirect('financeiro:banco')
-    bancos = BancosCliente.objects.filter(cliente=dadoscliente)
+    bancos = BancosCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
     context = {'dadoscliente': dadoscliente, 'bancos': bancos}
     return render(request, 'banco.html', context)
 
@@ -506,8 +516,8 @@ def bancosaldo(request, id):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
-    banco = BancosCliente.objects.get(cliente=dadoscliente, id=id)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
+    banco = BancosCliente.objects.for_tenant(request.tenant).get(cliente=dadoscliente, id=id)
     if request.method == 'POST':
         dados = request.POST.dict()
         data = dados.get('data')
@@ -521,7 +531,7 @@ def bancosaldo(request, id):
                 'saldofinal': float(saldofinal)
             }
         )
-        saldodiario(banco=banco.id, cliente=dadoscliente, data=data)
+        saldodiario(banco=banco.id, cliente=dadoscliente, data=data, request=request)
         return redirect('financeiro:banco')
     context = {'dadoscliente': dadoscliente, 'banco': banco}
     return render(request, 'bancosaldo.html', context)
@@ -532,9 +542,9 @@ def editarbanco(request, id):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
-    bancoeditado = BancosCliente.objects.get(cliente=dadoscliente, id=id)
-    bancos = BancosCliente.objects.filter(cliente=dadoscliente)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
+    bancoeditado = BancosCliente.objects.for_tenant(request.tenant).get(cliente=dadoscliente, id=id)
+    bancos = BancosCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
     if request.method == 'POST':
         bancoeditado.banco = request.POST.get('banco')
         bancoeditado.agencia = request.POST.get('agencia')
@@ -557,21 +567,21 @@ def categoria(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     if request.method == 'POST':
         dados = request.POST.dict()
         categoriamae = CategoriaMae.objects.get(id=dados.get("categoriamae"))
         nome = dados.get("nome")
 
         # Verificação se já existe uma categoria com o mesmo cliente, categoriamae e nome
-        if Categoria.objects.filter(cliente=dadoscliente, categoriamae=categoriamae, nome=nome).exists():
+        if Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente, categoriamae=categoriamae, nome=nome).exists():
             messages.error(request, "Categoria já cadastrada")
         else:
-            categoria = Categoria.objects.create(cliente=dadoscliente, categoriamae=categoriamae, nome=nome)
+            categoria = Categoria.objects.create(tenant=request.tenant, cliente=dadoscliente, categoriamae=categoriamae, nome=nome)
             categoria.save()
 
     categoriasmae = CategoriaMae.objects.all()
-    categorias = Categoria.objects.filter(cliente=dadoscliente)
+    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
     context = {
         'dadoscliente': dadoscliente,
         'categorias': categorias,
@@ -585,8 +595,8 @@ def editarcategoria(request, id):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
-    categoriaeditada = Categoria.objects.get(cliente=dadoscliente, id=id)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
+    categoriaeditada = Categoria.objects.for_tenant(request.tenant).get(cliente=dadoscliente, id=id)
     if request.method == 'POST':
         categoriaeditada.categoriamae = CategoriaMae.objects.get(nome=request.POST.get('categoriamae'))
         categoriaeditada.nome = request.POST.get('nome')
@@ -595,7 +605,7 @@ def editarcategoria(request, id):
 
         return redirect('financeiro:categoria')
     categoriasmae = CategoriaMae.objects.all()
-    categorias = Categoria.objects.filter(cliente=dadoscliente)
+    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
     context = {'dadoscliente': dadoscliente, 'categorias': categorias, 'categoriasmae': categoriasmae,
                'categoriaeditada': categoriaeditada}
     return render(request, 'editarcategoria.html', context)
@@ -606,22 +616,22 @@ def subcategoria(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     if request.method == 'POST':
         dados = request.POST.dict()
-        categoria = Categoria.objects.get(id=dados.get("categoria"), cliente=dadoscliente)
+        categoria = Categoria.objects.for_tenant(request.tenant).get(id=dados.get("categoria"), cliente=dadoscliente)
         nome = dados.get("nome")
 
         # Verificação se já existe uma subcategoria com o mesmo cliente, categoria e nome
-        if SubCategoria.objects.filter(cliente=dadoscliente, categoria=categoria, nome=nome).exists():
+        if SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente, categoria=categoria, nome=nome).exists():
             messages.error(request, "Sub-categoria já cadastrada")
         else:
-            subcategoria = SubCategoria.objects.create(cliente=dadoscliente, categoria=categoria, nome=nome)
+            subcategoria = SubCategoria.objects.create(tenant=request.tenant, cliente=dadoscliente, categoria=categoria, nome=nome)
             subcategoria.save()
 
     categoriasmae = CategoriaMae.objects.all()
-    categorias = Categoria.objects.filter(cliente=dadoscliente)
-    subcategorias = SubCategoria.objects.filter(cliente=dadoscliente)
+    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
     context = {
         'dadoscliente': dadoscliente,
         'categorias': categorias,
@@ -636,18 +646,18 @@ def editarsubcategoria(request, id):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
-    subcategoriaeditada = SubCategoria.objects.get(cliente=dadoscliente, id=id)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
+    subcategoriaeditada = SubCategoria.objects.for_tenant(request.tenant).get(cliente=dadoscliente, id=id)
     if request.method == 'POST':
-        subcategoriaeditada.categoria = Categoria.objects.get(nome=request.POST.get('categoria'), cliente=dadoscliente)
+        subcategoriaeditada.categoria = Categoria.objects.for_tenant(request.tenant).get(nome=request.POST.get('categoria'), cliente=dadoscliente)
         subcategoriaeditada.nome = request.POST.get('nome')
 
         subcategoriaeditada.save()
 
         return redirect('financeiro:subcategoria')
     categoriasmae = CategoriaMae.objects.all()
-    categorias = Categoria.objects.filter(cliente=dadoscliente)
-    subcategorias = SubCategoria.objects.filter(cliente=dadoscliente)
+    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
     context = {'dadoscliente': dadoscliente, 'categorias': categorias, 'categoriasmae': categoriasmae, 'subcategorias':
         subcategorias, 'subcategoriaeditada': subcategoriaeditada}
     return render(request, 'editarsubcategoria.html', context)
@@ -658,20 +668,20 @@ def centrocusto(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     if request.method == 'POST':
         dados = request.POST.dict()
         nome = dados.get("nome")
         ativo = dados.get("ativo")
 
         # Verificação se já existe um centro de custo com o mesmo cliente e nome
-        if CentroDeCusto.objects.filter(cliente=dadoscliente, nome=nome).exists():
+        if CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente, nome=nome).exists():
             messages.error(request, "Centro de Custo já cadastrado")
         else:
-            centrocusto = CentroDeCusto.objects.create(cliente=dadoscliente, nome=nome, ativo=ativo)
+            centrocusto = CentroDeCusto.objects.create(tenant=request.tenant, cliente=dadoscliente, nome=nome, ativo=ativo)
             centrocusto.save()
 
-    centrocustos = CentroDeCusto.objects.filter(cliente=dadoscliente)
+    centrocustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
     context = {'dadoscliente': dadoscliente, 'centrocustos': centrocustos}
     return render(request, 'centrocusto.html', context)
 
@@ -681,8 +691,8 @@ def editarcentrocusto(request, id):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
-    centrocustoeditado = CentroDeCusto.objects.get(cliente=dadoscliente, id=id)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
+    centrocustoeditado = CentroDeCusto.objects.for_tenant(request.tenant).get(cliente=dadoscliente, id=id)
     if request.method == 'POST':
         centrocustoeditado.nome = request.POST.get('nome')
         centrocustoeditado.ativo = True if request.POST.get('ativo') else False
@@ -690,7 +700,7 @@ def editarcentrocusto(request, id):
         centrocustoeditado.save()
 
         return redirect('financeiro:centrocusto')
-    centrocustos = CentroDeCusto.objects.filter(cliente=dadoscliente)
+    centrocustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
     context = {'dadoscliente': dadoscliente, 'centrocustos': centrocustos, 'centrocustoeditado': centrocustoeditado}
     return render(request, 'editarcentrocusto.html', context)
 
@@ -700,12 +710,12 @@ def editarregra(request, id):
     if not pk:
         return redirect('alguma_view_de_erro')
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
-    regraeditada = Regra.objects.get(cliente=dadoscliente, id=id)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
+    regraeditada = Regra.objects.for_tenant(request.tenant).get(cliente=dadoscliente, id=id)
 
     if request.method == 'POST':
         dados = request.POST.dict()
-        Regra.objects.filter(id=id, cliente=dadoscliente).update(
+        Regra.objects.for_tenant(request.tenant).filter(id=id, cliente=dadoscliente).update(
             cliente=dadoscliente,
             categoria=Categoria.objects.get(nome=dados.get("categoria"), cliente=dadoscliente),
             subcategoria=SubCategoria.objects.get(nome=dados.get("subcategoria"), cliente=dadoscliente),
@@ -715,11 +725,11 @@ def editarregra(request, id):
         )
 
     # Obtém todas as regras do cliente
-    regras = Regra.objects.filter(cliente=dadoscliente)
+    regras = Regra.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
 
-    categorias = Categoria.objects.filter(cliente=dadoscliente)
-    subcategorias = SubCategoria.objects.filter(cliente=dadoscliente)
-    centrodecustos = CentroDeCusto.objects.filter(cliente=dadoscliente)
+    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
 
     context = {
         'dadoscliente': dadoscliente,
@@ -737,12 +747,12 @@ def regra(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     if request.method == 'POST':
         dados = request.POST.dict()
         
         # Verifica se já existe um cadastro com os mesmos dados
-        existe_regra = Regra.objects.filter(
+        existe_regra = Regra.objects.for_tenant(request.tenant).filter(
             cliente=dadoscliente,
             categoria_id=dados.get("categoria"),
             subcategoria_id=dados.get("subcategoria"),
@@ -755,7 +765,7 @@ def regra(request):
             
         else:
             # Cria o novo registro
-            regras = Regra.objects.create(
+            regras = Regra.objects.create(tenant=request.tenant,
                 cliente=dadoscliente,
                 categoria=Categoria.objects.get(id=dados.get("categoria"), cliente=dadoscliente),
                 subcategoria=SubCategoria.objects.get(id=dados.get("subcategoria"), cliente=dadoscliente),
@@ -765,10 +775,10 @@ def regra(request):
             )
             regras.save()
 
-    categorias = Categoria.objects.filter(cliente=dadoscliente)
-    subcategorias = SubCategoria.objects.filter(cliente=dadoscliente)
-    centrodecustos = CentroDeCusto.objects.filter(cliente=dadoscliente)
-    regras = Regra.objects.filter(cliente=dadoscliente)
+    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    regras = Regra.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
 
     context = {'dadoscliente': dadoscliente, 'categorias': categorias, 'subcategorias': subcategorias,
                'centrodecustos': centrodecustos, 'regras': regras}
@@ -777,7 +787,7 @@ def regra(request):
 
 def get_movimentacao(request, id):
     try:
-        movimentacao = MovimentacoesCliente.objects.get(pk=id)
+        movimentacao = MovimentacoesCliente.objects.for_tenant(request.tenant).get(pk=id)
         global data_ant
         data_ant = movimentacao.data
         data = {
@@ -801,7 +811,7 @@ def edit_movimentacao(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     if request.method == 'POST':
         id = request.POST.get('id')
         movimentacao = get_object_or_404(MovimentacoesCliente, id=id)
@@ -815,7 +825,7 @@ def edit_movimentacao(request):
         subcategoria_id = request.POST.get('subcategoria')
         
         try:
-            movimentacao.banco = BancosCliente.objects.get(id=banco_id)
+            movimentacao.banco = BancosCliente.objects.for_tenant(request.tenant).get(id=banco_id)
         except ObjectDoesNotExist:
             return JsonResponse({'success': False, 'error': 'Banco não encontrado'})
         
@@ -824,17 +834,17 @@ def edit_movimentacao(request):
             movimentacao.centrodecusto = None
         else:
             try:
-                movimentacao.centrodecusto = CentroDeCusto.objects.get(id=centrodecusto_id)
+                movimentacao.centrodecusto = CentroDeCusto.objects.for_tenant(request.tenant).get(id=centrodecusto_id)
             except ObjectDoesNotExist:
                 return JsonResponse({'error': 'Centro de custo não encontrado'})
         
         try:
-            movimentacao.categoria = Categoria.objects.get(id=categoria_id)
+            movimentacao.categoria = Categoria.objects.for_tenant(request.tenant).get(id=categoria_id)
         except ObjectDoesNotExist:
             return JsonResponse({'error': 'Categoria não encontrada'})
         
         try:
-            movimentacao.subcategoria = SubCategoria.objects.get(id=subcategoria_id)
+            movimentacao.subcategoria = SubCategoria.objects.for_tenant(request.tenant).get(id=subcategoria_id)
         except ObjectDoesNotExist:
             return JsonResponse({'error': 'Subcategoria não encontrada'})
         
@@ -852,7 +862,7 @@ def edit_movimentacao(request):
             data=str(data_ant)
 
         movimentacao.save()
-        alteracaosaldo(banco=banco_id, cliente=dadoscliente.id, data=data)
+        alteracaosaldo(banco=banco_id, cliente=dadoscliente.id, data=data, request=request)
     
     return JsonResponse({'success': False})
 
@@ -862,15 +872,14 @@ def delete_movimentacao(request, id):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
-    dadoscliente = cadastro_de_cliente.objects.get(pk=pk)
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     if request.method == 'POST':
         try:
-            movimentacao = MovimentacoesCliente.objects.get(pk=id)
+            movimentacao = MovimentacoesCliente.objects.for_tenant(request.tenant).get(pk=id)
             data = str(movimentacao.data)
-            cliente = movimentacao.cliente
             banco = movimentacao.banco
             movimentacao.delete()
-            alteracaosaldo(banco=banco.id, cliente=dadoscliente.id, data=str(data))
+            alteracaosaldo(banco=banco.id, cliente=dadoscliente.id, data=str(data), request=request)
             return JsonResponse({'success': True})
         except MovimentacoesCliente.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Movimentação não encontrada'}, status=404)
