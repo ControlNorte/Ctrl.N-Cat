@@ -64,7 +64,6 @@ def saldodiario(banco, cliente, data, request):
         )
 
 
-
 def alteracaosaldo(banco, cliente, data, request):
     datainicial = datetime.strptime(data, "%Y-%m-%d").date()  # Determina a menor data entre as movimentações
     datafinal = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco).order_by('-data').first()
