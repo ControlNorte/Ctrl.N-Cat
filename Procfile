@@ -1,1 +1,1 @@
-web: python manage.py makemigrations && python manage.py migrate && gunicorn ControlNorte.wsgi --log-file - --timeout 300 --workers=3
+web: python manage.py makemigrations && python manage.py migrate hpinicial 0002_tenant --fake && gunicorn ControlNorte.wsgi --log-file - --timeout 300 --workers=3
