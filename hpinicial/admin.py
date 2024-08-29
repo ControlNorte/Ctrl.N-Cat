@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 # Register your models here.
 
 campos = list(UserAdmin.fieldsets)
-campos.append(("Informações pessoais", {"fields":("cpf",)}))
+campos.append(("Informações pessoais", {"fields":("cpf", "tenant_id")}))
 
 UserAdmin.fieldsets = tuple(campos)
 
