@@ -89,6 +89,7 @@ class TransicaoCliente(models.Model):
     objects = TenantManager()
 
 
+
 class Regra(models.Model):
     tenant = models.ForeignKey(Tenant, null=True, on_delete=models.CASCADE)
     categoria = models.ForeignKey(Categoria, null=True, on_delete=models.SET_NULL)
