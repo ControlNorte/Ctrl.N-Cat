@@ -84,7 +84,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
     # Criar o autômato Aho-Corasick
     A = ahocorasick.Automaton()
-    regras = Regra.objects.filter(cliente=cliente).select_related('categoria', 'subcategoria', 'centrodecusto')
+    regras = Regra.objects.for_tenant(request.tenant).filter(cliente=cliente).select_related('categoria', 'subcategoria', 'centrodecusto')
     for idx, regra in enumerate(regras):
         A.add_word(str(regra.descricao).upper(), (idx, regra))  # Adiciona as descrições das regras no autômato
     A.make_automaton()  # Compila o autômato para otimizar a pesquisa
@@ -98,7 +98,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
         descricao = dado['Descrição'].upper()
 
         # Verifica se já existe uma movimentação com a mesma data, descrição e valor
-        if MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=dado['Data'], descricao=descricao,
+        if MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco, data=dado['Data'], descricao=descricao,
                                                valor=dado['Valor']).exists():
             continue  # Pula para o próximo dado se já existir uma movimentação igual
 
@@ -107,6 +107,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
         # Itera pelas correspondências usando o autômato
         for _, (_, regra) in A.iter(descricao):
             movimentacoes_to_create.append(MovimentacoesCliente(
+                tenant=request.tenant,
                 cliente=cliente,
                 banco=banco,
                 data=dado['Data'].date(),
@@ -123,6 +124,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
         if not matched:  # Se nenhuma correspondência foi encontrada
             transicoes_to_create.append(TransicaoCliente(
+                tenant=request.tenant,
                 cliente=cliente,
                 banco=banco,
                 data=dado['Data'].date(),
@@ -141,23 +143,21 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     # Atualização do saldo baseado nas novas movimentações
     if movimentacoes_to_create:
         datainicial = min(mov.data for mov in movimentacoes_to_create)  # Determina a menor data entre as movimentações
-        datafinal = MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco).order_by('-data').first()
+        datafinal = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco).order_by('-data').first()
         datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=31)  # Determina a maior data entre as movimentações
 
         while datainicial <= datafinal:
             # Calcula o saldo inicial e final do dia
-            saldo_inicial = Saldo.objects.get(cliente=cliente, banco=banco,
+            saldo_inicial = Saldo.objects.for_tenant(request.tenant).get(cliente=cliente, banco=banco,
                                                  data=datainicial - timedelta(days=1))
 
             saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
 
             saldo_movimentacoes = \
-                MovimentacoesCliente.objects.filter(cliente=cliente, banco=banco, data=datainicial).aggregate(
+                MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco, data=datainicial).aggregate(
                     total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
 
             saldo_final = saldo_inicial + saldo_movimentacoes
-
-            print(f'SI: {saldo_inicial}, SF: {saldo_final}, data: {datainicial}')
 
             with connection.cursor() as cursor:
                 insert_query = """
@@ -179,7 +179,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
     return print(f'Importação concluída. {conciliados} movimentações conciliadas.')  # Retorna uma mensagem de sucesso
 
-MovimentacoesCliente
+
 class UploadFileForm(forms.ModelForm):
     class Meta:
         model = UploadedFile
