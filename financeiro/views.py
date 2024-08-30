@@ -73,7 +73,7 @@ def movimentacao(request, banco):
     if form.is_valid():
         form.save()
         file = request.FILES['file']
-        df = importar_arquivo_excel(file, cliente=dadoscliente.id, banco=bancoatual.id, request=request)
+        df = importar_arquivo_excel(file, cliente=dadoscliente, banco=bancoatual, request=request)
 
     if request.method == 'POST':
         dados = request.POST.dict()
