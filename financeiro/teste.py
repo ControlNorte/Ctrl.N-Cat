@@ -74,8 +74,6 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     dados = pd.read_excel(arquivo_upload, dtype={'Descrição': str, 'Data': str, 'Valor': float})
     dados['Data'] = pd.to_datetime(dados['Data'], errors='coerce')  # Converte as datas para o formato datetime
 
-    print(len(dados))
-
     # Verificar se há valores NaT
     if dados['Data'].isna().any():
         return print("Erro: Algumas datas não puderam ser convertidas. Verifique o formato das datas no arquivo Excel.")
@@ -85,7 +83,6 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     # Criar o autômato Aho-Corasick
     A = ahocorasick.Automaton()
     regras = Regra.objects.for_tenant(request.tenant).filter(cliente=cliente).select_related('categoria', 'subcategoria', 'centrodecusto')
-    print(regras)
     for idx, regra in enumerate(regras):
         A.add_word(str(regra.descricao).upper(), (idx, regra))  # Adiciona as descrições das regras no autômato
     A.make_automaton()  # Compila o autômato para otimizar a pesquisa
@@ -93,7 +90,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
     transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
     conciliados = 0  # Contador para o número de movimentações conciliadas
-
+    sim = 0
     # Processamento das transações
     for dado in dados_dict:
         descricao = dado['Descrição'].upper()
@@ -101,6 +98,8 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
         # Verifica se já existe uma movimentação com a mesma data, descrição e valor
         if MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco, data=dado['Data'], descricao=descricao,
                                                valor=dado['Valor']).exists():
+            sim += 1
+            print(sim)
             continue  # Pula para o próximo dado se já existir uma movimentação igual
 
         matched = False  # Indicador de correspondência
