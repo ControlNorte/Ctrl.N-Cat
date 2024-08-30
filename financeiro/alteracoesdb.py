@@ -19,7 +19,7 @@ import logging
 def saldodiario(banco, cliente, data, request):
     datainicial = datetime.strptime(data, '%Y-%m-%d').date()
     datainicialord = datainicial.toordinal() + 1
-    print(request.tenat)
+
     datafinal = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente.id, banco=banco).order_by('-data').first()
     datafinal = datafinal.data + timedelta(days=31) if datafinal else datainicial + timedelta(days=31)
     datafinal = datafinal.toordinal()
@@ -53,7 +53,7 @@ def saldodiario(banco, cliente, data, request):
         saldofinal = saldoinicial + saldodia
 
         Saldo.objects.update_or_create(
-            tenant=request.tenat,
+            tenant=request.tenant,
             data=data,
             banco=BancosCliente.objects.for_tenant(request.tenant).get(id=banco),
             cliente=cliente,
