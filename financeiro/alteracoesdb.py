@@ -82,6 +82,8 @@ def alteracaosaldo(banco, cliente, data, request):
 
         saldo_final = saldo_inicial + saldo_movimentacoes
 
+        tenant = request.tenant
+
         with connection.cursor() as cursor:
             insert_query = """
                         INSERT INTO financeiro_saldo (tenant_id, cliente_id, banco_id, data, saldoinicial, saldofinal)
@@ -91,7 +93,7 @@ def alteracaosaldo(banco, cliente, data, request):
                     """
 
             cursor.execute(insert_query, [
-                request.tenant,
+                tenant,
                 cliente,
                 banco,
                 datainicial,
