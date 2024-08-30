@@ -51,7 +51,7 @@ def saldodiario(banco, cliente, data, request):
             ]['valor'].sum()
 
         saldofinal = saldoinicial + saldodia
-
+        print(request.tenat)
         Saldo.objects.update_or_create(
             tenant=request.tenat,
             data=data,
