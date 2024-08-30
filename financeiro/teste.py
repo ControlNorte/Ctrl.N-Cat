@@ -165,7 +165,6 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
             tenant = int(request.tenant.id)
             print(cliente)
-            cliente = cliente.id
             banco = banco.id
 
             with connection.cursor() as cursor:
