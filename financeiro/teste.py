@@ -164,7 +164,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
             saldo_final = saldo_inicial + saldo_movimentacoes
 
             tenant = int(request.tenant.id)
-            cliente = int(cliente.id)
+            cliente = int(cliente)
             banco = banco.id
 
             with connection.cursor() as cursor:
