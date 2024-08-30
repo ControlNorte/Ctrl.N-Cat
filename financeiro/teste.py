@@ -85,6 +85,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     # Criar o autômato Aho-Corasick
     A = ahocorasick.Automaton()
     regras = Regra.objects.for_tenant(request.tenant).filter(cliente=cliente).select_related('categoria', 'subcategoria', 'centrodecusto')
+    print(regras)
     for idx, regra in enumerate(regras):
         A.add_word(str(regra.descricao).upper(), (idx, regra))  # Adiciona as descrições das regras no autômato
     A.make_automaton()  # Compila o autômato para otimizar a pesquisa
