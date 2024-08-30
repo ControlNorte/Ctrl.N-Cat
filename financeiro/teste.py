@@ -90,16 +90,16 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
     transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
     conciliados = 0  # Contador para o número de movimentações conciliadas
-    sim = 0
+
     # Processamento das transações
     for dado in dados_dict:
         descricao = dado['Descrição'].upper()
+        print(f'cliente: {cliente} \n banco: {banco} \n data: {dado['Data']} \n descrição: {descricao} \n valor: {dado['Valor']}')
 
         # Verifica se já existe uma movimentação com a mesma data, descrição e valor
         if MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco, data=dado['Data'], descricao=descricao,
                                                valor=dado['Valor']).exists():
-            sim += 1
-            print(sim)
+
             continue  # Pula para o próximo dado se já existir uma movimentação igual
 
         matched = False  # Indicador de correspondência
