@@ -162,8 +162,10 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
                     total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
 
             saldo_final = saldo_inicial + saldo_movimentacoes
+
             print(type(request.tenant))
-            tenant = int(request.tenant)
+            tenant = int(request.tenant.id)
+            print(tenant)
 
             with connection.cursor() as cursor:
                 insert_query = """
