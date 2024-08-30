@@ -84,13 +84,14 @@ def alteracaosaldo(banco, cliente, data, request):
 
         with connection.cursor() as cursor:
             insert_query = """
-                        INSERT INTO financeiro_saldo (cliente_id, banco_id, data, saldoinicial, saldofinal)
-                        VALUES (%s, %s, %s, %s, %s)
-                        ON CONFLICT (cliente_id, banco_id, data)
+                        INSERT INTO financeiro_saldo (tenant_id, cliente_id, banco_id, data, saldoinicial, saldofinal)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                        ON CONFLICT (tenant_id, cliente_id, banco_id, data)
                         DO UPDATE SET saldoinicial = EXCLUDED.saldoinicial, saldofinal = EXCLUDED.saldofinal;
                     """
 
             cursor.execute(insert_query, [
+                request.tenant,
                 cliente,
                 banco,
                 datainicial,
