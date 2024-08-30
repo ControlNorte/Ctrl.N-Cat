@@ -98,8 +98,11 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
         # Verifica se já existe uma movimentação com a mesma data, descrição e valor
         if MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco, data=dado['Data'], descricao=descricao,
                                                valor=dado['Valor']).exists():
-            print(MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco, data=dado['Data'], descricao=descricao,
-                                               valor=dado['Valor']))
+            a = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco,
+                                                                           data=dado['Data'], descricao=descricao,
+                                                                           valor=dado['Valor'])
+            print(a.cliente, a.banco, a.data, a.descricao,
+                                               a.valor)
             continue  # Pula para o próximo dado se já existir uma movimentação igual
 
         matched = False  # Indicador de correspondência
