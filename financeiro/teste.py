@@ -101,9 +101,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
             a = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco,
                                                                            data=dado['Data'], descricao=descricao,
                                                                            valor=dado['Valor'])
-            a = a.first()
-            print(a.cliente, a.banco, a.data, a.descricao,
-                                               a.valor)
+
             continue  # Pula para o próximo dado se já existir uma movimentação igual
 
         matched = False  # Indicador de correspondência
@@ -164,7 +162,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
             saldo_final = saldo_inicial + saldo_movimentacoes
 
             tenant = int(request.tenant.id)
-            print(cliente, banco)
+            print(cliente.id, banco.id)
             print(vars(cliente), vars(banco))
             cliente = int(cliente)
             banco = banco.id
