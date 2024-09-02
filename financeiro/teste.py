@@ -67,6 +67,11 @@ def format_currency(value):
 
 
 def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
+
+    print(type(cliente))
+    cliente = cliente.id
+    banco = banco.id
+
     if not arquivo_upload:
         return print("Erro: Nenhum arquivo foi selecionado.")  # Retorna erro se nenhum arquivo foi selecionado
 
@@ -162,6 +167,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
             saldo_final = saldo_inicial + saldo_movimentacoes
 
             tenant = int(request.tenant.id)
+            print(type(cliente))
             cliente = cliente.id
             banco = banco.id
 
