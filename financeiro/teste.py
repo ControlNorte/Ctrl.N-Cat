@@ -68,10 +68,6 @@ def format_currency(value):
 
 def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
-    print(type(cliente))
-    cliente = cliente.id
-    banco = banco.id
-
     if not arquivo_upload:
         return print("Erro: Nenhum arquivo foi selecionado.")  # Retorna erro se nenhum arquivo foi selecionado
 
@@ -153,6 +149,10 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
         datafinal = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco).order_by('-data').first()
         datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=31)  # Determina a maior data entre as movimentações
 
+        tenant = int(request.tenant.id)
+        cliente = cliente.id
+        banco = banco.id
+
         while datainicial <= datafinal:
             # Calcula o saldo inicial e final do dia
             saldo_inicial = Saldo.objects.for_tenant(request.tenant).get(cliente=cliente, banco=banco,
@@ -165,11 +165,6 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
                     total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
 
             saldo_final = saldo_inicial + saldo_movimentacoes
-
-            tenant = int(request.tenant.id)
-            print(type(cliente))
-            cliente = cliente.id
-            banco = banco.id
 
             with connection.cursor() as cursor:
                 insert_query = """
