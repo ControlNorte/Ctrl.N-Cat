@@ -24,7 +24,7 @@ from collections import defaultdict
 @login_required
 def financeiro_view(request):
     if request.tenant:
-        clientes = cadastro_de_cliente.objects.for_tenant(request.tenant)
+        clientes = cadastro_de_cliente.objects.for_tenant(request.tenant).filter(ativo=True).order_by('razao_social')
     else:
         clientes = "Sem Clientes Cadastrados"
     context = {'object_list': clientes}
