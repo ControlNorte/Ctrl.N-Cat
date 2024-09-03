@@ -84,7 +84,7 @@ def movimentacao(request, banco):
             exbextrato = extrato(cliente=dadoscliente, banco=bancoatual.id, mes=mesfiltro)
 
         elif dados.get('tipo') == 'entrada':
-            valor = float(dados.get('valor').replace('.', '').replace(',', '.'))
+            valor = float(dados.get('valor'))
             print(valor)
             if valor >= 0:
                 movimentacoes = MovimentacoesCliente.objects.create(tenant=request.tenant,
