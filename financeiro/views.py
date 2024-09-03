@@ -85,6 +85,7 @@ def movimentacao(request, banco):
 
         elif dados.get('tipo') == 'entrada':
             valor = float(dados.get('valor').replace('.', '').replace(',', '.'))
+            print(valor)
             if valor >= 0:
                 movimentacoes = MovimentacoesCliente.objects.create(tenant=request.tenant,
                                                                     cliente=dadoscliente,
