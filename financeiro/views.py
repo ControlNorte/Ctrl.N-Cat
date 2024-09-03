@@ -104,9 +104,9 @@ def movimentacao(request, banco):
 
         elif dados.get('tipo') == 'saida':
             if float(dados.get('valor')) <= 0:
-                valor = float(dados.get('valor'))
+                valor = float(dados.get('valor').replace(',', '.'))
             else:
-                valor = float(dados.get('valor')) * - 1.0
+                valor = float(dados.get('valor').replace(',', '.')) * - 1.0
             movimentacoes = MovimentacoesCliente.objects.create(tenant=request.tenant,
                                                                 cliente=dadoscliente,
                                                                 banco=BancosCliente.objects.get(id=bancoatual.id, cliente=dadoscliente),

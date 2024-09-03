@@ -438,7 +438,6 @@ Financeiro | {{ dadoscliente }}
                                             <label class="p-2">Valor:</label>
                                             <input type="text"
                                                    name="valor"
-                                                   id="valor"
                                                    placeholder="0,00"
                                                    oninput="formatValue(this)"
                                                    required/>
@@ -513,12 +512,11 @@ Financeiro | {{ dadoscliente }}
                                                     {% endfor %}
                                             </select>
                                             <label class="p-2">Valor:</label>
-                                            <input type="number"
+                                            <input type="text"
                                                    name="valor"
-                                                   step="0.010"
-                                                   placeholder="Valor"
-                                                   class="form-control"
-                                                   required>
+                                                   placeholder="0,00"
+                                                   oninput="formatValue(this)"
+                                                   required/>
                                         </div>
                                         <div class="col-start-3 flex justify-end">
                                             <button
