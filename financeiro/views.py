@@ -46,7 +46,7 @@ def caixa(request):
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
-    bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente)
+    bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente).order_by('banco')
     context = {'dadoscliente': dadoscliente, 'bancos': bancos}
     return render(request, 'caixa.html', context)
 
@@ -58,7 +58,7 @@ def movimentacao(request, banco):
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
-    bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente)
+    bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente).order_by('banco')
     bancoatual = BancosCliente.objects.for_tenant(request.tenant).get(ativo='True', cliente=dadoscliente, banco=banco)
     request.session['bancoatual'] = bancoatual.id
     mesatual = datetime.now().month
@@ -150,11 +150,11 @@ def movimentacao(request, banco):
             bancoentrada = BancosCliente.objects.for_tenant(request.tenant).get(id=dados.get('bancoentrada'), cliente=dadoscliente)
             alteracaosaldo(banco=bancoentrada.id, cliente=dadoscliente.id, data=dados.get('data'), request=request)
 
-    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
-    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
-    centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
-    transicoes = TransicaoCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente, banco=bancoatual)
-    bancodestinos = BancosCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente, ativo=True)
+    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
+    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
+    centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
+    transicoes = TransicaoCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente, banco=bancoatual).order_by('data')
+    bancodestinos = BancosCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente, ativo=True).order_by('banco')
 
     context = {'dadoscliente': dadoscliente, 'banco': bancoatual, 'categorias': categorias,
                'subcategorias': subcategorias, 'centrodecustos': centrodecustos, 'bancos': bancos, 'mesatual': mesatual,
@@ -424,7 +424,7 @@ def dre(request):
                 dreexb = dreprincipal(cliente=dadoscliente, ano=dados.get('ano'),
                                       centrocusto=dados.get('centrodecusto'))
 
-    centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
 
     context = {'dadoscliente': dadoscliente, 'totcatmaeexb': totcatmaeexb, 'anos': anos, 'mes1': mes1, 'ano1': ano1,
                'mes2': mes2, 'ano2': ano2, 'dreexb': dreexb, 'centrodecustos': centrodecustos, 'cdcseleted': cdcseleted,
@@ -473,10 +473,10 @@ def contas(request):
     paginator = Paginator(movimentacoes, 100)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
-    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
-    centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
-    bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente)
+    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
+    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
+    centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
+    bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente).order_by('banco')
     context = {'dadoscliente': dadoscliente, 'movimentacoes': movimentacoes, 'page_obj':page_obj, 'categorias': categorias, 
                'subcategorias': subcategorias, 'centrodecustos': centrodecustos, 'bancos': bancos}
     return render(request, 'contas.html', context)
@@ -506,7 +506,7 @@ def banco(request):
                                              ativo=dados.get("ativo"))
         banco.save()
         return redirect('financeiro:banco')
-    bancos = BancosCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    bancos = BancosCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('banco')
     context = {'dadoscliente': dadoscliente, 'bancos': bancos}
     return render(request, 'banco.html', context)
 
@@ -544,7 +544,7 @@ def editarbanco(request, id):
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     bancoeditado = BancosCliente.objects.for_tenant(request.tenant).get(cliente=dadoscliente, id=id)
-    bancos = BancosCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    bancos = BancosCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('banco')
     if request.method == 'POST':
         bancoeditado.banco = request.POST.get('banco')
         bancoeditado.agencia = request.POST.get('agencia')
@@ -581,7 +581,7 @@ def categoria(request):
             categoria.save()
 
     categoriasmae = CategoriaMae.objects.all()
-    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     context = {
         'dadoscliente': dadoscliente,
         'categorias': categorias,
@@ -604,8 +604,8 @@ def editarcategoria(request, id):
         categoriaeditada.save()
 
         return redirect('financeiro:categoria')
-    categoriasmae = CategoriaMae.objects.all()
-    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    categoriasmae = CategoriaMae.objects.all().order_by('nome')
+    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     context = {'dadoscliente': dadoscliente, 'categorias': categorias, 'categoriasmae': categoriasmae,
                'categoriaeditada': categoriaeditada}
     return render(request, 'editarcategoria.html', context)
@@ -629,9 +629,9 @@ def subcategoria(request):
             subcategoria = SubCategoria.objects.create(tenant=request.tenant, cliente=dadoscliente, categoria=categoria, nome=nome)
             subcategoria.save()
 
-    categoriasmae = CategoriaMae.objects.all()
-    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
-    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    categoriasmae = CategoriaMae.objects.all().order_by('nome')
+    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
+    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     context = {
         'dadoscliente': dadoscliente,
         'categorias': categorias,
@@ -655,9 +655,9 @@ def editarsubcategoria(request, id):
         subcategoriaeditada.save()
 
         return redirect('financeiro:subcategoria')
-    categoriasmae = CategoriaMae.objects.all()
-    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
-    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    categoriasmae = CategoriaMae.objects.all().order_by('nome')
+    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
+    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     context = {'dadoscliente': dadoscliente, 'categorias': categorias, 'categoriasmae': categoriasmae, 'subcategorias':
         subcategorias, 'subcategoriaeditada': subcategoriaeditada}
     return render(request, 'editarsubcategoria.html', context)
@@ -681,7 +681,7 @@ def centrocusto(request):
             centrocusto = CentroDeCusto.objects.create(tenant=request.tenant, cliente=dadoscliente, nome=nome, ativo=ativo)
             centrocusto.save()
 
-    centrocustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    centrocustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     context = {'dadoscliente': dadoscliente, 'centrocustos': centrocustos}
     return render(request, 'centrocusto.html', context)
 
@@ -700,7 +700,7 @@ def editarcentrocusto(request, id):
         centrocustoeditado.save()
 
         return redirect('financeiro:centrocusto')
-    centrocustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    centrocustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     context = {'dadoscliente': dadoscliente, 'centrocustos': centrocustos, 'centrocustoeditado': centrocustoeditado}
     return render(request, 'editarcentrocusto.html', context)
 
@@ -725,11 +725,11 @@ def editarregra(request, id):
         )
 
     # Obtém todas as regras do cliente
-    regras = Regra.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    regras = Regra.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('categoria')
 
-    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
-    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
-    centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
+    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
+    centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
 
     context = {
         'dadoscliente': dadoscliente,
@@ -775,10 +775,10 @@ def regra(request):
             )
             regras.save()
 
-    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
-    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
-    centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
-    regras = Regra.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+    categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
+    subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
+    centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
+    regras = Regra.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('categoria')
 
     context = {'dadoscliente': dadoscliente, 'categorias': categorias, 'subcategorias': subcategorias,
                'centrodecustos': centrodecustos, 'regras': regras}
