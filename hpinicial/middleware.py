@@ -5,8 +5,8 @@ from .models import Tenant
 class TenantMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
-        tenant = request.user.tenant
         try:
+            tenant = request.user.tenant
             request.tenant = Tenant.objects.get(id=tenant.id)
             print(request.tenant)
         except Tenant.DoesNotExist:
