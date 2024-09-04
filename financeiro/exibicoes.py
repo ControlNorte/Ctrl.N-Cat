@@ -733,7 +733,7 @@ def drecomp(mes1, ano1, mes2, ano2, cliente, centrocusto=None):
             {% for cm in tabela_final %}
             <tr>
                 <td class="cm">{{ cm['Categorias'] }}</td>
-                <td class="cm text-center">{{ cm['Valor Mes1'] }}</td>
+                <td class="cm text-center">{{ formatar_valor(cm['Valor Mes1']) if cm['Valor Mes1'] != '' else ''  }}</td>
                 <td class="cm text-center">{{ cm['Porc% Mes1'] }}</td>
                 <td class="cm text-center">{{ cm['Valor Mes2'] }}</td>
                 <td class="cm text-center">{{ cm['Porc% Mes2'] }}</td>
@@ -765,11 +765,12 @@ def drecomp(mes1, ano1, mes2, ano2, cliente, centrocusto=None):
         </body>
         """
 
+
         # Criar o template Jinja2
         template = Template(template_str)
 
         # Renderizar o template com os dados da tabela final
-        html_output = template.render(tabela_final=tabela_final)
+        html_output = template.render(tabela_final=tabela_final, formatar_valor=formatar_valor)
 
         return html_output
 
