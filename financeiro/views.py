@@ -103,7 +103,7 @@ def movimentacao(request, banco):
                 erroentrada = 'Valor de Entrada Tem que ser maior que 0'
 
         elif dados.get('tipo') == 'saida':
-            if float(dados.get('valor')) <= 0:
+            if float(dados.get('valor').replace(',', '.')) <= 0:
                 valor = float(dados.get('valor').replace(',', '.'))
             else:
                 valor = float(dados.get('valor').replace(',', '.')) * - 1.0
