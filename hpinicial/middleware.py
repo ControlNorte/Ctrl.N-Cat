@@ -8,7 +8,5 @@ class TenantMiddleware(MiddlewareMixin):
         try:
             tenant = request.user.tenant
             request.tenant = Tenant.objects.get(id=tenant.id)
-            print(request.tenant)
         except Tenant.DoesNotExist:
             request.tenant = None
-            print(None)
