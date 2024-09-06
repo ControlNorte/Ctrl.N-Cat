@@ -865,6 +865,8 @@ def edit_movimentacao(request):
         movimentacao.save()
         alteracaosaldo(banco=banco_id, cliente=dadoscliente.id, data=data, request=request)
 
+        return redirect('financeiro:conta')
+
     return JsonResponse({'success': False})
 
 
