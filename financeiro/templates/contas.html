@@ -418,7 +418,7 @@ Financeiro | {{ dadoscliente }}
 
         $.ajax({
             type: 'POST',
-            url: '{% url "url_da_sua_view" %}',  // Ajuste para a URL correta
+            url: '{% url "financeiro:contas" %}',  // Ajuste para a URL correta
             data: formData,
             success: function(response) {
                 if (response.success) {
