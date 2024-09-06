@@ -409,5 +409,29 @@ Financeiro | {{ dadoscliente }}
         });
     }
 </script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $('#form-movimentacao').on('submit', function(e) {
+        e.preventDefault();  // Previne o comportamento padrão do formulário
+
+        var formData = $(this).serialize();  // Coleta os dados do formulário
+
+        $.ajax({
+            type: 'POST',
+            url: '{% url "url_da_sua_view" %}',  // Ajuste para a URL correta
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    window.location.reload();  // Recarrega a página se o sucesso for verdadeiro
+                } else {
+                    alert('Ocorreu um erro: ' + response.error);  // Mostra erro, se houver
+                }
+            },
+            error: function() {
+                alert('Ocorreu um erro inesperado.');
+            }
+        });
+    });
+</script>
 
 {% endblock %}

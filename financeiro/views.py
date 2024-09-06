@@ -828,7 +828,7 @@ def edit_movimentacao(request):
         try:
             movimentacao.banco = BancosCliente.objects.for_tenant(request.tenant).get(id=banco_id)
         except ObjectDoesNotExist:
-            pass
+            return JsonResponse({'success': False, 'error': 'Banco não encontrado'})
         
         # Definindo centrodecusto como None se o valor for uma string vazia
         if centrodecusto_id == '':
@@ -837,22 +837,22 @@ def edit_movimentacao(request):
             try:
                 movimentacao.centrodecusto = CentroDeCusto.objects.for_tenant(request.tenant).get(id=centrodecusto_id)
             except ObjectDoesNotExist:
-                pass
+                return JsonResponse({'error': 'Centro de custo não encontrado'})
         
         try:
             movimentacao.categoria = Categoria.objects.for_tenant(request.tenant).get(id=categoria_id)
         except ObjectDoesNotExist:
-            pass
+            return JsonResponse({'error': 'Categoria não encontrada'})
         
         try:
             movimentacao.subcategoria = SubCategoria.objects.for_tenant(request.tenant).get(id=subcategoria_id)
         except ObjectDoesNotExist:
-            pass
+            return JsonResponse({'error': 'Subcategoria não encontrada'})
         
         try:
             movimentacao.valor = float(request.POST.get('valor'))  # Converte o valor para float
         except ValueError:
-            pass
+            return JsonResponse({'error': 'Valor inválido'})
         
         data1 = datetime.strptime(request.POST.get('data'), '%Y-%m-%d').date()
         data2 = data1.strftime('%Y-%m-%d')
@@ -865,7 +865,7 @@ def edit_movimentacao(request):
         movimentacao.save()
         alteracaosaldo(banco=banco_id, cliente=dadoscliente.id, data=data, request=request)
 
-    return JsonResponse({'success': False, 'error': 'Método não permitido'}, status=405)
+    return JsonResponse({'success': False})
 
 
 def delete_movimentacao(request, id):
