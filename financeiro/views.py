@@ -860,12 +860,12 @@ def edit_movimentacao(request):
         if data1 < data_ant:
             data = data2
         else:
-            data=str(data_ant)
+            data = str(data_ant)
 
         movimentacao.save()
         alteracaosaldo(banco=banco_id, cliente=dadoscliente.id, data=data, request=request)
 
-        return redirect('financeiro:conta')
+        return redirect('financeiro:contas')
 
     return JsonResponse({'success': False})
 
