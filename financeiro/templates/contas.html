@@ -341,13 +341,13 @@ Financeiro | {{ dadoscliente }}
             <button type="button" onclick="deleteMovimentacao()">Deletar</button>
         </form>
     </div>
-    % for item in pesquisa %}
-    <tr>
-        <td>{{ item.id }}</td>
-        <td>{{ item.descricao }}</td>
+    {% for item in pesquisa %}
+    <div>
+        <p>{{ item.id }}</p>
+        <p>{{ item.descricao }}</p>
         <!-- Outros campos -->
-    </tr>
-{% endfor %}
+    </div>
+    {% endfor %}
 </main>
 
 <script>
