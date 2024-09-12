@@ -8,8 +8,8 @@ from .alteracoesdb import *
 import ahocorasick
 from django.db.models import Sum, Q
 
-
 register = template.Library()
+
 
 def mes(num):
     meses = {
@@ -67,7 +67,6 @@ def format_currency(value):
 
 
 def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
-
     if not arquivo_upload:
         return print("Erro: Nenhum arquivo foi selecionado.")  # Retorna erro se nenhum arquivo foi selecionado
 
@@ -83,7 +82,9 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
     # Criar o autômato Aho-Corasick
     A = ahocorasick.Automaton()
-    regras = Regra.objects.for_tenant(request.tenant).filter(cliente=cliente).select_related('categoria', 'subcategoria', 'centrodecusto')
+    regras = Regra.objects.for_tenant(request.tenant).filter(cliente=cliente).select_related('categoria',
+                                                                                             'subcategoria',
+                                                                                             'centrodecusto')
     for idx, regra in enumerate(regras):
         A.add_word(str(regra.descricao).upper(), (idx, regra))  # Adiciona as descrições das regras no autômato
     A.make_automaton()  # Compila o autômato para otimizar a pesquisa
@@ -97,11 +98,12 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
         descricao = dado['Descrição'].upper()
 
         # Verifica se já existe uma movimentação com a mesma data, descrição e valor
-        if MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco, data=dado['Data'], descricao=descricao,
-                                               valor=dado['Valor']).exists():
+        if MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco,
+                                                                          data=dado['Data'], descricao=descricao,
+                                                                          valor=dado['Valor']).exists():
             a = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco,
-                                                                           data=dado['Data'], descricao=descricao,
-                                                                           valor=dado['Valor'])
+                                                                               data=dado['Data'], descricao=descricao,
+                                                                               valor=dado['Valor'])
 
             continue  # Pula para o próximo dado se já existir uma movimentação igual
 
@@ -146,8 +148,12 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
     # Atualização do saldo baseado nas novas movimentações
     if movimentacoes_to_create:
         datainicial = min(mov.data for mov in movimentacoes_to_create)  # Determina a menor data entre as movimentações
-        datafinal = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco).order_by('-data').first()
-        datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial, "%Y-%m-%d") + timedelta(days=31)  # Determina a maior data entre as movimentações
+        datafinal = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente,
+                                                                                   banco=banco).order_by(
+            '-data').first()
+        datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial,
+                                                                                            "%Y-%m-%d") + timedelta(
+            days=31)  # Determina a maior data entre as movimentações
 
         tenant = int(request.tenant.id)
         cliente = cliente.id
@@ -156,12 +162,13 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
         while datainicial <= datafinal:
             # Calcula o saldo inicial e final do dia
             saldo_inicial = Saldo.objects.for_tenant(request.tenant).get(cliente=cliente, banco=banco,
-                                                 data=datainicial - timedelta(days=1))
+                                                                         data=datainicial - timedelta(days=1))
 
             saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
 
             saldo_movimentacoes = \
-                MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco, data=datainicial).aggregate(
+                MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco,
+                                                                               data=datainicial).aggregate(
                     total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
 
             saldo_final = saldo_inicial + saldo_movimentacoes
@@ -196,7 +203,6 @@ class UploadFileForm(forms.ModelForm):
 
 def pesquisa_db(tenant, id=None, dt_i=None, dt_f=None, descricao=None, detalhe=None, banco=None, centro_custo=None,
                 categoria=None, sub_categoria=None, valor=None):
-
     filtrados = MovimentacoesCliente.objects.for_tenant(tenant)
 
     # Aplica filtros apenas se os parâmetros não forem None
@@ -227,5 +233,6 @@ def pesquisa_db(tenant, id=None, dt_i=None, dt_f=None, descricao=None, detalhe=N
     elif dt_f is not None:
         # Se apenas a data final for fornecida, filtrar até essa data
         filtrados = filtrados.filter(data__lte=dt_f)
-    
+
+    assert isinstance(filtrados, object)
     return filtrados
