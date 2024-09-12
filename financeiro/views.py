@@ -486,7 +486,7 @@ def contas(request):
         pesquisa = pesquisa_db(tenant, id=id, dt_i=dt_i, dt_f=dt_f, descricao=descricao, detalhe=detalhe, banco=banco,
                             centro_custo=centro_custo, categoria=categoria,
                             sub_categoria=sub_categoria, valor=valor)
-        print(pesquisa)
+
         return pesquisa
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
@@ -499,7 +499,7 @@ def contas(request):
     centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente).order_by('banco')
     context = {'dadoscliente': dadoscliente, 'movimentacoes': movimentacoes, 'page_obj':page_obj, 'categorias': categorias, 
-               'subcategorias': subcategorias, 'centrodecustos': centrodecustos, 'bancos': bancos, 'pesquisa': pesquisa}
+               'subcategorias': subcategorias, 'centrodecustos': centrodecustos, 'bancos': bancos, 'pesquisa': dadoscliente}
     return render(request, 'contas.html', context)
 
 
