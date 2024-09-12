@@ -203,8 +203,9 @@ class UploadFileForm(forms.ModelForm):
 
 def pesquisa_db(tenant, id=None, dt_i=None, dt_f=None, descricao=None, detalhe=None, banco=None, centro_custo=None,
                 categoria=None, sub_categoria=None, valor=None):
-    filtrados = MovimentacoesCliente.objects.for_tenant(tenant)
 
+    filtrados = MovimentacoesCliente.objects.for_tenant(tenant)
+    print(filtrados.query)
     # Aplica filtros apenas se os parâmetros não forem None
     if id is not None:
         filtrados = filtrados.filter(id=id)
@@ -234,5 +235,4 @@ def pesquisa_db(tenant, id=None, dt_i=None, dt_f=None, descricao=None, detalhe=N
         # Se apenas a data final for fornecida, filtrar até essa data
         filtrados = filtrados.filter(data__lte=dt_f)
 
-    assert isinstance(filtrados, object)
     return filtrados
