@@ -472,11 +472,20 @@ def contas(request):
     pesquisa = ''
     if request.method == 'POST':
         dados = request.POST.dict()
+        id = dados.get('id') or None
+        dt_i = dados.get('dt_i') or None
+        dt_f = dados.get('dt_f') or None
+        descricao = dados.get('descricao') or None
+        detalhe = dados.get('detalhe') or None
+        banco = dados.get('banco') or None
+        centro_custo = dados.get('centro_custo') or None
+        categoria = dados.get('categoria') or None
+        sub_categoria = dados.get('sub_categoria') or None
+        valor = dados.get('valor') or None
         tenant = request.tenant
-        pesquisa = pesquisa_db(tenant, id=dados.get('id'), dt_i=dados.get('dt_i'), dt_f=dados.get('dt_f'),
-                            descricao=dados.get('descricao'), detalhe=dados.get('detalhe'), banco=dados.get('banco'),
-                            centro_custo=dados.get('centro_custo'), categoria=dados.get('categoria'),
-                            sub_categoria=dados.get('sub_categoria'), valor=dados.get('valor'))
+        pesquisa = pesquisa_db(tenant, id=id, dt_i=dt_i, dt_f=dt_f, descricao=descricao, detalhe=detalhe, banco=banco,
+                            centro_custo=centro_custo, categoria=categoria,
+                            sub_categoria=sub_categoria, valor=sub_categoria)
         return pesquisa
     print(pesquisa)
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
