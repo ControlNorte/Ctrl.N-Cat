@@ -487,7 +487,7 @@ def contas(request):
                             centro_custo=centro_custo, categoria=categoria,
                             sub_categoria=sub_categoria, valor=valor)
         return pesquisa
-    print(pesquisa)
+
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     movimentacoes = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('id')
     paginator = Paginator(movimentacoes, 100)

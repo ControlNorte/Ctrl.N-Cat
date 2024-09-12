@@ -200,8 +200,7 @@ Financeiro | {{ dadoscliente }}
                 <div>
                     <label>Centro de Custo: </label>
                     <select name="centro_custo"
-                            class="form-control"
-                            required>
+                            class="form-control">
                             <option value="" selected></option>
                             {% for centrodecusto in centrodecustos %}
                             <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
@@ -211,8 +210,7 @@ Financeiro | {{ dadoscliente }}
                 <div>
                     <label>Categoria: </label>
                     <select name="categoria"
-                            class="form-control"
-                            required>
+                            class="form-control">
                             <option value="" selected></option>
                             {% for categoria in categorias %}
                             <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
@@ -222,8 +220,7 @@ Financeiro | {{ dadoscliente }}
                 <div>
                     <label>Sub-Categoria: </label>
                     <select name="sub_categoria"
-                            class="form-control"
-                            required>
+                            class="form-control">
                             <option value="" selected></option>
                             {% for subcategoria in subcategorias %}
                             <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
