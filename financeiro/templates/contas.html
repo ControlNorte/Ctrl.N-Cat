@@ -167,46 +167,69 @@ Financeiro | {{ dadoscliente }}
         </div>
         <hr>
         <br>
-        <form>
+        <form method="POST">
             {% csrf_token %}
             <div class="flex flex-nowrap- justify -between w-full">
                 <div>
                     <label>Id: </label>
-                    <input type="text">
+                    <input type="text" name="id">
                 </div>
                 <div>
                     <label>Data Inicial: </label>
-                    <input type="date">
+                    <input type="date" name="dt_i">
                     <label>Data Final: </label>
-                    <input type="date">
+                    <input type="date" name="dt_f">
                 </div>
                 <div>
                     <label>Descrição: </label>
-                    <input type="text">
+                    <input type="text" name="descricao">
                 </div>
                 <div>
                     <label>Detalhe: </label>
-                    <input type="text">
+                    <input type="text" name="detalhe">
                 </div>
                 <div>
                     <label>Banco: </label>
-                    <input type="text">
+                    <select name="banco" class="selectconci">
+                    <option selected></option>
+                    {% for banco in bancos %}
+                        <option value="{{ banco.id }}">{{ banco.banco }}</option>
+                    {% endfor %}
+                </select>
                 </div>
                 <div>
                     <label>Centro de Custo: </label>
-                    <input type="text">
+                    <select name="centro_custo"
+                            class="form-control"
+                            required>
+                            {% for centrodecusto in centrodecustos %}
+                            <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
+                            {% endfor %}
+                    </select>
                 </div>
                 <div>
                     <label>Categoria: </label>
-                    <input type="text">
+                    <select name="categoria"
+                            class="form-control"
+                            required>
+                            {% for categoria in categorias %}
+                            <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                            {% endfor %}
+                    </select>
                 </div>
                 <div>
                     <label>Sub-Categoria: </label>
-                    <input type="text">
+                    <select name="sub_categoria"
+                            class="form-control"
+                            required>
+                            {% for subcategoria in subcategorias %}
+                            <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
+                            {% endfor %}
+                    </select>
                 </div>
                 <div>
                     <label>Valor: </label>
-                    <input type="text">
+                    <input type="text" name="valor">
                 </div>
             </div>
         </form>
@@ -317,6 +340,7 @@ Financeiro | {{ dadoscliente }}
             <button type="button" onclick="deleteMovimentacao()">Deletar</button>
         </form>
     </div>
+    {{ pesquisa }}
 </main>
 
 <script>

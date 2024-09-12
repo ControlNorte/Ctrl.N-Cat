@@ -469,6 +469,16 @@ def contas(request):
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
+    pesquisa = ''
+    if request.method == 'POST':
+        dados = request.POST.dict()
+        tenant = request.tenant
+        pesquisa = pesquisa_db(tenant, id=dados.get('id'), dt_i=dados.get('dt_i'), dt_f=dados.get('dt_f'),
+                            descricao=dados.get('descricao'), detalhe=dados.get('detalhe'), banco=dados.get('banco'),
+                            centro_custo=dados.get('centro_custo'), categoria=dados.get('categoria'),
+                            sub_categoria=dados.get('sub_categoria'), valor=dados.get('valor'))
+        return pesquisa
+    print(pesquisa)
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     movimentacoes = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('id')
     paginator = Paginator(movimentacoes, 100)
@@ -479,7 +489,7 @@ def contas(request):
     centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente).order_by('banco')
     context = {'dadoscliente': dadoscliente, 'movimentacoes': movimentacoes, 'page_obj':page_obj, 'categorias': categorias, 
-               'subcategorias': subcategorias, 'centrodecustos': centrodecustos, 'bancos': bancos}
+               'subcategorias': subcategorias, 'centrodecustos': centrodecustos, 'bancos': bancos, 'pesquisa': pesquisa}
     return render(request, 'contas.html', context)
 
 

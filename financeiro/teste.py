@@ -192,3 +192,39 @@ class UploadFileForm(forms.ModelForm):
     class Meta:
         model = UploadedFile
         fields = ['file']
+
+
+def pesquisa_db(tenant, id=None, dt_i=None, dt_f=None, descricao=None, detalhe=None, banco=None, centro_custo=None,
+                categoria=None, sub_categoria=None, valor=None):
+    dados = MovimentacoesCliente.objects.for_tenant(tenant)
+
+    # Aplica filtros apenas se os parâmetros não forem None
+    if id is not None:
+        dados = dados.filter(id=id)
+    if descricao is not None:
+        dados = dados.filter(descricao=descricao)
+    if detalhe is not None:
+        dados = dados.filter(detalhe=detalhe)
+    if banco is not None:
+        dados = dados.filter(banco=banco)
+    if centro_custo is not None:
+        dados = dados.filter(centrodecusto=centro_custo)
+    if categoria is not None:
+        dados = dados.filter(categoria=categoria)
+    if sub_categoria is not None:
+        dados = dados.filter(subcategoria=sub_categoria)
+    if valor is not None:
+        dados = dados.filter(valor=valor)
+
+    # Filtros de datas
+    if dt_i is not None and dt_f is not None:
+        # Se ambas as datas estão fornecidas, filtrar pelo intervalo
+        dados = dados.filter(data__range=[dt_i, dt_f])
+    elif dt_i is not None:
+        # Se apenas a data inicial for fornecida, filtrar a partir dela
+        dados = dados.filter(data__gte=dt_i)
+    elif dt_f is not None:
+        # Se apenas a data final for fornecida, filtrar até essa data
+        dados = dados.filter(data__lte=dt_f)
+
+    return dados
