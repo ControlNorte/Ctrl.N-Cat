@@ -486,6 +486,7 @@ def contas(request):
         pesquisa = pesquisa_db(tenant, id=id, dt_i=dt_i, dt_f=dt_f, descricao=descricao, detalhe=detalhe, banco=banco,
                             centro_custo=centro_custo, categoria=categoria,
                             sub_categoria=sub_categoria, valor=valor)
+        print(type(pesquisa))
         return pesquisa
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
