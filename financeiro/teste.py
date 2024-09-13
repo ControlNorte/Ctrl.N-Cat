@@ -205,7 +205,7 @@ def pesquisa_db(tenant, id=None, dt_i=None, dt_f=None, descricao=None, detalhe=N
                 categoria=None, sub_categoria=None, valor=None):
 
     filtrados = MovimentacoesCliente.objects.for_tenant(tenant)
-    print(filtrados.query)
+
     # Aplica filtros apenas se os parâmetros não forem None
     if id is not None:
         filtrados = filtrados.filter(id=id)
@@ -234,5 +234,5 @@ def pesquisa_db(tenant, id=None, dt_i=None, dt_f=None, descricao=None, detalhe=N
     elif dt_f is not None:
         # Se apenas a data final for fornecida, filtrar até essa data
         filtrados = filtrados.filter(data__lte=dt_f)
-
+    print(filtrados.id)
     return filtrados
