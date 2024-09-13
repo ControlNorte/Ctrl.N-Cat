@@ -481,11 +481,12 @@ def contas(request):
         centro_custo = dados.get('centro_custo') or None
         categoria = dados.get('categoria') or None
         sub_categoria = dados.get('sub_categoria') or None
-        valor = dados.get('valor') or None
+        vl_i = dados.get('vl_i') or None
+        vl_f = dados.get('vl_f') or None
         tenant = request.tenant
         pesquisas = pesquisa_db(tenant, cliente=dadoscliente, id=id, dt_i=dt_i, dt_f=dt_f, descricao=descricao, detalhe=detalhe, banco=banco,
                             centro_custo=centro_custo, categoria=categoria,
-                            sub_categoria=sub_categoria, valor=valor)
+                            sub_categoria=sub_categoria, vl_i=vl_i, vl_f=vl_f)
 
 
     movimentacoes = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('id')

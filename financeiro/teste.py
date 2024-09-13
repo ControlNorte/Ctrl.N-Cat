@@ -202,7 +202,7 @@ class UploadFileForm(forms.ModelForm):
 
 
 def pesquisa_db(tenant, cliente, id=None, dt_i=None, dt_f=None, descricao=None, detalhe=None, banco=None, centro_custo=None,
-                categoria=None, sub_categoria=None, valor=None):
+                categoria=None, sub_categoria=None, vl_i=None, vl_f=None):
 
     filtrados = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente=cliente)
     print(descricao)
@@ -210,9 +210,9 @@ def pesquisa_db(tenant, cliente, id=None, dt_i=None, dt_f=None, descricao=None, 
     if id is not None:
         filtrados = filtrados.filter(id=id)
     if descricao is not None:
-        filtrados = filtrados.filter(descricao=str(descricao))
+        filtrados = filtrados.filter(descricao__icontains=descricao)
     if detalhe is not None:
-        filtrados = filtrados.filter(detalhe=detalhe)
+        filtrados = filtrados.filter(detalhe__icontains=detalhe)
     if banco is not None:
         filtrados = filtrados.filter(banco=banco)
     if centro_custo is not None:
@@ -221,8 +221,17 @@ def pesquisa_db(tenant, cliente, id=None, dt_i=None, dt_f=None, descricao=None, 
         filtrados = filtrados.filter(categoria=categoria)
     if sub_categoria is not None:
         filtrados = filtrados.filter(subcategoria=sub_categoria)
-    if valor is not None:
-        filtrados = filtrados.filter(valor=valor)
+
+    # Filtros de valores
+    if vl_i is not None and vl_f is not None:
+        # Se ambas as datas estão fornecidas, filtrar pelo intervalo
+        filtrados = filtrados.filter(valor__range=[vl_i, vl_f])
+    elif vl_i is not None:
+        # Se apenas a data inicial for fornecida, filtrar a partir dela
+        filtrados = filtrados.filter(valor__gte=vl_i)
+    elif vl_f is not None:
+        # Se apenas a data final for fornecida, filtrar até essa data
+        filtrados = filtrados.filter(valor__lte=vl_f)
 
     # Filtros de datas
     if dt_i is not None and dt_f is not None:
