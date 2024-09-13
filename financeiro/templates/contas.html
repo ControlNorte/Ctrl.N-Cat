@@ -172,25 +172,25 @@ Financeiro | {{ dadoscliente }}
             <div class="flex flex-nowrap- justify -between w-full">
                 <div>
                     <label>Id: </label>
-                    <input type="text" name="id">
+                    <input class="form-control" type="text" name="id">
                 </div>
                 <div>
                     <label>Data Inicial: </label>
-                    <input type="date" name="dt_i">
+                    <input class="form-control" type="date" name="dt_i">
                     <label>Data Final: </label>
-                    <input type="date" name="dt_f">
+                    <input class="form-control" type="date" name="dt_f">
                 </div>
                 <div>
                     <label>Descrição: </label>
-                    <input type="text" name="descricao">
+                    <input class="form-control" type="text" name="descricao">
                 </div>
                 <div>
                     <label>Detalhe: </label>
-                    <input type="text" name="detalhe">
+                    <input class="form-control" type="text" name="detalhe">
                 </div>
                 <div>
                     <label>Banco: </label>
-                    <select name="banco" class="selectconci">
+                    <select class="form-control" name="banco" class="selectconci">
                     <option selected></option>
                     {% for banco in bancos %}
                         <option value="{{ banco.id }}">{{ banco.banco }}</option>
@@ -229,7 +229,7 @@ Financeiro | {{ dadoscliente }}
                 </div>
                 <div>
                     <label>Valor: </label>
-                    <input type="text" name="valor">
+                    <input class="form-control" type="text" name="valor">
                 </div>
             </div>
             <button type="submit">Enviar</button>
