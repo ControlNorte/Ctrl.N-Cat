@@ -486,10 +486,10 @@ def contas(request):
         pesquisas = pesquisa_db(tenant, id=id, dt_i=dt_i, dt_f=dt_f, descricao=descricao, detalhe=detalhe, banco=banco,
                             centro_custo=centro_custo, categoria=categoria,
                             sub_categoria=sub_categoria, valor=valor)
-        for pesquisa in pesquisas:
-            print(pesquisa)
-        return pesquisa
 
+        return pesquisas
+    for pesquisa in pesquisas:
+        print(pesquisa)
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     movimentacoes = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('id')
     paginator = Paginator(movimentacoes, 100)
