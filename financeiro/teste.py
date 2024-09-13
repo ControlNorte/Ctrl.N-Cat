@@ -210,7 +210,7 @@ def pesquisa_db(tenant, cliente, id=None, dt_i=None, dt_f=None, descricao=None, 
     if id is not None:
         filtrados = filtrados.filter(id=id)
     if descricao is not None:
-        filtrados = filtrados.filter(descricao=descricao)
+        filtrados = filtrados.filter(descricao=str(descricao))
     if detalhe is not None:
         filtrados = filtrados.filter(detalhe=detalhe)
     if banco is not None:
