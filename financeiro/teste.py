@@ -201,10 +201,10 @@ class UploadFileForm(forms.ModelForm):
         fields = ['file']
 
 
-def pesquisa_db(tenant, id=None, dt_i=None, dt_f=None, descricao=None, detalhe=None, banco=None, centro_custo=None,
+def pesquisa_db(tenant, cliente, id=None, dt_i=None, dt_f=None, descricao=None, detalhe=None, banco=None, centro_custo=None,
                 categoria=None, sub_categoria=None, valor=None):
 
-    filtrados = MovimentacoesCliente.objects.for_tenant(tenant)
+    filtrados = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente=cliente)
 
     # Aplica filtros apenas se os parâmetros não forem None
     if id is not None:

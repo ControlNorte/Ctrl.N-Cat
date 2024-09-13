@@ -468,7 +468,7 @@ def contas(request):
     pk = request.session.get('dadoscliente')
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
-
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     pesquisas = ''
     if request.method == 'POST':
         dados = request.POST.dict()
@@ -483,11 +483,11 @@ def contas(request):
         sub_categoria = dados.get('sub_categoria') or None
         valor = dados.get('valor') or None
         tenant = request.tenant
-        pesquisas = pesquisa_db(tenant, id=id, dt_i=dt_i, dt_f=dt_f, descricao=descricao, detalhe=detalhe, banco=banco,
+        pesquisas = pesquisa_db(tenant, cliente=dadoscliente, id=id, dt_i=dt_i, dt_f=dt_f, descricao=descricao, detalhe=detalhe, banco=banco,
                             centro_custo=centro_custo, categoria=categoria,
                             sub_categoria=sub_categoria, valor=valor)
 
-    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
+
     movimentacoes = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('id')
     paginator = Paginator(movimentacoes, 100)
     page_number = request.GET.get('page')
