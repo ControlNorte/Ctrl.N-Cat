@@ -205,7 +205,7 @@ def pesquisa_db(tenant, cliente, id=None, dt_i=None, dt_f=None, descricao=None, 
                 categoria=None, sub_categoria=None, valor=None):
 
     filtrados = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente=cliente)
-
+    print(descricao)
     # Aplica filtros apenas se os parâmetros não forem None
     if id is not None:
         filtrados = filtrados.filter(id=id)
