@@ -235,5 +235,6 @@ def pesquisa_db(tenant, id=None, dt_i=None, dt_f=None, descricao=None, detalhe=N
         # Se apenas a data final for fornecida, filtrar até essa data
         filtrados = filtrados.filter(data__lte=dt_f)
 
-    print(filtrado for filtrado in filtrados)
+    for filtrado in filtrados:
+        print(filtrado)
     return filtrados
