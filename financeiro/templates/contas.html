@@ -250,7 +250,7 @@ Financeiro | {{ dadoscliente }}
                     </tr>
                 </thead>
                 <tbody>
-                    {% for movimentacao in movimentacoes %}
+                    {% for movimentacao in pesquisas %}
                     <tr>
                         <td>{{ movimentacao.id }}</td>
                         <td>{{ movimentacao.data|format_date }}</td>
@@ -341,7 +341,6 @@ Financeiro | {{ dadoscliente }}
             <button type="button" onclick="deleteMovimentacao()">Deletar</button>
         </form>
     </div>
-    {{pesquisas}}
 </main>
 
 <script>
