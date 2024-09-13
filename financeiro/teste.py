@@ -236,5 +236,5 @@ def pesquisa_db(tenant, id=None, dt_i=None, dt_f=None, descricao=None, detalhe=N
         filtrados = filtrados.filter(data__lte=dt_f)
 
     for filtrado in filtrados:
-        print(filtrado)
+        print(filtrado.id)
     return filtrados
