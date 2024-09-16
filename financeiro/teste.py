@@ -202,10 +202,10 @@ class UploadFileForm(forms.ModelForm):
 
 
 def pesquisa_db(tenant, cliente, id=None, dt_i=None, dt_f=None, descricao=None, detalhe=None, banco=None, centro_custo=None,
-                categoria=None, sub_categoria=None, vl_i=None, vl_f=None):
+                categoria=None, sub_categoria=None, vl_i=None, vl_f=None, tipo=None):
 
     filtrados = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente=cliente)
-    print(descricao)
+
     # Aplica filtros apenas se os parâmetros não forem None
     if id is not None:
         filtrados = filtrados.filter(id=id)
@@ -221,6 +221,12 @@ def pesquisa_db(tenant, cliente, id=None, dt_i=None, dt_f=None, descricao=None, 
         filtrados = filtrados.filter(categoria=categoria)
     if sub_categoria is not None:
         filtrados = filtrados.filter(subcategoria=sub_categoria)
+    if tipo is not None:
+        if tipo == "entrada":
+            filtrados = filtrados.filter(valor__gte=0)
+        if tipo == "saida":
+            filtrados = filtrados.filter(valor__lte=0)
+
 
     # Filtros de valores
     if vl_i is not None and vl_f is not None:
