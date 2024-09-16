@@ -166,7 +166,7 @@
     }
 
     form div div {
-
+        margin-bottom: 15px;
         flex-wrap: wrap;
     }
 
@@ -357,23 +357,25 @@ Financeiro | {{ dadoscliente }}
                             </select>
                         </div>
                     </div>
-                    <div class="flex justify-start">
-                        <label for="cat">Categoria:</label>
-                        <select id="cat" name="categoria" class="form-control">
-                            <option value="" selected></option>
-                            {% for categoria in categorias %}
-                                <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="flex justify-start">
-                        <label for="sub-cat" >Sub-Categoria:</label>
-                        <select id="sub-cat" name="sub_categoria" class="form-control">
-                            <option value="" selected></option>
-                            {% for subcategoria in subcategorias %}
-                                <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="flex justify-between">
+                        <div class="flex justify-start">
+                            <label for="cat">Categoria:</label>
+                            <select id="cat" name="categoria" class="form-control">
+                                <option value="" selected></option>
+                                {% for categoria in categorias %}
+                                    <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="flex justify-start">
+                            <label for="sub-cat" >Sub-Categoria:</label>
+                            <select id="sub-cat" name="sub_categoria" class="form-control">
+                                <option value="" selected></option>
+                                {% for subcategoria in subcategorias %}
+                                    <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
                     <div class="flex justify-between">
                         <div class="flex justify-start pr-2">
