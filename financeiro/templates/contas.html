@@ -299,41 +299,43 @@ Financeiro | {{ dadoscliente }}
                 <div class="form-content">
                     <!-- Fechar a pop-up -->
                     <span class="close">&times;</span>
-                    <div>
-                        <label>Id: </label>
-                        <input class="form-control" type="text" name="id">
-                    </div>
-                    <div>
-                        <label for="tipo" >Tipo: </label>
-                        <select id="tipo" name="tipo" class="form-control">
-                            <option value="" selected></option>
-                            <option value="entrada">Entrada</option>
-                            <option value="saida">Saída</option>
-                        </select>
+                    <div class="flex justify-between">
+                        <div>
+                            <label>Id:</label>
+                            <input class="form-control" type="text" name="id">
+                        </div>
+                        <div>
+                            <label for="tipo" >Tipo:</label>
+                            <select id="tipo" name="tipo" class="form-control">
+                                <option value="" selected></option>
+                                <option value="entrada">Entrada</option>
+                                <option value="saida">Saída</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="flex justify-between">
                         <div>
-                            <label for="dt_i" >Data Inicial: </label>
+                            <label for="dt_i" >Data Inicial:</label>
                             <input id="dt_i" class="form-control" type="date" name="dt_i">
                         </div>
                         <div>
-                            <label for="dt_f">Data Final: </label>
+                            <label for="dt_f">Data Final:</label>
                             <input id="dt_f" class="form-control" type="date" name="dt_f">
                         </div>
                     </div>
                     <div class="flex justify-between">
                         <div>
-                            <label for="descricaos" >Descrição: </label>
+                            <label for="descricaos" >Descrição:</label>
                             <input id="descricaos" class="form-control" type="text" name="descricao">
                         </div>
                         <div>
-                            <label for="detalhes">Detalhe: </label>
+                            <label for="detalhes">Detalhe:</label>
                             <input id="detalhes" class="form-control" type="text" name="detalhe">
                         </div>
                     </div>
                     <div class="flex justify-between">
                         <div>
-                            <label for="banco">Banco: </label>
+                            <label for="banco">Banco:</label>
                             <select id="banco" class="form-control" name="banco">
                                 <option selected></option>
                                 {% for banco in bancos %}
@@ -342,7 +344,7 @@ Financeiro | {{ dadoscliente }}
                             </select>
                         </div>
                         <div>
-                            <label for="centrocusto">Centro de Custo: </label>
+                            <label for="centrocusto">Centro de Custo:</label>
                             <select id="centrocusto" name="centro_custo" class="form-control">
                                 <option value="" selected></option>
                                 {% for centrodecusto in centrodecustos %}
@@ -352,7 +354,7 @@ Financeiro | {{ dadoscliente }}
                         </div>
                     </div>
                     <div class="flex justify-start">
-                        <label for="cat">Categoria: </label>
+                        <label for="cat">Categoria:</label>
                         <select id="cat" name="categoria" class="form-control">
                             <option value="" selected></option>
                             {% for categoria in categorias %}
@@ -361,7 +363,7 @@ Financeiro | {{ dadoscliente }}
                         </select>
                     </div>
                     <div class="flex justify-start">
-                        <label for="sub-cat" >Sub-Categoria: </label>
+                        <label for="sub-cat" >Sub-Categoria:</label>
                         <select id="sub-cat" name="sub_categoria" class="form-control">
                             <option value="" selected></option>
                             {% for subcategoria in subcategorias %}
@@ -371,11 +373,11 @@ Financeiro | {{ dadoscliente }}
                     </div>
                     <div class="flex justify-between">
                         <div>
-                            <label for="vl_i" >Valor Inicial: </label>
+                            <label for="vl_i" >Valor Inicial:</label>
                             <input id="vl_i" class="form-control" type="text" name="vl_i">
                         </div>
                         <div>
-                            <label for="vl_f">Valor Final: </label>
+                            <label for="vl_f">Valor Final:</label>
                             <input id="vl_f" class="form-control" type="text" name="vl_f">
                         </div>
                     </div>
