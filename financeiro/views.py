@@ -491,9 +491,9 @@ def contas(request):
                             centro_custo=centro_custo, categoria=categoria,
                             sub_categoria=sub_categoria, vl_i=vl_i, vl_f=vl_f, tipo=tipo)
 
-    id = '' if dados.get('id') is None else dados.get('id')
-    tipo = '' if dados.get('tipo') is None else dados.get('tipo')
-    dt_i = '' if dados.get('dt_i') is None else dados.get('dt_i')
+    id = '' if id is None else id
+    tipo = '' if tipo is None else tipo
+    dt_i = '' if dt_i is None else dt_i
     movimentacoes = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('id')
     paginator = Paginator(movimentacoes, 100)
     page_number = request.GET.get('page')
