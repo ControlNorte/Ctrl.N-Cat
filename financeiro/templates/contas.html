@@ -304,60 +304,80 @@ Financeiro | {{ dadoscliente }}
                         <input class="form-control" type="text" name="id">
                     </div>
                     <div>
-                        <label>Data Inicial: </label>
-                        <input class="form-control" type="date" name="dt_i">
-                        <label>Data Final: </label>
-                        <input class="form-control" type="date" name="dt_f">
-                    </div>
-                    <div>
-                        <label>Descrição: </label>
-                        <input class="form-control" type="text" name="descricao">
-                    </div>
-                    <div>
-                        <label>Detalhe: </label>
-                        <input class="form-control" type="text" name="detalhe">
-                    </div>
-                    <div>
-                        <label>Banco: </label>
-                        <select class="form-control" name="banco">
-                            <option selected></option>
-                            {% for banco in bancos %}
-                                <option value="{{ banco.id }}">{{ banco.banco }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div>
-                        <label>Centro de Custo: </label>
-                        <select name="centro_custo" class="form-control">
+                        <label for="tipo" >Tipo: </label>
+                        <select id="tipo" name="tipo" class="form-control">
                             <option value="" selected></option>
-                            {% for centrodecusto in centrodecustos %}
-                                <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
-                            {% endfor %}
+                            <option value="entrada">Entrada</option>
+                            <option value="saida">Saída</option>
                         </select>
                     </div>
-                    <div>
-                        <label>Categoria: </label>
-                        <select name="categoria" class="form-control">
+                    <div class="flex justify-between">
+                        <div>
+                            <label for="dt_i" >Data Inicial: </label>
+                            <input id="dt_i" class="form-control" type="date" name="dt_i">
+                        </div>
+                        <div>
+                            <label for="dt_f">Data Final: </label>
+                            <input id="dt_f" class="form-control" type="date" name="dt_f">
+                        </div>
+                    </div>
+                    <div class="flex justify-between">
+                        <div>
+                            <label for="descricaos" >Descrição: </label>
+                            <input id="descricaos" class="form-control" type="text" name="descricao">
+                        </div>
+                        <div>
+                            <label for="detalhes">Detalhe: </label>
+                            <input id="detalhes" class="form-control" type="text" name="detalhe">
+                        </div>
+                    </div>
+                    <div class="flex justify-between">
+                        <div>
+                            <label for="banco">Banco: </label>
+                            <select id="banco" class="form-control" name="banco">
+                                <option selected></option>
+                                {% for banco in bancos %}
+                                    <option value="{{ banco.id }}">{{ banco.banco }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="centrocusto">Centro de Custo: </label>
+                            <select id="centrocusto" name="centro_custo" class="form-control">
+                                <option value="" selected></option>
+                                {% for centrodecusto in centrodecustos %}
+                                    <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-start">
+                        <label for="cat">Categoria: </label>
+                        <select id="cat" name="categoria" class="form-control">
                             <option value="" selected></option>
                             {% for categoria in categorias %}
                                 <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
                             {% endfor %}
                         </select>
                     </div>
-                    <div>
-                        <label>Sub-Categoria: </label>
-                        <select name="sub_categoria" class="form-control">
+                    <div class="flex justify-start">
+                        <label for="sub-cat" >Sub-Categoria: </label>
+                        <select id="sub-cat" name="sub_categoria" class="form-control">
                             <option value="" selected></option>
                             {% for subcategoria in subcategorias %}
                                 <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
                             {% endfor %}
                         </select>
                     </div>
-                    <div>
-                        <label>Valor Inicial: </label>
-                        <input class="form-control" type="text" name="vl_i">
-                        <label>Valor Final: </label>
-                        <input class="form-control" type="text" name="vl_f">
+                    <div class="flex justify-between">
+                        <div>
+                            <label for="vl_i" >Valor Inicial: </label>
+                            <input id="vl_i" class="form-control" type="text" name="vl_i">
+                        </div>
+                        <div>
+                            <label for="vl_f">Valor Final: </label>
+                            <input id="vl_f" class="form-control" type="text" name="vl_f">
+                        </div>
                     </div>
                     <button type="submit">Enviar</button>
                 </div>
