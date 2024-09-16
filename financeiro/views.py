@@ -470,6 +470,7 @@ def contas(request):
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     pesquisas = ''
+    id = ''
     if request.method == 'POST':
         dados = request.POST.dict()
         id = dados.get('id') or None
@@ -498,7 +499,8 @@ def contas(request):
     centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente).order_by('banco')
     context = {'dadoscliente': dadoscliente, 'movimentacoes': movimentacoes, 'page_obj':page_obj, 'categorias': categorias, 
-               'subcategorias': subcategorias, 'centrodecustos': centrodecustos, 'bancos': bancos, 'pesquisas': pesquisas}
+               'subcategorias': subcategorias, 'centrodecustos': centrodecustos, 'bancos': bancos, 'pesquisas': pesquisas,
+               'id':id}
     return render(request, 'contas.html', context)
 
 
