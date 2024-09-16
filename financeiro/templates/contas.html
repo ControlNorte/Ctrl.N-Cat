@@ -260,75 +260,80 @@ Financeiro | {{ dadoscliente }}
         </div>
         <hr>
         <br>
-        <form method="POST">
-            {% csrf_token %}
-            <div class="">
-                <div>
-                    <label>Id: </label>
-                    <input class="form-control" type="text" name="id">
-                </div>
-                <div>
-                    <label>Data Inicial: </label>
-                    <input class="form-control" type="date" name="dt_i">
-                    <label>Data Final: </label>
-                    <input class="form-control" type="date" name="dt_f">
-                </div>
-                <div>
-                    <label>Descrição: </label>
-                    <input class="form-control" type="text" name="descricao">
-                </div>
-                <div>
-                    <label>Detalhe: </label>
-                    <input class="form-control" type="text" name="detalhe">
-                </div>
-                <div>
-                    <label>Banco: </label>
-                    <select class="form-control" name="banco" class="selectconci">
-                    <option selected></option>
-                    {% for banco in bancos %}
-                        <option value="{{ banco.id }}">{{ banco.banco }}</option>
-                    {% endfor %}
-                </select>
-                </div>
-                <div>
-                    <label>Centro de Custo: </label>
-                    <select name="centro_custo"
-                            class="form-control">
+        <!-- Botão Filtrar -->
+        <button id="filtrarBtn">Filtrar</button>
+
+        <!-- Caixa pop-up para o formulário -->
+        <div id="popupForm" class="popup-form">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-content">
+                    <!-- Fechar a pop-up -->
+                    <span class="close">&times;</span>
+                    <div>
+                        <label>Id: </label>
+                        <input class="form-control" type="text" name="id">
+                    </div>
+                    <div>
+                        <label>Data Inicial: </label>
+                        <input class="form-control" type="date" name="dt_i">
+                        <label>Data Final: </label>
+                        <input class="form-control" type="date" name="dt_f">
+                    </div>
+                    <div>
+                        <label>Descrição: </label>
+                        <input class="form-control" type="text" name="descricao">
+                    </div>
+                    <div>
+                        <label>Detalhe: </label>
+                        <input class="form-control" type="text" name="detalhe">
+                    </div>
+                    <div>
+                        <label>Banco: </label>
+                        <select class="form-control" name="banco">
+                            <option selected></option>
+                            {% for banco in bancos %}
+                                <option value="{{ banco.id }}">{{ banco.banco }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Centro de Custo: </label>
+                        <select name="centro_custo" class="form-control">
                             <option value="" selected></option>
                             {% for centrodecusto in centrodecustos %}
-                            <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
+                                <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
                             {% endfor %}
-                    </select>
-                </div>
-                <div>
-                    <label>Categoria: </label>
-                    <select name="categoria"
-                            class="form-control">
+                        </select>
+                    </div>
+                    <div>
+                        <label>Categoria: </label>
+                        <select name="categoria" class="form-control">
                             <option value="" selected></option>
                             {% for categoria in categorias %}
-                            <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                                <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
                             {% endfor %}
-                    </select>
-                </div>
-                <div>
-                    <label>Sub-Categoria: </label>
-                    <select name="sub_categoria"
-                            class="form-control">
+                        </select>
+                    </div>
+                    <div>
+                        <label>Sub-Categoria: </label>
+                        <select name="sub_categoria" class="form-control">
                             <option value="" selected></option>
                             {% for subcategoria in subcategorias %}
-                            <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
+                                <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
                             {% endfor %}
-                    </select>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Valor Inicial: </label>
+                        <input class="form-control" type="text" name="vl_i">
+                        <label>Valor Final: </label>
+                        <input class="form-control" type="text" name="vl_f">
+                    </div>
+                    <button type="submit">Enviar</button>
                 </div>
-                <div>
-                    <label>Valor Inicial: </label>
-                    <input class="form-control" type="text" name="vl_i">
-                    <label>Valor Final: </label>
-                    <input class="form-control" type="text" name="vl_f">
-                </div>
-            </div>
-            <button type="submit">Enviar</button>
-        </form>
+            </form>
+        </div>
         <div id="main">
             <table id="movimentacoesTable">
                 <thead>
