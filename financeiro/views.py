@@ -491,7 +491,9 @@ def contas(request):
                             centro_custo=centro_custo, categoria=categoria,
                             sub_categoria=sub_categoria, vl_i=vl_i, vl_f=vl_f, tipo=tipo)
 
-
+    id = '' if dados.get('id') is None else dados.get('id')
+    tipo = '' if dados.get('tipo') is None else dados.get('tipo')
+    dt_i = '' if dados.get('dt_i') is None else dados.get('dt_i')
     movimentacoes = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('id')
     paginator = Paginator(movimentacoes, 100)
     page_number = request.GET.get('page')
@@ -502,7 +504,7 @@ def contas(request):
     bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente).order_by('banco')
     context = {'dadoscliente': dadoscliente, 'movimentacoes': movimentacoes, 'page_obj':page_obj, 'categorias': categorias, 
                'subcategorias': subcategorias, 'centrodecustos': centrodecustos, 'bancos': bancos, 'pesquisas': pesquisas,
-               'id': id, 'tipo': tipo}
+               'id': id, 'tipo': tipo, 'dt_i': dt_i}
     return render(request, 'contas.html', context)
 
 
