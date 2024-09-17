@@ -254,7 +254,6 @@ def pesquisa_db(tenant, cliente, id=None, dt_i=None, dt_f=None, descricao=None, 
     return filtrados
 
 
-
 def export_to_excel(request, tenant, cliente):
     # Captura os parâmetros GET
     id_param = request.GET.get('id')

@@ -61,6 +61,9 @@ Cadastrar Cliente
             <div class="flex flex-nowrap justify-between">
                 <div class="text-3xl text-violet-900">Cadastro de Cliente</div>
             </div>
+            <button class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md" type="button" data-bs-toggle="modal" data-bs-target="#importModal">
+                Importar
+            </button>
             <br>
             <form method="POST">
             {% csrf_token %}
@@ -191,4 +194,37 @@ Cadastrar Cliente
         </div>
     </section>
 </main>
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Importar Dados</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Faça o download do modelo de importação e selecione ou arraste o arquivo para importar:</p>
+
+                <!-- Botão para download do modelo -->
+                <a href="{% url 'download_modelo_importacao' %}" class="btn btn-primary">Baixar modelo de importação</a>
+
+                <br><br>
+
+                <!-- Campo para upload -->
+                <div class="mb-3">
+                    <label for="formFile" class="form-label">Selecione o arquivo para importação</label>
+                    <input class="form-control" type="file" id="formFile">
+                </div>
+
+                <!-- Campo para arrastar e soltar o arquivo -->
+                <div class="dropzone" style="border: 2px dashed #ccc; padding: 20px; text-align: center;">
+                    Arraste o arquivo aqui
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary">Importar</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

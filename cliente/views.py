@@ -52,7 +52,7 @@ def cadastrarcliente(request):
 
     ramos = Ramo.objects.all()
 
-    context = {'ramos':ramos}
+    context = {'ramos': ramos}
 
     return render(request, 'cadastrarcliente.html', context)
 
