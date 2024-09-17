@@ -331,5 +331,4 @@ def export_to_excel(request, tenant, cliente):
     # Escreva o DataFrame em um arquivo Excel
     df.to_excel(response, index=False, engine='openpyxl')
 
-
     return response
