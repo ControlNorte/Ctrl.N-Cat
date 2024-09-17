@@ -490,16 +490,16 @@ def contas(request):
         dt_f = dados.get('dt_f') or None
         descricao = dados.get('descricao') or None
         detalhe = dados.get('detalhe') or None
-        banco = dados.get('banco') or None
-        centro_custo = dados.get('centro_custo') or None
-        categoria = dados.get('categoria') or None
-        sub_categoria = dados.get('sub_categoria') or None
+        banco_selecionado = dados.get('banco') or None
+        centro_custo_selecionado = dados.get('centro_custo') or None
+        categoria_selecionada = dados.get('categoria') or None
+        sub_categoria_selecionada = dados.get('sub_categoria') or None
         vl_i = dados.get('vl_i') or None
         vl_f = dados.get('vl_f') or None
         tenant = request.tenant
-        pesquisas = pesquisa_db(tenant, cliente=dadoscliente, id=id, dt_i=dt_i, dt_f=dt_f, descricao=descricao, detalhe=detalhe, banco=banco,
-                            centro_custo=centro_custo, categoria=categoria,
-                            sub_categoria=sub_categoria, vl_i=vl_i, vl_f=vl_f, tipo=tipo)
+        pesquisas = pesquisa_db(tenant, cliente=dadoscliente, id=id, dt_i=dt_i, dt_f=dt_f, descricao=descricao, detalhe=detalhe, banco=banco_selecionado,
+                            centro_custo=centro_custo_selecionado, categoria=categoria_selecionada,
+                            sub_categoria=sub_categoria_selecionada, vl_i=vl_i, vl_f=vl_f, tipo=tipo)
 
     id = '' if id is None else id
     tipo = '' if tipo is None else tipo
@@ -507,10 +507,10 @@ def contas(request):
     dt_f = '' if dt_f is None else dt_f
     descricao = '' if descricao is None else descricao
     detalhe = '' if detalhe is None else detalhe
-    banco_selecionado = '' if banco is None else BancosCliente.objects.get(pk=banco)
-    centro_custo_selecionado = '' if centro_custo is None else CentroDeCusto.objects.get(pk=centro_custo)
-    categoria_selecionada = '' if categoria is None else Categoria.objects.get(pk=categoria)
-    sub_categoria_selecionada = '' if sub_categoria is None else SubCategoria.objects.get(pk=categoria)
+    banco_selecionado = '' if banco_selecionado is None else BancosCliente.objects.get(pk=banco_selecionado)
+    centro_custo_selecionado = '' if centro_custo_selecionado is None else CentroDeCusto.objects.get(pk=centro_custo_selecionado)
+    categoria_selecionada = '' if categoria_selecionada is None else Categoria.objects.get(pk=categoria_selecionada)
+    sub_categoria_selecionada = '' if sub_categoria_selecionada is None else SubCategoria.objects.get(pk=sub_categoria_selecionada)
     vl_i = '' if vl_i is None else vl_i
     vl_f = '' if vl_f is None else vl_f
     movimentacoes = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('id')
