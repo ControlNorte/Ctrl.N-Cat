@@ -507,10 +507,22 @@ def contas(request):
     dt_f = '' if dt_f is None else dt_f
     descricao = '' if descricao is None else descricao
     detalhe = '' if detalhe is None else detalhe
-    banco_selecionado = '' if banco_selecionado is None else BancosCliente.objects.get(pk=banco_selecionado)
-    centro_custo_selecionado = '' if centro_custo_selecionado is None else CentroDeCusto.objects.get(pk=centro_custo_selecionado)
-    categoria_selecionada = '' if categoria_selecionada is None else Categoria.objects.get(pk=categoria_selecionada)
-    sub_categoria_selecionada = '' if sub_categoria_selecionada is None else SubCategoria.objects.get(pk=sub_categoria_selecionada)
+    if banco_selecionado is None:
+        banco_selecionado = ''
+    else:
+        banco_selecionado = BancosCliente.objects.get(pk=banco_selecionado)
+    if centro_custo_selecionado is None:
+        centro_custo_selecionado = ''
+    else:
+        centro_custo_selecionado = CentroDeCusto.objects.get(pk=centro_custo_selecionado)
+    if categoria_selecionada is None:
+        categoria_selecionada = ''
+    else:
+        categoria_selecionada = Categoria.objects.get(pk=categoria_selecionada)
+    if sub_categoria_selecionada is None:
+        sub_categoria_selecionada = ''
+    else:
+        sub_categoria_selecionada = SubCategoria.objects.get(pk=sub_categoria_selecionada)
     vl_i = '' if vl_i is None else vl_i
     vl_f = '' if vl_f is None else vl_f
     movimentacoes = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('id')
