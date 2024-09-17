@@ -257,9 +257,9 @@ def pesquisa_db(tenant, cliente, id=None, dt_i=None, dt_f=None, descricao=None, 
 def export_to_excel(request, tenant, cliente, pesquisa=None):
     # Obtenha o queryset (pode ser filtrado conforme sua necessidade)
     if pesquisa == '':
-        queryset = pesquisa
-    else:
         queryset = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente=cliente)
+    else:
+        queryset = pesquisa
 
     # Converta o queryset em uma lista de dicionários
     data = list(queryset.values(
