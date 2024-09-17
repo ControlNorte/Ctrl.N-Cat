@@ -3,6 +3,9 @@ from .models import *
 from django.views.generic import TemplateView, ListView, DetailView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import Cadastrodeclientes
+from django.http import FileResponse
+import openpyxl
+from io import BytesIO
 
 
 # Create your views here.
@@ -75,3 +78,25 @@ class Editarcliente(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('cliente:cliente')
+
+
+def download_modelo_importacao_cadastro_cliente(request):
+    # Criar um arquivo Excel em memória
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Modelo de Importação"
+
+    # Obter os campos do model CadastroClientes
+    fields = [field.name for field in cadastro_de_cliente._meta.fields]
+    print(fields)
+    # Escrever os nomes dos campos na primeira linha
+    for col_num, field in enumerate(fields, 1):
+        ws.cell(row=1, column=col_num, value=field)
+
+    # Salvar o arquivo Excel em memória
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    # Retornar o arquivo como resposta para download
+    return FileResponse(output, as_attachment=True, filename='modelo_importacao.xlsx')
