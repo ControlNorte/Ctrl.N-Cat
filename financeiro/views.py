@@ -483,29 +483,24 @@ def contas(request):
     vl_i = ''
     vl_f = ''
     tenant = request.tenant
-    if request.method == 'POST':
+    if request.method == 'get':
         dados = request.POST.dict()
-        if dados.get('funcao') == 'filtrar':
-            tipo = dados.get('tipo') or None
-            id = dados.get('id') or None
-            dt_i = dados.get('dt_i') or None
-            dt_f = dados.get('dt_f') or None
-            descricao = dados.get('descricao') or None
-            detalhe = dados.get('detalhe') or None
-            banco_selecionado = dados.get('banco') or None
-            centro_custo_selecionado = dados.get('centro_custo') or None
-            categoria_selecionada = dados.get('categoria') or None
-            sub_categoria_selecionada = dados.get('sub_categoria') or None
-            vl_i = dados.get('vl_i') or None
-            vl_f = dados.get('vl_f') or None
-            tenant = request.tenant
-            pesquisas = pesquisa_db(tenant, cliente=dadoscliente, id=id, dt_i=dt_i, dt_f=dt_f, descricao=descricao, detalhe=detalhe, banco=banco_selecionado,
-                                centro_custo=centro_custo_selecionado, categoria=categoria_selecionada,
-                                sub_categoria=sub_categoria_selecionada, vl_i=vl_i, vl_f=vl_f, tipo=tipo)
-
-        if dados.get('funcao') == 'export':
-            tenant = request.tenant
-            export_to_excel(request, tenant, cliente=dadoscliente, pesquisa=pesquisas)
+        tipo = dados.get('tipo') or None
+        id = dados.get('id') or None
+        dt_i = dados.get('dt_i') or None
+        dt_f = dados.get('dt_f') or None
+        descricao = dados.get('descricao') or None
+        detalhe = dados.get('detalhe') or None
+        banco_selecionado = dados.get('banco') or None
+        centro_custo_selecionado = dados.get('centro_custo') or None
+        categoria_selecionada = dados.get('categoria') or None
+        sub_categoria_selecionada = dados.get('sub_categoria') or None
+        vl_i = dados.get('vl_i') or None
+        vl_f = dados.get('vl_f') or None
+        tenant = request.tenant
+        pesquisas = pesquisa_db(tenant, cliente=dadoscliente, id=id, dt_i=dt_i, dt_f=dt_f, descricao=descricao, detalhe=detalhe, banco=banco_selecionado,
+                            centro_custo=centro_custo_selecionado, categoria=categoria_selecionada,
+                            sub_categoria=sub_categoria_selecionada, vl_i=vl_i, vl_f=vl_f, tipo=tipo)
 
     id = '' if id is None else id
     tipo = '' if tipo is None else tipo
