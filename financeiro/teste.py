@@ -260,7 +260,7 @@ def export_to_excel(request, tenant, cliente, pesquisa=None):
         queryset = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente=cliente)
     else:
         queryset = pesquisa
-
+    print(queryset)
     # Converta o queryset em uma lista de dicionários
     data = list(queryset.values(
         'id', 'data', 'descricao', 'detalhe', 'banco', 'centrodecusto', 'categoria', 'subcategoria', 'valor'
