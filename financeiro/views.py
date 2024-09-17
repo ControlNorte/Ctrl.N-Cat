@@ -507,21 +507,13 @@ def contas(request):
     dt_f = '' if dt_f is None else dt_f
     descricao = '' if descricao is None else descricao
     detalhe = '' if detalhe is None else detalhe
-    if banco_selecionado is None:
-        banco_selecionado = ''
-    else:
+    if banco_selecionado != '':
         banco_selecionado = BancosCliente.objects.get(pk=banco_selecionado)
-    if centro_custo_selecionado is None:
-        centro_custo_selecionado = ''
-    else:
+    if centro_custo_selecionado != '':
         centro_custo_selecionado = CentroDeCusto.objects.get(pk=centro_custo_selecionado)
-    if categoria_selecionada is None:
-        categoria_selecionada = ''
-    else:
+    if categoria_selecionada != '':
         categoria_selecionada = Categoria.objects.get(pk=categoria_selecionada)
-    if sub_categoria_selecionada is None:
-        sub_categoria_selecionada = ''
-    else:
+    if sub_categoria_selecionada != '':
         sub_categoria_selecionada = SubCategoria.objects.get(pk=sub_categoria_selecionada)
     vl_i = '' if vl_i is None else vl_i
     vl_f = '' if vl_f is None else vl_f
