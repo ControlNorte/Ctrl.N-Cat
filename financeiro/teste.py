@@ -318,7 +318,7 @@ def export_to_excel(request, tenant, cliente):
 
     # Converta o queryset em uma lista de dicionários
     data = list(queryset.values(
-        'id', 'data', 'descricao', 'detalhes', 'banco', 'centro_custo', 'categoria', 'subcategoria', 'valor'
+        'id', 'data', 'descricao', 'detalhe', 'banco', 'centro_custo', 'categoria', 'subcategoria', 'valor'
     ))
 
     # Crie um DataFrame Pandas a partir da lista de dicionários
