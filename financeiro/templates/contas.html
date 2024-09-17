@@ -279,7 +279,7 @@ Financeiro | {{ dadoscliente }}
         <br>
         <!-- Botão Filtrar -->
         <button class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md" id="filtrarBtn">Filtrar</button>
-        <a href="{% url 'financeiro:export_to_excel' tenant.id cliente.id %}">
+        <a href="{% url 'financeiro:export_to_excel' tenant.id cliente.id pesquisas %}">
             <button type="button">Exportar</button>
         </a>
         <!-- Caixa pop-up para o formulário -->
