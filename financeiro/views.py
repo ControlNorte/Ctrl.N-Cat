@@ -483,8 +483,8 @@ def contas(request):
     vl_i = ''
     vl_f = ''
     tenant = request.tenant
-    if request.method == 'GET':
-        dados = request.GET.dict()
+    if request.method == 'POST':
+        dados = request.POST.dict()
         tipo = dados.get('tipo') or None
         id = dados.get('id') or None
         dt_i = dados.get('dt_i') or None
