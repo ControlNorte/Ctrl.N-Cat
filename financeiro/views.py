@@ -473,6 +473,15 @@ def contas(request):
     id = ''
     tipo = ''
     dt_i = ''
+    dt_f = ''
+    descricao = ''
+    detalhe = ''
+    banco_selecionado = ''
+    centro_custo_selecionado = ''
+    categoria_selecionada = ''
+    sub_categoria = ''
+    vl_i = ''
+    vl_f = ''
     if request.method == 'POST':
         dados = request.POST.dict()
         tipo = dados.get('tipo') or None
@@ -495,6 +504,15 @@ def contas(request):
     id = '' if id is None else id
     tipo = '' if tipo is None else tipo
     dt_i = '' if dt_i is None else dt_i
+    dt_f = '' if dt_f is None else dt_f
+    descricao = '' if descricao is None else descricao
+    detalhe = '' if detalhe is None else detalhe
+    banco_selecionado = '' if banco is None else BancosCliente.objects.get(pk=banco)
+    centro_custo_selecionado = '' if centro_custo is None else CentroDeCusto.objects.get(pk=centro_custo)
+    categoria_selecionada = '' if categoria is None else Categoria.objects.get(pk=categoria)
+    sub_categoria_selecionada = '' if sub_categoria is None else SubCategoria.objects.get(pk=categoria)
+    vl_i = '' if vl_i is None else vl_i
+    vl_f = '' if vl_f is None else vl_f
     movimentacoes = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('id')
     paginator = Paginator(movimentacoes, 100)
     page_number = request.GET.get('page')
@@ -505,7 +523,10 @@ def contas(request):
     bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente).order_by('banco')
     context = {'dadoscliente': dadoscliente, 'movimentacoes': movimentacoes, 'page_obj':page_obj, 'categorias': categorias, 
                'subcategorias': subcategorias, 'centrodecustos': centrodecustos, 'bancos': bancos, 'pesquisas': pesquisas,
-               'id': id, 'tipo': tipo, 'dt_i': dt_i}
+               'id': id, 'tipo': tipo, 'dt_i': dt_i, 'dt_f': dt_f, 'descricao': descricao, 'detalhe': detalhe,
+               'banco_selecionado': banco_selecionado, 'centro_custo_selecionado': centro_custo_selecionado,
+               'categoria_selecionada': categoria_selecionada, 'sub_categoria_selecionada': sub_categoria_selecionada,
+               'vl_i': vl_i, 'vl_f': vl_f}
     return render(request, 'contas.html', context)
 
 
