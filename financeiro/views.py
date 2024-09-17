@@ -482,6 +482,7 @@ def contas(request):
     sub_categoria_selecionada = ''
     vl_i = ''
     vl_f = ''
+    tenant = request.tenant
     if request.method == 'POST':
         dados = request.POST.dict()
         if dados.get('funcao') == 'filtrar':
@@ -554,7 +555,7 @@ def contas(request):
                'id': id, 'tipo': tipo, 'dt_i': dt_i, 'dt_f': dt_f, 'descricao': descricao, 'detalhe': detalhe,
                'banco_selecionado': banco_selecionado, 'centro_custo_selecionado': centro_custo_selecionado,
                'categoria_selecionada': categoria_selecionada, 'sub_categoria_selecionada': sub_categoria_selecionada,
-               'vl_i': vl_i, 'vl_f': vl_f}
+               'vl_i': vl_i, 'vl_f': vl_f, 'tenant': tenant, 'cliente': dadoscliente}
     return render(request, 'contas.html', context)
 
 

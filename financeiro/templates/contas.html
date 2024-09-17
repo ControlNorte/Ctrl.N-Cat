@@ -279,11 +279,9 @@ Financeiro | {{ dadoscliente }}
         <br>
         <!-- Botão Filtrar -->
         <button class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md" id="filtrarBtn">Filtrar</button>
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="funcao" value="export">
-            <button type="submit">Exportar</button>
-        </form>
+        <a href="{% url 'financeiro:export_to_excel' tenant.id cliente.id %}">
+            <button type="button">Exportar</button>
+        </a>
         <!-- Caixa pop-up para o formulário -->
         <div id="popupForm" class="popup-form">
             <form method="POST">
