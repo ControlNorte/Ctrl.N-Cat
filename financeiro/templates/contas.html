@@ -279,12 +279,12 @@ Financeiro | {{ dadoscliente }}
         <br>
         <!-- Botão Filtrar -->
         <button class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md" id="filtrarBtn">Filtrar</button>
-        <a href="{% url 'financeiro:export_to_excel' tenant.id cliente.id pesquisas %}">
-            <button type="button">Exportar</button>
+        <a id="exportExcel" href="#">
+            <button type="button">Exportar para Excel</button>
         </a>
         <!-- Caixa pop-up para o formulário -->
         <div id="popupForm" class="popup-form">
-            <form method="POST">
+            <form id="filterForm" method="GET" action="{% url 'export_to_excel' tenant.id cliente.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="funcao" value="filtrar">
                 <div class="form-content">
@@ -600,6 +600,20 @@ Financeiro | {{ dadoscliente }}
             popupForm.style.display = 'none';
             document.body.classList.remove('popup-open');
         }
+    });
+
+    document.getElementById('exportExcel').addEventListener('click', function() {
+        // Pegue os valores do formulário
+        let form = document.getElementById('filterForm');
+        let params = new URLSearchParams(new FormData(form)).toString();
+
+        // Construa a URL com os parâmetros do formulário
+        let tenant = "{{ tenant.id }}";
+        let cliente = "{{ cliente.id }}";
+        let url = `{% url 'export_to_excel' tenant.id cliente.id %}?${params}`;
+
+        // Defina a URL gerada no href do link
+        document.getElementById('exportExcel').setAttribute('href', url);
     });
 </script>
 

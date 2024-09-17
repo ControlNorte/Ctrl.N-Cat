@@ -254,16 +254,71 @@ def pesquisa_db(tenant, cliente, id=None, dt_i=None, dt_f=None, descricao=None, 
     return filtrados
 
 
-def export_to_excel(request, tenant, cliente, pesquisa=None):
-    # Obtenha o queryset (pode ser filtrado conforme sua necessidade)
-    if pesquisa == '' or pesquisa is None:
-        queryset = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente=cliente)
-    else:
-        queryset = pesquisa
-    print(queryset)
+
+def export_to_excel(request, tenant, cliente):
+    # Captura os parâmetros GET
+    id_param = request.GET.get('id')
+    tipo_param = request.GET.get('tipo')
+    dt_i_param = request.GET.get('dt_i')
+    dt_f_param = request.GET.get('dt_f')
+    descricao_param = request.GET.get('descricao')
+    detalhe_param = request.GET.get('detalhe')
+    banco_param = request.GET.get('banco')
+    centro_custo_param = request.GET.get('centro_custo')
+    categoria_param = request.GET.get('categoria')
+    sub_categoria_param = request.GET.get('sub_categoria')
+    valor_inicial_param = request.GET.get('vl_i')
+    valor_final_param = request.GET.get('vl_f')
+
+    # Inicia o queryset
+    queryset = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente=cliente)
+
+    # Aplica os filtros, se houver
+    if id_param:
+        queryset = queryset.filter(id=id_param)
+    if descricao_param:
+        queryset = queryset.filter(descricao__icontains=descricao_param)
+    if detalhe_param:
+        queryset = queryset.filter(detalhe__icontains=detalhe_param)
+    if banco_param:
+        queryset = queryset.filter(banco=banco_param)
+    if centro_custo_param:
+        queryset = queryset.filter(centrodecusto=centro_custo_param)
+    if categoria_param:
+        queryset = queryset.filter(categoria=categoria_param)
+    if sub_categoria_param:
+        queryset = queryset.filter(subcategoria=sub_categoria_param)
+    if tipo_param:
+        if tipo_param == "entrada":
+            queryset = queryset.filter(valor__gte=0)
+        if tipo_param == "saida":
+            queryset = queryset.filter(valor__lte=0)
+
+    # Filtros de valores
+    if valor_inicial_param and valor_final_param:
+        # Se ambas as datas estão fornecidas, filtrar pelo intervalo
+        queryset = queryset.filter(valor__range=[valor_inicial_param, valor_final_param])
+    elif valor_inicial_param:
+        # Se apenas a data inicial for fornecida, filtrar a partir dela
+        queryset = queryset.filter(valor__gte=valor_inicial_param)
+    elif valor_final_param:
+        # Se apenas a data final for fornecida, filtrar até essa data
+        queryset = queryset.filter(valor__lte=valor_final_param)
+
+    # Filtros de datas
+    if dt_i_param and dt_f_param:
+        # Se ambas as datas estão fornecidas, filtrar pelo intervalo
+        queryset = queryset.filter(data__range=[dt_i_param, dt_f_param])
+    elif dt_i_param:
+        # Se apenas a data inicial for fornecida, filtrar a partir dela
+        queryset = queryset.filter(data__gte=dt_i_param)
+    elif dt_f_param:
+        # Se apenas a data final for fornecida, filtrar até essa data
+        queryset = queryset.filter(data__lte=dt_f_param)
+
     # Converta o queryset em uma lista de dicionários
     data = list(queryset.values(
-        'id', 'data', 'descricao', 'detalhe', 'banco', 'centrodecusto', 'categoria', 'subcategoria', 'valor'
+        'id', 'data', 'descricao', 'detalhes', 'banco', 'centro_custo', 'categoria', 'subcategoria', 'valor'
     ))
 
     # Crie um DataFrame Pandas a partir da lista de dicionários
