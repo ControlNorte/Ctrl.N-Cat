@@ -511,7 +511,7 @@ def contas(request):
     descricao = '' if descricao is None else descricao
 
     detalhe = '' if detalhe is None else detalhe
-
+    print(banco_selecionado)
     if banco_selecionado != '' or banco_selecionado is not None:
         banco_selecionado = BancosCliente.objects.get(pk=banco_selecionado)
 
