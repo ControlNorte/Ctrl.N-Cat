@@ -472,6 +472,7 @@ def contas(request):
     pesquisas = ''
     id = ''
     tipo = ''
+    dt_i = ''
     if request.method == 'POST':
         dados = request.POST.dict()
         tipo = dados.get('tipo') or None
@@ -493,7 +494,7 @@ def contas(request):
 
     id = '' if id is None else id
     tipo = '' if tipo is None else tipo
-
+    dt_i = '' if dt_i is None else dt_i
     movimentacoes = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('id')
     paginator = Paginator(movimentacoes, 100)
     page_number = request.GET.get('page')
