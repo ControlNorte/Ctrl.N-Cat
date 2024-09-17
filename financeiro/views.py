@@ -479,7 +479,7 @@ def contas(request):
     banco_selecionado = ''
     centro_custo_selecionado = ''
     categoria_selecionada = ''
-    sub_categoria = ''
+    sub_categoria_selecionada = ''
     vl_i = ''
     vl_f = ''
     if request.method == 'POST':
