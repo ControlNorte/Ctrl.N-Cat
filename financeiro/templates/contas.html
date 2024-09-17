@@ -284,7 +284,7 @@ Financeiro | {{ dadoscliente }}
         </a>
         <!-- Caixa pop-up para o formulário -->
         <div id="popupForm" class="popup-form">
-            <form id="filterForm" method="GET" action="{% url 'export_to_excel' tenant.id cliente.id %}">
+            <form id="filterForm" method="GET" action="{% url 'financeiro:export_to_excel' tenant.id cliente.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="funcao" value="filtrar">
                 <div class="form-content">
@@ -610,7 +610,7 @@ Financeiro | {{ dadoscliente }}
         // Construa a URL com os parâmetros do formulário
         let tenant = "{{ tenant.id }}";
         let cliente = "{{ cliente.id }}";
-        let url = `{% url 'export_to_excel' tenant.id cliente.id %}?${params}`;
+        let url = `{% url 'financeiro:export_to_excel' tenant.id cliente.id %}?${params}`;
 
         // Defina a URL gerada no href do link
         document.getElementById('exportExcel').setAttribute('href', url);
