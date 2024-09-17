@@ -503,20 +503,30 @@ def contas(request):
 
     id = '' if id is None else id
     tipo = '' if tipo is None else tipo
+
     dt_i = '' if dt_i is None else dt_i
+
     dt_f = '' if dt_f is None else dt_f
+
     descricao = '' if descricao is None else descricao
+
     detalhe = '' if detalhe is None else detalhe
+
     if banco_selecionado != '' or banco_selecionado is not None:
         banco_selecionado = BancosCliente.objects.get(pk=banco_selecionado)
+
     if centro_custo_selecionado != '' or centro_custo_selecionado is not None:
         centro_custo_selecionado = CentroDeCusto.objects.get(pk=centro_custo_selecionado)
+
     if categoria_selecionada != '' or categoria_selecionada is not None:
         categoria_selecionada = Categoria.objects.get(pk=categoria_selecionada)
+
     if sub_categoria_selecionada != '' or sub_categoria_selecionada is not None:
         sub_categoria_selecionada = SubCategoria.objects.get(pk=sub_categoria_selecionada)
     vl_i = '' if vl_i is None else vl_i
+
     vl_f = '' if vl_f is None else vl_f
+
     movimentacoes = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('id')
     paginator = Paginator(movimentacoes, 100)
     page_number = request.GET.get('page')
