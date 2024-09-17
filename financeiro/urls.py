@@ -46,6 +46,6 @@ urlpatterns = [
     path('edit_movimentacao/', views.edit_movimentacao, name='edit_movimentacao'),
     path('delete_movimentacao/<int:id>/', views.delete_movimentacao, name='delete_movimentacao'),
     path('get_movimentacao/<int:id>/', views.get_movimentacao, name='get_movimentacao'),
-    path('exportar-excel/<int:tenant>/<int:cliente>/<queryset:pesquisa>/', views.export_to_excel, name='export_to_excel')
+    path('exportar-excel/<int:tenant>/<int:cliente>', views.export_to_excel, name='export_to_excel')
 
 ]
