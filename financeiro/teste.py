@@ -7,6 +7,7 @@ from django.db import connection
 from .alteracoesdb import *
 import ahocorasick
 from django.db.models import Sum, Q
+from django.http import HttpResponse
 
 register = template.Library()
 
@@ -250,6 +251,29 @@ def pesquisa_db(tenant, cliente, id=None, dt_i=None, dt_f=None, descricao=None, 
         # Se apenas a data final for fornecida, filtrar até essa data
         filtrados = filtrados.filter(data__lte=dt_f)
 
-    for filtrado in filtrados:
-        print(filtrado.id)
     return filtrados
+
+
+def export_to_excel(request, tenant, cliente, pesquisa=None):
+    # Obtenha o queryset (pode ser filtrado conforme sua necessidade)
+    if pesquisa == '':
+        queryset = pesquisa
+    else:
+        queryset = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente=cliente)
+
+    # Converta o queryset em uma lista de dicionários
+    data = list(queryset.values(
+        'id', 'data', 'descricao', 'detalhes', 'banco', 'centro_custo', 'categoria', 'subcategoria', 'valor'
+    ))
+
+    # Crie um DataFrame Pandas a partir da lista de dicionários
+    df = pd.DataFrame(data)
+
+    # Defina o tipo de resposta como 'application/vnd.ms-excel'
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="movimentacoes_cliente.xlsx"'
+
+    # Escreva o DataFrame em um arquivo Excel
+    df.to_excel(response, index=False, engine='openpyxl')
+
+    return response
