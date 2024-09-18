@@ -8,7 +8,6 @@ from .alteracoesdb import *
 from .exibicoes import *
 from datetime import *
 from .teste import *
-from django.http import JsonResponse
 from django.contrib import messages
 from django.http import HttpResponse
 from django.core.paginator import Paginator
