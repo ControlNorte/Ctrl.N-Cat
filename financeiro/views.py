@@ -99,7 +99,7 @@ def movimentacao(request, banco):
                 movimentacoes.save()
                 alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente.id, data=dados.get('data'), request=request)
             else:
-                erroentrada = 'Valor de Entrada Tem que ser maior que zero'
+                erroentrada = 'Valor de Entrada Tem que ser maior que 0'
 
         elif dados.get('tipo') == 'saida':
             if float(dados.get('valor').replace(',', '.')) <= 0:
