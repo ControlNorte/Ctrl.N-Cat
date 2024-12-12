@@ -75,9 +75,9 @@ class cadastro_de_cliente(models.Model):
     sugestoes = models.TextField(max_length=500, null=True, blank=True)
     historico = models.TextField(max_length=500, null=True, blank=True)
     criado_em = models.DateTimeField(auto_now_add=True)
-    data_inicio = models.DateTimeField(null=True, blank=True)
-    tempo_plano = models.CharField(max_length=100, null=True, blank=True)
-    data_final = models.DateTimeField(null=True, blank=True)
+    data_inicio_plano = models.DateTimeField(null=True, blank=True, default="")
+    tempo_plano = models.CharField(max_length=100, null=True, blank=True, default="")
+    data_final_plano = models.DateTimeField(null=True, blank=True, default="")
 
     objects = TenantManager()
 
