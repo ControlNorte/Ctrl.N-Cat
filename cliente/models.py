@@ -78,6 +78,7 @@ class cadastro_de_cliente(models.Model):
     data_inicio_plano = models.DateTimeField(null=True, blank=True, default=None)
     tempo_plano = models.CharField(max_length=100, null=True, blank=True, default=None)
     data_final_plano = models.DateTimeField(null=True, blank=True, default=None)
+    tempo_plano1 = models.CharField(max_length=100, null=True, blank=True, default=None)
 
     objects = TenantManager()
 
