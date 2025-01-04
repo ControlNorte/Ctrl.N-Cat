@@ -14,4 +14,4 @@ class HpinicialConfig(AppConfig):
 
         usuarios = Usuario.objects.filter(email=email)
         if not usuarios:
-            usuarios.objects.creat_superuser(username="admin", email=email, password=senha, is_active=True, is_staff=True)
+            Usuario.objects.creat_superuser(username="admin", email=email, password=senha, is_active=True, is_staff=True)
