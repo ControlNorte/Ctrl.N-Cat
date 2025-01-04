@@ -1,4 +1,3 @@
-from Demos.win32ts_logoff_disconnected import username
 from django.apps import AppConfig
 
 
