@@ -25,14 +25,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 TOKEN_CSRF = os.getenv('TOKEN_CSRF')
 if TOKEN_CSRF:
     SECRET_KEY = TOKEN_CSRF
-    CSRF_TRUSTED_ORIGINS = ['https://controlnorte-producao.up.railway.app']
+    CSRF_TRUSTED_ORIGINS = ['https://controlnorte-production.up.railway.app']
 else:
     SECRET_KEY = 'django-insecure-1aof%_lm8&%gqcvbefus9us4p^fppotzpaadx+tffm*a_m42wx'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["controlnorte-producao.up.railway.app", 'localhost', '127.0.0.1:8000']
+ALLOWED_HOSTS = ["controlnorte-production.up.railway.app", 'localhost', '127.0.0.1:8000']
 
 
 # Application definition
