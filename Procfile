@@ -1,1 +1,1 @@
-web: python manage.py makemigrations && python manage.py migrate --run-syncdb && gunicorn ControlNorte.wsgi --log-file - --timeout 300 --workers=3
+web: python manage.py makemigrations && python manage.py migrate --fake sessions zero && gunicorn ControlNorte.wsgi --log-file - --timeout 300 --workers=3
