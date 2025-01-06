@@ -1,8 +1,3 @@
-from multiprocessing.reduction import send_handle
-from os import getenv
-
-from Demos.win32ts_logoff_disconnected import username
-from IPython.lib.editorhooks import emacs
 from django.apps import AppConfig
 
 
