@@ -11,6 +11,7 @@ from django.shortcuts import redirect
 from django.contrib import messages
 import pandas as pd
 from django.http import JsonResponse
+from financeiro.teste import UploadFileForm
 
 
 # Create your views here.
@@ -37,6 +38,11 @@ class Destalhesclientes(LoginRequiredMixin, DetailView):
 
 
 def cadastrarcliente(request):
+    form = UploadFileForm(request.POST, request.FILES)
+    if form.is_valid():
+        form.save()
+        file = request.FILES['file']
+        print(file)
     if request.method == 'POST':
         dados = request.POST.dict()
         novocliente = cadastro_de_cliente.objects.create(razao_social=dados.get('razao'), cnpj=dados.get('cnpj'),
@@ -60,7 +66,7 @@ def cadastrarcliente(request):
 
     ramos = Ramo.objects.all()
 
-    context = {'ramos': ramos}
+    context = {'ramos': ramos, 'form': form}
 
     return render(request, 'cadastrarcliente.html', context)
 

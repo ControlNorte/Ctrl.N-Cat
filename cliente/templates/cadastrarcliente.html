@@ -220,8 +220,8 @@ Cadastrar Cliente
                 <!-- Campo para upload -->
 
                 <div class="mb-3">
-                    <label for="formFile" class="form-label">Selecione o arquivo para importação</label>
-                    <input class="form-control" type="file" name="file" id="formFile" accept=".xlsx">
+                    <label class="form-label">Selecione o arquivo para importação</label>
+                    {{ form.as_p }}
                 </div>
 
                 <!-- Campo para arrastar e soltar o arquivo -->
