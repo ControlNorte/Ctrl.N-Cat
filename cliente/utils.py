@@ -15,8 +15,6 @@ class UploadFileForm(forms.ModelForm):
 
 def importar_clientes(arquivo_importacao_cliente, tenant):
 
-    cliente = []
-
     if not arquivo_importacao_cliente:
         print("Erro: Nenhum arquivo foi selecionado.")  # Retorna erro se nenhum arquivo foi selecionado
 
@@ -28,7 +26,8 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
         registros = df.to_dict(orient='records')
 
         # Lista para armazenar os objetos do model
-        clientes = ''
+        cliente = ''
+        clientes = []
         razao_social = ''
         cnpj = ''
         logadouro = ''
