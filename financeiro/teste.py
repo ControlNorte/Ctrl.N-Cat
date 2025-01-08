@@ -1,7 +1,6 @@
 from datetime import *
 import pandas as pd
 from django import forms, template
-from .models import UploadedFile
 from .models import *
 from django.db import connection
 from .alteracoesdb import *
