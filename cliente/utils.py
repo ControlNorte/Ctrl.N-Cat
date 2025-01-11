@@ -46,13 +46,13 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
                 razao_social = registro.get('razao_social')
                 print(razao_social)
             else:
-                JsonResponse({'error': 'Razão Social não encontrada'})
+                print("Razão Social não encontrada")
 
             if registro.get('cnpj'):
                 cnpj = registro.get('cnpj')
                 print(cnpj)
             else:
-                JsonResponse({'error': 'CNPJ não encontrado'})
+                print("Razão Social não encontrada")
 
             if registro.get('logadouro'):
                 logadouro = registro.get('logadouro')
