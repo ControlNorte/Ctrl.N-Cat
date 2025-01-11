@@ -19,6 +19,8 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
         print("Erro: Nenhum arquivo foi selecionado.")  # Retorna erro se nenhum arquivo foi selecionado
 
     print(tenant)
+    erro = ''
+
     try:
         # Ler o arquivo Excel usando pandas
         df = pd.read_excel(arquivo_importacao_cliente)
@@ -46,13 +48,13 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
                 razao_social = registro.get('razao_social')
                 print(razao_social)
             else:
-                print("Razão Social não encontrada")
+                erro = "Razão Social não encontrada"
 
             if registro.get('cnpj'):
                 cnpj = registro.get('cnpj')
                 print(cnpj)
             else:
-                print("Razão Social não encontrada")
+                erro = "CNPJ não encontrado"
 
             if registro.get('logadouro'):
                 logadouro = registro.get('logadouro')
@@ -121,6 +123,6 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
         print('Clientes salvos com Sucesso')
 
     except:
-        print('Erro')
+        print(f'Erro: {erro}')
 
     return print('Importação finalizado')
