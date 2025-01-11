@@ -44,83 +44,86 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
 
     # Criar objetos de CadastroClientes com base nos registros
     for registro in registros:
-        if registro.get('razao_social') is not empty:
+        if registro.get('razao_social'):
+            razao_social = registro.get('razao_social')
             print(razao_social)
-
-            if registro.get('cnpj') is not empty:
-                print(cnpj)
-
-                if registro.get('logadouro'):
-                    logadouro = registro.get('logadouro')
-                    print(logadouro)
-
-                if registro.get('numero'):
-                    numero = registro.get('numero')
-                    print(numero)
-
-                if registro.get('bairro'):
-                    bairro = registro.get('bairro')
-                    print(bairro)
-
-                if registro.get('cidade'):
-                    cidade = registro.get('cidade')
-                    print(cidade)
-
-                if registro.get('estado'):
-                    estado = registro.get('estado')
-                    print(estado)
-
-                if registro.get('pessoa_contato'):
-                    pessoa_contato = registro.get('pessoa_contato')
-                    print(pessoa_contato)
-
-                if registro.get('telefone'):
-                    telefone = registro.get('telefone')
-                    print(telefone)
-
-                if registro.get('email'):
-                    email = registro.get('email')
-                    print(email)
-
-                cliente = cadastro_de_cliente(
-                        razao_social=razao_social,
-                        cnpj=cnpj,
-                        logadouro=logadouro,
-                        numero=numero,
-                        bairro=bairro,
-                        cidade=cidade,
-                        estado=estado,
-                        pessoa_contato=pessoa_contato,
-                        telefone=telefone,
-                        email=email,
-                        bancos=registro.get('bancos'),
-                        servicos=registro.get('servicos'),
-                        conciliacao=registro.get('conciliacao'),
-                        reunioes=registro.get('reunioes'),
-                        funcionarios=registro.get('funcionarios'),
-                        contas_fixas=registro.get('contas_fixas'),
-                        classificacoes=registro.get('classificacoes'),
-                        fornecedores=registro.get('fornecedores'),
-                        observacoes=registro.get('observacoes'),
-                        sugestoes=registro.get('sugestoes'),
-                        historico=registro.get('historico'),
-                        ativo=registro.get('ativo') == 'Sim',  # Converter "Sim" ou "Não" para booleano
-                        tenant=tenant,
-                    )
-
-            else:
-                print("CNPJ não encontrado")
-
         else:
-            print("Razão Social não encontrada")
+            erro = "Razão Social não encontrada"
+
+        if registro.get('cnpj'):
+            cnpj = registro.get('cnpj')
+            print(cnpj)
+        else:
+            erro = "CNPJ não encontrado"
+
+        if registro.get('logadouro'):
+            logadouro = registro.get('logadouro')
+            print(logadouro)
+
+        if registro.get('numero'):
+            numero = registro.get('numero')
+            print(numero)
+
+        if registro.get('bairro'):
+            bairro = registro.get('bairro')
+            print(bairro)
+
+        if registro.get('cidade'):
+            cidade = registro.get('cidade')
+            print(cidade)
+
+        if registro.get('estado'):
+            estado = registro.get('estado')
+            print(estado)
+
+        if registro.get('pessoa_contato'):
+            pessoa_contato = registro.get('pessoa_contato')
+            print(pessoa_contato)
+
+        if registro.get('telefone'):
+            telefone = registro.get('telefone')
+            print(telefone)
+
+        if registro.get('email'):
+            email = registro.get('email')
+            print(email)
+
+        cliente = cadastro_de_cliente(
+                razao_social=razao_social,
+                cnpj=cnpj,
+                logadouro=logadouro,
+                numero=numero,
+                bairro=bairro,
+                cidade=cidade,
+                estado=estado,
+                pessoa_contato=pessoa_contato,
+                telefone=telefone,
+                email=email,
+                bancos=registro.get('bancos'),
+                servicos=registro.get('servicos'),
+                conciliacao=registro.get('conciliacao'),
+                reunioes=registro.get('reunioes'),
+                funcionarios=registro.get('funcionarios'),
+                contas_fixas=registro.get('contas_fixas'),
+                classificacoes=registro.get('classificacoes'),
+                fornecedores=registro.get('fornecedores'),
+                observacoes=registro.get('observacoes'),
+                sugestoes=registro.get('sugestoes'),
+                historico=registro.get('historico'),
+                ativo=registro.get('ativo') == 'Sim',  # Converter "Sim" ou "Não" para booleano
+                tenant=tenant,
+            )
 
     clientes.append(cliente)
 
     # Salvar os dados no banco de dados em uma transação atômica
-    with transaction.atomic():
-        cadastro_de_cliente.objects.bulk_create(clientes)
+    if razao_social and cnpj is not empty:
+        with transaction.atomic():
+            cadastro_de_cliente.objects.bulk_create(clientes)
 
-        print('Clientes salvos com Sucesso')
+            print('Clientes salvos com Sucesso')
 
+    else:
+        print("Preencher os campos de Razão Social e CNPJ")
 
     return print('Importação finalizado')
