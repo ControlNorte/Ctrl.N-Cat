@@ -53,43 +53,35 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
 
             if registro.get('logadouro'):
                 logadouro = registro.get('logadouro')
-            else:
-                JsonResponse({'error': 'Logadouro não encontrado'})
+
 
             if registro.get('numero'):
                 numero = registro.get('numero')
-            else:
-                JsonResponse({'error': 'Numero não encontrado'})
+
 
             if registro.get('bairro'):
                 bairro = registro.get('bairro')
-            else:
-                JsonResponse({'error': 'Bairro não encontrado'})
+
 
             if registro.get('cidade'):
                 cidade = registro.get('cidade')
-            else:
-                JsonResponse({'error': 'Cidade não encontrado'})
+
 
             if registro.get('estado'):
                 estado = registro.get('estado')
-            else:
-                JsonResponse({'error': 'Estado não encontrado'})
+
 
             if registro.get('pessoa_contato'):
                 pessoa_contato = registro.get('pessoa_contato')
-            else:
-                JsonResponse({'error': 'Pessoa de Contato não encontrada'})
+
 
             if registro.get('telefone'):
                 telefone = registro.get('telefone')
-            else:
-                JsonResponse({'error': 'Telefone não encontrado'})
+
 
             if registro.get('email'):
                 email = registro.get('email')
-            else:
-                JsonResponse({'error': 'E-mail não encontrado'})
+
 
             cliente = cadastro_de_cliente(
                     razao_social=razao_social,
@@ -124,7 +116,8 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
             cadastro_de_cliente.objects.bulk_create(clientes)
 
         messages.success("Clientes importados com sucesso!")
-    except Exception as e:
-        messages.error(f"Ocorreu um erro ao importar: {e}")
+
+    except:
+        pass
 
     return print('Clientes salvos com Sucesso')
