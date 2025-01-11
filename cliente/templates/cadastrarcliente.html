@@ -47,6 +47,20 @@
         border-color: #5a2d9b;
         outline: none;
     }
+
+    /* Estilo para o popup */
+        #popup {
+            display: none; /* Esconde o popup por padrão */
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000; /* Garante que o popup ficará acima de outros elementos */
+        }
 </style>
 
 <!-- Bootstrap CSS -->
@@ -237,4 +251,20 @@ Cadastrar Cliente
         </div>
     </div>
 </div>
+
+<!-- Popup -->
+<div id="popup">
+    {{ importar }}
+</div>
+
+<script>
+    // Verifica se há uma mensagem na variável 'importar'
+    const popup = document.getElementById("popup");
+    if ("{{ importar }}") {
+        popup.style.display = "block"; // Exibe o popup
+        setTimeout(() => {
+            popup.style.display = "none"; // Esconde após 3 segundos
+        }, 3000); // 3000 milissegundos = 3 segundos
+    }
+</script>
 {% endblock %}
