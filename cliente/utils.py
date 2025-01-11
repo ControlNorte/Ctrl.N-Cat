@@ -118,9 +118,9 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
         with transaction.atomic():
             cadastro_de_cliente.objects.bulk_create(clientes)
 
-        messages.success("Clientes importados com sucesso!")
+        print('Clientes salvos com Sucesso')
 
     except:
-        pass
+        print('Erro')
 
-    return print('Clientes salvos com Sucesso')
+    return print('Importação finalizado')
