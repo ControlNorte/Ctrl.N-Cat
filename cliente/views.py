@@ -44,7 +44,8 @@ def cadastrarcliente(request):
     if form.is_valid():
         form.save()
         file = request.FILES['file']
-        importar_clientes(arquivo_importacao_cliente=file,tenant=request.tenant)
+        importar = importar_clientes(arquivo_importacao_cliente=file,tenant=request.tenant)
+        print(importar)
 
     if not file:
         if request.method == 'POST':

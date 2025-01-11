@@ -21,7 +21,7 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
         print("Erro: Nenhum arquivo foi selecionado.")  # Retorna erro se nenhum arquivo foi selecionado
 
     print(tenant)
-    erro = ''
+    retorno = ''
     # Ler o arquivo Excel usando pandas
     df = pd.read_excel(arquivo_importacao_cliente)
 
@@ -121,9 +121,9 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
         with transaction.atomic():
             cadastro_de_cliente.objects.bulk_create(clientes)
 
-            print('Clientes salvos com Sucesso')
+            retorno = 'Clientes salvos com Sucesso'
 
     else:
-        print("Preencher os campos de Razão Social e CNPJ")
+        retorno = "Preencher os campos de Razão Social e CNPJ"
 
-    return print('Importação finalizado')
+    return retorno
