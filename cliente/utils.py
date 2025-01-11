@@ -42,12 +42,10 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
 
     # Criar objetos de CadastroClientes com base nos registros
     for registro in registros:
-        try:
-            razao_social = registro.get('razao_social')
+        if registro.get('razao_social'):
             print(razao_social)
 
-            try:
-                cnpj = registro.get('cnpj')
+            if registro.get('cnpj'):
                 print(cnpj)
 
                 if registro.get('logadouro'):
@@ -108,10 +106,10 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
                         tenant=tenant,
                     )
 
-            except:
+            else:
                 print("CNPJ não encontrado")
 
-        except:
+        else:
             print("Razão Social não encontrada")
 
     clientes.append(cliente)
