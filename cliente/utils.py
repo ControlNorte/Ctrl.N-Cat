@@ -2,6 +2,8 @@ import pandas as pd
 from django import forms
 from django.http import JsonResponse
 from django.db import transaction
+from django.utils.functional import empty
+
 from .models import cadastro_de_cliente
 from django.contrib import messages
 
@@ -42,10 +44,10 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
 
     # Criar objetos de CadastroClientes com base nos registros
     for registro in registros:
-        if registro.get('razao_social'):
+        if registro.get('razao_social') is not empty:
             print(razao_social)
 
-            if registro.get('cnpj'):
+            if registro.get('cnpj') is not empty:
                 print(cnpj)
 
                 if registro.get('logadouro'):
