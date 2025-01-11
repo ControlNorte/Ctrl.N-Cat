@@ -40,6 +40,7 @@ class Destalhesclientes(LoginRequiredMixin, DetailView):
 
 def cadastrarcliente(request):
     file = ""
+    importar = ""
     form = UploadFileForm(request.POST, request.FILES)
     if form.is_valid():
         form.save()
