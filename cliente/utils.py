@@ -115,7 +115,7 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
             )
 
     clientes.append(cliente)
-
+    print(clientes)
     # Salvar os dados no banco de dados em uma transação atômica
     with transaction.atomic():
         cadastro_de_cliente.objects.bulk_create(clientes)
