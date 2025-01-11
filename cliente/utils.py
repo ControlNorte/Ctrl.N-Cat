@@ -18,6 +18,7 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
     if not arquivo_importacao_cliente:
         print("Erro: Nenhum arquivo foi selecionado.")  # Retorna erro se nenhum arquivo foi selecionado
 
+    print(tenant)
     try:
         # Ler o arquivo Excel usando pandas
         df = pd.read_excel(arquivo_importacao_cliente)
@@ -43,45 +44,47 @@ def importar_clientes(arquivo_importacao_cliente, tenant):
         for registro in registros:
             if registro.get('razao_social'):
                 razao_social = registro.get('razao_social')
+                print(razao_social)
             else:
                 JsonResponse({'error': 'Razão Social não encontrada'})
 
             if registro.get('cnpj'):
                 cnpj = registro.get('cnpj')
+                print(cnpj)
             else:
                 JsonResponse({'error': 'CNPJ não encontrado'})
 
             if registro.get('logadouro'):
                 logadouro = registro.get('logadouro')
-
+                print(logadouro)
 
             if registro.get('numero'):
                 numero = registro.get('numero')
-
+                print(numero)
 
             if registro.get('bairro'):
                 bairro = registro.get('bairro')
-
+                print(bairro)
 
             if registro.get('cidade'):
                 cidade = registro.get('cidade')
-
+                print(cidade)
 
             if registro.get('estado'):
                 estado = registro.get('estado')
-
+                print(estado)
 
             if registro.get('pessoa_contato'):
                 pessoa_contato = registro.get('pessoa_contato')
-
+                print(pessoa_contato)
 
             if registro.get('telefone'):
                 telefone = registro.get('telefone')
-
+                print(telefone)
 
             if registro.get('email'):
                 email = registro.get('email')
-
+                print(email)
 
             cliente = cadastro_de_cliente(
                     razao_social=razao_social,
