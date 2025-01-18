@@ -29,6 +29,6 @@ def concexao_api():
     }
 
     response = requests.post(url, json=payload, headers=headers)
-    access_token = requests.get(url, json=payload, headers=headers)
+    response = requests.get(url, json=payload, headers=headers)
 
-    print(access_token)
+    print(response.text)
