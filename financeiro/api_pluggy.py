@@ -15,6 +15,8 @@ def concexao_api():
 
     response = requests.post(url, json=payload, headers=headers)
 
+    print(response.text)
+
     api_key = response.text
 
     payload = {
@@ -29,6 +31,9 @@ def concexao_api():
     }
 
     response = requests.post(url, json=payload, headers=headers)
+
+    print(response.text)
+
     response = requests.get(url, json=payload, headers=headers)
 
     print(response.text)
