@@ -30,10 +30,6 @@ def concexao_api():
         "X-API-KEY": api_key
     }
 
-    response = requests.post(url, json=payload, headers=headers)
-
-    print(response.text)
-
     response = requests.get(url, json=payload, headers=headers)
 
     print(response.text)
