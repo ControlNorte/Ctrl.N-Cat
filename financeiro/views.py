@@ -1,7 +1,5 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import ListView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from cliente.models import cadastro_de_cliente
 from .models import *
 from .alteracoesdb import *
@@ -9,13 +7,11 @@ from .exibicoes import *
 from datetime import *
 from .teste import *
 from django.contrib import messages
-from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
-from collections import defaultdict
+from .api_pluggy import concexao_api
 
 # Create your views here.
 
@@ -76,6 +72,10 @@ def movimentacao(request, banco):
 
     if request.method == 'POST':
         dados = request.POST.dict()
+
+        if dados.get('tipo') == 'api':
+            concexao_api()
+
         if dados.get('tipo') == 'mes':
             mesfiltro = messtr(dados.get('mesfiltro'))
             mesatual = dados.get('mesfiltro')
