@@ -15,16 +15,16 @@ def concexao_api():
 
     response = requests.post(url, json=payload, headers=headers)
 
-    # api_key =
-    print(response.text)
-    #
-    # headers = {
-    #     "accept": "application/json",
-    #     "content-type": "application/json",
-    #     "X-API-KEY": api_key
-    # }
-    #
-    # response = requests.post(url, headers=headers)
-    #
-    # access_token = response.text
-    # print(access_token)
+    api_key = response.text
+    print(api_key)
+
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "X-API-KEY": api_key
+    }
+
+    response = requests.post(url, headers=headers)
+
+    access_token = response.text
+    print(access_token)

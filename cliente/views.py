@@ -106,7 +106,7 @@ def download_modelo_importacao_cadastro_cliente(request):
     # Obter os campos do model CadastroClientes
     fields = [field.name for field in cadastro_de_cliente._meta.fields]
     # Verificando se o campo existe antes de remover
-    for field in ['id', 'tenant', 'historico', 'criado_em']:
+    for field in ['id', 'tenant', 'historico', 'criado_em', 'servicos_contratados', 'ativo', 'ramo']:
         if field in fields:
             fields.remove(field)
     # Escrever os nomes dos campos na primeira linha
