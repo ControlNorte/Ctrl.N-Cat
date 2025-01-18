@@ -16,7 +16,6 @@ def concexao_api():
     response = requests.post(url, json=payload, headers=headers)
 
     api_key = response.text
-    print(api_key)
 
     payload = {
         "clientId": "226a2d88-095c-4469-9943-1a3e6e3ae477",
@@ -30,6 +29,6 @@ def concexao_api():
     }
 
     response = requests.post(url, json=payload, headers=headers)
+    access_token = requests.get(url, headers=headers)
 
-    access_token = response.text
     print(access_token)
