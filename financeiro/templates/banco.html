@@ -108,44 +108,51 @@ Financeiro | {{ dadoscliente }}
                 </table>
                 </div>
             </div>
-
+    <button id="connectButton">Conectar Conta</button>
     </div>
 
     <script src="https://cdn.pluggy.ai/pluggy-connect/v2.8.2/pluggy-connect.js"></script>
     <script>
-      // Use your own connect token API endpoint, this one only list sandbox connectors
-      // Example Reference: https://github.com/pluggyai/quickstart/tree/master/examples/vercel-node-connect-token
-      fetch('https://api-plug-controlnortes-projects.vercel.app/api/token', {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          options: {
-            clientUserId: 'user@example.com',
+      // Seleciona o botão pelo ID
+      const connectButton = document.getElementById('connectButton');
+
+      // Adiciona um evento de clique no botão
+      connectButton.addEventListener('click', () => {
+        // Realiza a requisição fetch ao clicar no botão
+        fetch('https://api-plug-controlnortes-projects.vercel.app/api/token', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
           },
-        }),
-      })
-        .then((response) => response.json())
-        .then(({ accessToken }) => {
-          const pluggyConnect = new PluggyConnect({
-            connectToken: accessToken,
-            includeSandbox: true,
-            onSuccess: (itemData) => {
-              // TODO: Implement logic for succesful connection
-              // The following line is an example, it should be removed when implemented.
-              console.log('Yay! Pluggy connect success!', itemData)
+          body: JSON.stringify({
+            options: {
+              clientUserId: 'user@example.com',
             },
-            onError: (error) => {
-              // TODO: Implement logic for error on connection
-              // The following line is an example, it should be removed when implemented.
-              console.error('Whoops! Pluggy Connect error... ', error)
-            },
-          })
-          pluggyConnect.init()
+          }),
         })
+          .then((response) => response.json())
+          .then(({ accessToken }) => {
+            const pluggyConnect = new PluggyConnect({
+              connectToken: accessToken,
+              includeSandbox: true,
+              onSuccess: (itemData) => {
+                // TODO: Implementar lógica para conexão bem-sucedida
+                console.log('Conexão Pluggy bem-sucedida!', itemData);
+              },
+              onError: (error) => {
+                // TODO: Implementar lógica para erro na conexão
+                console.error('Erro ao conectar com o Pluggy:', error);
+              },
+            });
+            pluggyConnect.init();
+          })
+          .catch((error) => {
+            console.error('Erro na requisição do token:', error);
+          });
+      });
     </script>
+
 </main>
 </body>
 
