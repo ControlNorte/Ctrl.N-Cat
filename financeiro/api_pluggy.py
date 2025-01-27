@@ -51,7 +51,7 @@ def handle_item_data(request):
 
             url = f"https://api.pluggy.ai/accounts"
 
-            params = {"itemId": "c706f8ae-3757-40b0-bc93-e017724ce4b2"}
+            params = {"itemId": itemId}
 
             query_string = urlencode(params)
             url = f"{url}?{query_string}"
