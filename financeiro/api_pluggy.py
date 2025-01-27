@@ -2,7 +2,7 @@ from IPython.terminal.shortcuts.filters import pass_through
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import BancosCliente, cadastro_de_cliente
-import requests, time, json
+import requests, json
 
 
 @csrf_exempt  # Use apenas para testes; idealmente, configure o CSRF corretamente.
@@ -49,17 +49,16 @@ def handle_item_data(request):
         try:
             # Lista de contas
 
-            print("Esperando 30 segundos antes de fazer a requisição...")
-            time.sleep(20)
+            url = f"https://api.pluggy.ai/accounts"
 
-            url = f"https://api.pluggy.ai/accounts?itemId={itemId}"
+            params = {"itemId": itemId}
 
             headers = {
                 "accept": "application/json",
                 "X-API-KEY": access_token['apiKey']
             }
 
-            response = requests.get(url, headers=headers)
+            response = requests.get(url, headers=headers, params=params)
 
             print(response.text)
 
