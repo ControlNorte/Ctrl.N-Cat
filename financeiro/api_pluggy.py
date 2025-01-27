@@ -93,7 +93,7 @@ def handle_item_data(request):
             print(f"Agência: {agencia}")
             print(f"Conta: {conta}")
             print(f"Dígito: {digito}")
-            print(itemId)
+            print(data)
             # # Criando banco no banco de dados
             # pk = request.session.get('dadoscliente')
             # if not pk:
