@@ -61,7 +61,7 @@ def handle_item_data(request):
                 "X-API-KEY": access_token['apiKey']
             }
 
-            response = requests.get(url, headers=headers, params=params)
+            response = requests.get(url, headers=headers)
 
             print(response.text)
 
