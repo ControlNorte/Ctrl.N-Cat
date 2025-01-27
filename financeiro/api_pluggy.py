@@ -42,21 +42,19 @@ def handle_item_data(request):
 
     access_token = response.text
     access_token = json.loads(access_token)
-    print(access_token)
+    print(access_token['apiKey'])
     print(itemId)
 
     if request.method == 'POST':
         try:
             # Lista de contas
 
-            url = f"https://api.pluggy.ai/accounts"
+            url = f"https://api.pluggy.ai/accounts?"
 
             params = {"itemId": itemId}
 
             query_string = urlencode(params)
             url = f"{url}?{query_string}"
-
-            time.sleep(20)
 
             headers = {
                 "accept": "application/json",
