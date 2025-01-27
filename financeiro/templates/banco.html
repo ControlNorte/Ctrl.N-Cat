@@ -4,6 +4,10 @@
 Financeiro | {{ dadoscliente }}
 {% endblock %}
 
+{% block head %}
+<meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
+
 {% block content %}
 <body>
 <main class="py-20 px-10">
@@ -137,9 +141,24 @@ Financeiro | {{ dadoscliente }}
               connectToken: accessToken,
               includeSandbox: true,
               onSuccess: (itemData) => {
-                // TODO: Implementar lógica para conexão bem-sucedida
-                console.log('Conexão Pluggy bem-sucedida!', itemData);
-              },
+              // Enviar itemData para o backend
+              fetch('/api/item-data/', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  // Adicione o cabeçalho CSRF se necessário
+                  'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: JSON.stringify(itemData), // Envia os dados para a view no Django
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  console.log('Resposta do backend:', data);
+                })
+                .catch((err) => {
+                  console.error('Erro ao enviar dados para o backend:', err);
+                });
+            },
               onError: (error) => {
                 // TODO: Implementar lógica para erro na conexão
                 console.error('Erro ao conectar com o Pluggy:', error);
@@ -151,6 +170,27 @@ Financeiro | {{ dadoscliente }}
             console.error('Erro na requisição do token:', error);
           });
       });
+
+        function getCookie(name) {
+          const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+          return csrfToken || '';
+        }
+
+        // Função para obter o cookie CSRF
+        function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === name + '=') {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
     </script>
 
 </main>
