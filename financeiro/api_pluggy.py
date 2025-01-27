@@ -58,7 +58,7 @@ def handle_item_data(request):
 
             response = requests.get(url, headers=headers)
 
-            print(response)
+            print(response.text)
 
 
             # # Criando banco no banco de dados
