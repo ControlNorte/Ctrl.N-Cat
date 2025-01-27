@@ -50,7 +50,7 @@ def handle_item_data(request):
             # Lista de contas
 
             print("Esperando 30 segundos antes de fazer a requisição...")
-            time.sleep(30)
+            time.sleep(20)
 
             url = f"https://api.pluggy.ai/accounts?itemId={itemId}"
 
