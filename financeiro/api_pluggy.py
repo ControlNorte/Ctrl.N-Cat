@@ -13,12 +13,12 @@ def handle_item_data(request):
         return print('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
-    print(dadoscliente)
 
     # Converte o corpo da requisição JSON em dicionário Python
     data = json.loads(request.body)
 
     itemId = data['item']['id']
+    banco = data['item']['conector']['name']
 
     url = "https://api.pluggy.ai/auth"
 
@@ -50,8 +50,6 @@ def handle_item_data(request):
 
     access_token = response.text
     access_token = json.loads(access_token)
-    print(access_token['apiKey'])
-    print(itemId)
 
     if request.method == 'POST':
         try:
@@ -63,7 +61,7 @@ def handle_item_data(request):
 
             query_string = urlencode(params)
             url = f"{url}?{query_string}"
-            print(url)
+
             headers = {
                 "accept": "application/json",
                 "X-API-KEY": access_token['apiKey']
@@ -71,13 +69,12 @@ def handle_item_data(request):
 
             response = requests.get(url, headers=headers)
             if response.status_code == 200:
-                print(response.json())
+                print("certo")
             else:
                 print('erro')
 
             dados_banco = response.json()
             dados_banco = dados_banco['results'][0]['number']
-            print(dados_banco)
 
             # Pegar o primeiro número
             first_number = dados_banco
@@ -93,7 +90,7 @@ def handle_item_data(request):
             print(f"Agência: {agencia}")
             print(f"Conta: {conta}")
             print(f"Dígito: {digito}")
-            print(data)
+            print(banco)
             # # Criando banco no banco de dados
             # pk = request.session.get('dadoscliente')
             # if not pk:
