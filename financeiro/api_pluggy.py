@@ -2,7 +2,7 @@ from IPython.terminal.shortcuts.filters import pass_through
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import BancosCliente, cadastro_de_cliente
-import requests, json
+import requests, json, time
 from urllib.parse import urlencode
 
 @csrf_exempt  # Use apenas para testes; idealmente, configure o CSRF corretamente.
@@ -55,6 +55,8 @@ def handle_item_data(request):
 
             query_string = urlencode(params)
             url = f"{url}?{query_string}"
+
+            time.sleep(20)
 
             headers = {
                 "accept": "application/json",
