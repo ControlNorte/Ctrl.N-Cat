@@ -43,6 +43,8 @@ def handle_item_data(request):
 
     access_token = response.text
     access_token = json.loads(access_token)
+    print(access_token)
+    print(itemId)
 
     if request.method == 'POST':
         try:
