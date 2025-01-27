@@ -8,42 +8,42 @@ import requests
 
 @csrf_exempt  # Use apenas para testes; idealmente, configure o CSRF corretamente.
 def handle_item_data(request):
+    # Converte o corpo da requisição JSON em dicionário Python
+    data = json.loads(request.body)
+
+    itemId = data['item']['id']
+
+    url = "https://api.pluggy.ai/auth"
+
+    payload = {
+        "clientId": "226a2d88-095c-4469-9943-1a3e6e3ae477",
+        "clientSecret": "58b103c9-2272-4f7d-a1ef-80dd015704dc"
+    }
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/json"
+    }
+
+    response = requests.post(url, json=payload, headers=headers)
+
+    print(response.text)
+    apiKey = response.text
+
+    url = "https://api.pluggy.ai/connect_token"
+
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "X-API-KEY": apiKey
+    }
+
+    response = requests.post(url, headers=headers)
+
+    acesse_Token = response.text
+    print(acesse_Token)
+
     if request.method == 'POST':
         try:
-            # Converte o corpo da requisição JSON em dicionário Python
-            data = json.loads(request.body)
-
-            itemId= data['item']['id']
-
-            url = "https://api.pluggy.ai/auth"
-
-            payload = {
-                "clientId": "226a2d88-095c-4469-9943-1a3e6e3ae477",
-                "clientSecret": "58b103c9-2272-4f7d-a1ef-80dd015704dc"
-            }
-            headers = {
-                "accept": "application/json",
-                "content-type": "application/json"
-            }
-
-            response = requests.post(url, json=payload, headers=headers)
-
-            print(response.text)
-            apiKey = response.text
-
-            url = "https://api.pluggy.ai/connect_token"
-
-            headers = {
-                "accept": "application/json",
-                "content-type": "application/json",
-                "X-API-KEY": apiKey
-            }
-
-            response = requests.post(url, headers=headers)
-
-            acesse_Token = response.text
-            print(acesse_Token)
-
             # Lista de contas
             url = f"https://api.pluggy.ai/accounts?itemId={itemId}"
 
