@@ -17,12 +17,31 @@ def handle_item_data(request):
             print("Item Data recebido:", data)
 
             itemId= data['item']['id']
+
             print(itemId)
+
+            url = "https://api.pluggy.ai/auth"
+
+            payload = {
+                "clientId": "226a2d88-095c-4469-9943-1a3e6e3ae477",
+                "clientSecret": "58b103c9-2272-4f7d-a1ef-80dd015704dc"
+            }
+            headers = {
+                "accept": "application/json",
+                "content-type": "application/json"
+            }
+
+            response = requests.post(url, json=payload, headers=headers)
+
+            api_Key = response.text
 
             # Lista de contas
             url = f"https://api.pluggy.ai/accounts?itemId={itemId}"
 
-            headers = {"accept": "application/json"}
+            headers = {
+                "accept": "application/json",
+                "X-API-KEY": api_Key
+            }
 
             response = requests.get(url, headers=headers)
 
@@ -37,7 +56,7 @@ def handle_item_data(request):
             # banco = BancosCliente.objects.create(tenant=request.tenant, cliente=dadoscliente, banco=dados.get("banco"),
             #                                      agencia=dados.get("agencia"),
             #                                      conta=dados.get("conta"), digito=dados.get("digito"),
-            #                                      ativo=dados.get("ativo"))
+            #                                      ativo=dados.get("ativo")) ## criar accountId no bd para conseguir pular uma estapa
             # banco.save()
 
 
