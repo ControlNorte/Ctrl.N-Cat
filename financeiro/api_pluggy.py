@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import BancosCliente, cadastro_de_cliente
 import requests, json
-
+from urllib.parse import urlencode
 
 @csrf_exempt  # Use apenas para testes; idealmente, configure o CSRF corretamente.
 def handle_item_data(request):
@@ -51,7 +51,10 @@ def handle_item_data(request):
 
             url = f"https://api.pluggy.ai/accounts"
 
-            params = {"itemId": itemId}
+            params = {"itemId": "c706f8ae-3757-40b0-bc93-e017724ce4b2"}
+
+            query_string = urlencode(params)
+            url = f"{url}?{query_string}"
 
             headers = {
                 "accept": "application/json",
