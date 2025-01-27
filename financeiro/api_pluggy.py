@@ -13,12 +13,7 @@ def handle_item_data(request):
             # Converte o corpo da requisição JSON em dicionário Python
             data = json.loads(request.body)
 
-            # Processa o itemData (por exemplo, salvando no banco de dados)
-            print("Item Data recebido:", data)
-
             itemId= data['item']['id']
-
-            print(itemId)
 
             url = "https://api.pluggy.ai/auth"
 
@@ -33,14 +28,14 @@ def handle_item_data(request):
 
             response = requests.post(url, json=payload, headers=headers)
 
-            api_Key = response.text
+            apiKey = response.text
 
             url = "https://api.pluggy.ai/connect_token"
 
             headers = {
                 "accept": "application/json",
                 "content-type": "application/json",
-                "X-API-KEY": api_Key
+                "X-API-KEY": apiKey
             }
 
             response = requests.post(url, headers=headers)
@@ -53,7 +48,7 @@ def handle_item_data(request):
 
             headers = {
                 "accept": "application/json",
-                "X-API-KEY": api_Key
+                "X-API-KEY": acesse_Token
             }
 
             response = requests.get(url, headers=headers)
