@@ -72,9 +72,6 @@ def movimentacao(request, banco):
     if request.method == 'POST':
         dados = request.POST.dict()
 
-        if dados.get('tipo') == 'api':
-            concexao_api()
-
         if dados.get('tipo') == 'mes':
             mesfiltro = messtr(dados.get('mesfiltro'))
             mesatual = dados.get('mesfiltro')
