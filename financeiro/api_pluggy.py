@@ -26,21 +26,25 @@ def handle_item_data(request):
 
     response = requests.post(url, json=payload, headers=headers)
 
-    print(response.text)
-    apiKey = response.text
+    api_key = response.text
+    print(api_key)
 
-    url = "https://api.pluggy.ai/connect_token"
+    payload = {
+        "clientId": "226a2d88-095c-4469-9943-1a3e6e3ae477",
+        "clientSecret": "58b103c9-2272-4f7d-a1ef-80dd015704dc"
+    }
 
     headers = {
         "accept": "application/json",
         "content-type": "application/json",
-        "X-API-KEY": apiKey
+        "X-API-KEY": api_key
     }
 
-    response = requests.post(url, headers=headers)
+    response = requests.post(url, json=payload, headers=headers)
 
-    acesse_Token = response.text
-    print(acesse_Token)
+    access_token = response.text
+    access_token = json.loads(access_token)
+    print(access_token)
 
     if request.method == 'POST':
         try:
@@ -49,7 +53,7 @@ def handle_item_data(request):
 
             headers = {
                 "accept": "application/json",
-                "X-API-KEY": acesse_Token
+                "X-API-KEY": access_token
             }
 
             response = requests.get(url, headers=headers)

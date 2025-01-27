@@ -48,6 +48,7 @@ urlpatterns = [
     path('delete_movimentacao/<int:id>/', views.delete_movimentacao, name='delete_movimentacao'),
     path('get_movimentacao/<int:id>/', views.get_movimentacao, name='get_movimentacao'),
     path('exportar-excel/<int:tenant>/<int:cliente>', views.export_to_excel, name='export_to_excel'),
+
     path('api/item-data/', handle_item_data, name='handle_item_data'),
 
 ]
