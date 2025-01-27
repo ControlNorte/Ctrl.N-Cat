@@ -1,9 +1,8 @@
 from IPython.terminal.shortcuts.filters import pass_through
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-import json
 from .models import BancosCliente, cadastro_de_cliente
-import requests
+import requests, time, json
 
 
 @csrf_exempt  # Use apenas para testes; idealmente, configure o CSRF corretamente.
@@ -49,6 +48,10 @@ def handle_item_data(request):
     if request.method == 'POST':
         try:
             # Lista de contas
+
+            print("Esperando 30 segundos antes de fazer a requisição...")
+            time.sleep(30)
+
             url = f"https://api.pluggy.ai/accounts?itemId={itemId}"
 
             headers = {
