@@ -49,13 +49,13 @@ def handle_item_data(request):
         try:
             # Lista de contas
 
-            url = f"https://api.pluggy.ai/accounts?"
+            url = f"https://api.pluggy.ai/accounts"
 
             params = {"itemId": itemId}
 
             query_string = urlencode(params)
             url = f"{url}?{query_string}"
-
+            print(url)
             headers = {
                 "accept": "application/json",
                 "X-API-KEY": access_token['apiKey']
