@@ -2,7 +2,7 @@ from IPython.terminal.shortcuts.filters import pass_through
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import BancosCliente, cadastro_de_cliente
-import requests, json, time
+import requests, json, re
 from urllib.parse import urlencode
 
 @csrf_exempt  # Use apenas para testes; idealmente, configure o CSRF corretamente.
@@ -68,8 +68,23 @@ def handle_item_data(request):
                 print('erro')
 
             dados_banco = response.json()
-            agencia = dados_banco['results'][0]['number']
-            print(agencia)
+            dados_banco = dados_banco['results'][0]['number']
+            print(dados_banco)
+
+            # Pegar o primeiro número
+            first_number = dados_banco
+
+            # Separar usando regex
+            separated_parts = re.split(r'[/-]', first_number)
+
+            # Atribuir às variáveis
+            agencia = separated_parts[0]
+            conta = separated_parts[1]
+            digito = separated_parts[2]
+
+            print(f"Agência: {agencia}")
+            print(f"Conta: {conta}")
+            print(f"Dígito: {digito}")
 
             # # Criando banco no banco de dados
             # pk = request.session.get('dadoscliente')
