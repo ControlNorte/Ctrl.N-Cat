@@ -27,7 +27,6 @@ def handle_item_data(request):
     response = requests.post(url, json=payload, headers=headers)
 
     api_key = response.text
-    print(api_key)
 
     payload = {
         "clientId": "226a2d88-095c-4469-9943-1a3e6e3ae477",
@@ -44,7 +43,6 @@ def handle_item_data(request):
 
     access_token = response.text
     access_token = json.loads(access_token)
-    print(access_token)
 
     if request.method == 'POST':
         try:
@@ -53,7 +51,7 @@ def handle_item_data(request):
 
             headers = {
                 "accept": "application/json",
-                "X-API-KEY": access_token
+                "X-API-KEY": access_token['apiKey']
             }
 
             response = requests.get(url, headers=headers)
