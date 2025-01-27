@@ -28,6 +28,7 @@ def handle_item_data(request):
 
             response = requests.post(url, json=payload, headers=headers)
 
+            print(response.text)
             apiKey = response.text
 
             url = "https://api.pluggy.ai/connect_token"
