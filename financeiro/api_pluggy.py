@@ -7,13 +7,6 @@ from urllib.parse import urlencode
 
 @csrf_exempt  # Use apenas para testes; idealmente, configure o CSRF corretamente.
 def handle_item_data(request):
-
-    pk = request.session.get('dadoscliente')
-    if not pk:
-        return print('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
-
-    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
-
     # Converte o corpo da requisição JSON em dicionário Python
     data = json.loads(request.body)
 
@@ -87,21 +80,17 @@ def handle_item_data(request):
             conta = separated_parts[1]
             digito = separated_parts[2]
 
-            print(f"Agência: {agencia}")
-            print(f"Conta: {conta}")
-            print(f"Dígito: {digito}")
-            print(banco)
-            # # Criando banco no banco de dados
-            # pk = request.session.get('dadoscliente')
-            # if not pk:
-            #     print("sem pk")
-            # dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
-            # banco = BancosCliente.objects.create(tenant=request.tenant, cliente=dadoscliente, banco="teste1",
-            #                                      agencia=agencia,
-            #                                      conta=conta, digito=digito,
-            #                                      ativo=True ## criar accountId no bd para conseguir pular uma estapa
-            # banco.save()
+            # Criando banco no banco de dados
+            pk = request.session.get('dadoscliente')
+            if not pk:
+                print("sem pk")
+            dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
+            banco = BancosCliente.objects.create(tenant=request.tenant, cliente=dadoscliente, banco=banco,
+                                                 agencia=agencia,
+                                                 conta=conta, digito=digito,
+                                                 ativo=True)
+            banco.save()
 
 
             # Retorna uma resposta de sucesso
