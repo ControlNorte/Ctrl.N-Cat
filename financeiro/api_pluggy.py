@@ -18,7 +18,7 @@ def handle_item_data(request):
     data = json.loads(request.body)
 
     itemId = data['item']['id']
-    banco = data['item']['conector']['name']
+    banco = data['item']['connector']['name']
 
     url = "https://api.pluggy.ai/auth"
 
