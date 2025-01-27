@@ -35,7 +35,18 @@ def handle_item_data(request):
 
             api_Key = response.text
 
-            print(api_Key)
+            url = "https://api.pluggy.ai/connect_token"
+
+            headers = {
+                "accept": "application/json",
+                "content-type": "application/json",
+                "X-API-KEY": api_Key
+            }
+
+            response = requests.post(url, headers=headers)
+
+            acesse_Token = response.text
+            print(acesse_Token)
 
             # Lista de contas
             url = f"https://api.pluggy.ai/accounts?itemId={itemId}"
