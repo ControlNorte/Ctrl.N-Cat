@@ -65,8 +65,10 @@ def handle_item_data(request):
                 print(response.json())
             else:
                 print('erro')
-            print(response.text)
 
+            dados_banco = response.json()
+            agencia = dados_banco['results']['number']
+            print(agencia)
 
             # # Criando banco no banco de dados
             # pk = request.session.get('dadoscliente')
