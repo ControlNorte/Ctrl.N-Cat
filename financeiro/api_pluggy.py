@@ -35,6 +35,8 @@ def handle_item_data(request):
 
             api_Key = response.text
 
+            print(api_Key)
+
             # Lista de contas
             url = f"https://api.pluggy.ai/accounts?itemId={itemId}"
 
