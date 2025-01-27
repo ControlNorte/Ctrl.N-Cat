@@ -48,7 +48,6 @@ def handle_item_data(request):
     if request.method == 'POST':
         try:
             # Lista de contas
-            time.sleep(55)
             url = f"https://api.pluggy.ai/accounts"
 
             params = {"itemId": itemId}
@@ -62,7 +61,10 @@ def handle_item_data(request):
             }
 
             response = requests.get(url, headers=headers)
-
+            if response.status_code == 200:
+                print(response.json())
+            else:
+                print('erro')
             print(response.text)
 
 
