@@ -106,3 +106,4 @@ def handle_item_data(request):
 def recice_webhook(request):
     webhook = json.loads(request.body)
     print(webhook)
+    return JsonResponse({'status': 'success', 'message': 'Webhook received successfully'}, status=200)
