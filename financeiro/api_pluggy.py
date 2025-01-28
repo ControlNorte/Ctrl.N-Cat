@@ -1,3 +1,5 @@
+from cgi import print_environ
+
 from IPython.terminal.shortcuts.filters import pass_through
 from dask.array import empty
 from django.http import JsonResponse
@@ -63,10 +65,6 @@ def handle_item_data(request):
             }
 
             response = requests.get(url, headers=headers)
-            if response.status_code == 200:
-                print("certo")
-            else:
-                print('erro')
 
             dados_banco = response.json()
             print(dados_banco)
@@ -102,8 +100,63 @@ def handle_item_data(request):
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'Método não permitido'}, status=405)
 
+
 @csrf_exempt
 def recice_webhook(request):
     webhook = json.loads(request.body)
-    print(webhook)
+
+    event = webhook['evente']
+    if event == "item/update":
+        url = "https://api.pluggy.ai/auth"
+
+        payload = {
+            "clientId": "226a2d88-095c-4469-9943-1a3e6e3ae477",
+            "clientSecret": "58b103c9-2272-4f7d-a1ef-80dd015704dc"
+        }
+        headers = {
+            "accept": "application/json",
+            "content-type": "application/json"
+        }
+
+        response = requests.post(url, json=payload, headers=headers)
+
+        api_key = response.text
+
+        payload = {
+            "clientId": "226a2d88-095c-4469-9943-1a3e6e3ae477",
+            "clientSecret": "58b103c9-2272-4f7d-a1ef-80dd015704dc"
+        }
+
+        headers = {
+            "accept": "application/json",
+            "content-type": "application/json",
+            "X-API-KEY": api_key
+        }
+
+        response = requests.post(url, json=payload, headers=headers)
+
+        access_token = response.text
+        access_token = json.loads(access_token)
+
+        itemId =webhook['itemId']
+
+        url = f"https://api.pluggy.ai/accounts"
+
+        params = {"itemId": itemId,
+                  "type": "BANK"}
+
+        query_string = urlencode(params)
+        url = f"{url}?{query_string}"
+
+        headers = {
+            "accept": "application/json",
+            "X-API-KEY": access_token['apiKey']
+        }
+
+        response = requests.get(url, headers=headers)
+
+        dados_banco = response.json()
+
+        print(dados_banco)
+
     return JsonResponse({'status': 'success', 'message': 'Webhook received successfully'}, status=200)
