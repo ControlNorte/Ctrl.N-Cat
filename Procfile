@@ -1,1 +1,1 @@
-web: python manage.py migrate financeiro 0010_bancoscliente_tenant_categoria_tenant_and_more --fake && python manage.py makemigrations && python manage.py migrate && gunicorn --timeout 60 ControlNorte.wsgi --log-file -
+web: python manage.py migrate financeiro 0010 --fake && python manage.py makemigrations && python manage.py migrate && gunicorn --timeout 60 ControlNorte.wsgi --log-file -
