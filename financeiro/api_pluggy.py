@@ -101,3 +101,8 @@ def handle_item_data(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'Método não permitido'}, status=405)
+
+@csrf_exempt
+def recice_webhook(request):
+    print(request)
+    return JsonResponse({'status': 'true', 'messege':'worked'})

@@ -1,7 +1,9 @@
+from dask.dataframe.io.demo import names
 from django.urls import path, re_path
 from . import views
 from .views import *
-from .api_pluggy import handle_item_data
+from .api_pluggy import handle_item_data, recice_webhook
+
 # from django.contrib.auth import views as auth_view
 
 app_name = 'financeiro'
@@ -50,5 +52,6 @@ urlpatterns = [
     path('exportar-excel/<int:tenant>/<int:cliente>', views.export_to_excel, name='export_to_excel'),
 
     path('api/item-data/', handle_item_data, name='handle_item_data'),
+    path('recive-webhook/', recice_webhook, name='recive_webhook')
 
 ]
