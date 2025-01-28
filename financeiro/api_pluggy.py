@@ -158,6 +158,49 @@ def recice_webhook(request):
 
         dados_banco = response.json()
 
-        print(dados_banco)
+        dados_banco = dados_banco['results'][0]['number']
+
+        # Pegar o primeiro número
+        first_number = dados_banco
+
+        # Separar usando regex
+        separated_parts = re.split(r'[/-]', first_number)
+
+        # Atribuir às variáveis
+        agencia = separated_parts[0]
+        conta = separated_parts[1]
+        digito = separated_parts[2]
+
+        # Criando banco no banco de dados
+        pk = request.session.get('dadoscliente')
+        if not pk:
+            print("sem pk")
+        dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
+
+        banco = BancosCliente.objects.filter(tenant=request.tenant, cliente=dadoscliente, agencia=agencia, conta=conta,
+                                             digito=digito)
+
+        url = "https://api.pluggy.ai/transactions?&&to=fwef"
+
+        accountId = dados_banco['results'][0]['id']
+        # from_date = ""
+        # to_date = ''
+
+        params = {"accountId": accountId,
+                  # "from": from_date,
+                  # "to": to_date,
+                  }
+
+        query_string = urlencode(params)
+        url = f"{url}?{query_string}"
+
+        headers = {
+            "accept": "application/json",
+            "X-API-KEY": access_token['apiKey']
+        }
+
+        response = requests.get(url, headers=headers)
+
+        print(response.text)
 
     return JsonResponse({'status': 'success', 'message': 'Webhook received successfully'}, status=200)
