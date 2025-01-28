@@ -225,8 +225,8 @@ def recice_webhook(request):
 
         dados = []
 
-        tenant = Tenant.objects.get(nome=tenant)
-        tenant = tenant.id
+        tenants = Tenant.objects.get(nome=tenant)
+        tenant = tenants.id
         cliente = cadastro_de_cliente.objects.get(razao_social=cliente)
         cliente = cliente.id
         banco = BancosCliente.objects.get(banco=banco)
@@ -249,7 +249,7 @@ def recice_webhook(request):
 
         # Criar o autômato Aho-Corasick
         A = ahocorasick.Automaton()
-        regras = Regra.objects.for_tenant(tenant).filter(cliente_id=cliente).select_related('categoria',
+        regras = Regra.objects.for_tenant(tenants.nome).filter(cliente_id=cliente).select_related('categoria',
                                                                                                  'subcategoria',
                                                                                                  'centrodecusto')
         for idx, regra in enumerate(regras):
@@ -266,11 +266,11 @@ def recice_webhook(request):
             descricao = dado['descricao'].upper()
 
             # Verifica se já existe uma movimentação com a mesma data, descrição e valor
-            if MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
+            if MovimentacoesCliente.objects.for_tenant(tenants.nome).filter(cliente_id=cliente, banco_id=banco,
                                                                               data=dado['data'],
                                                                               descricao=descricao,
                                                                               valor=dado['valor']).exists():
-                a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
+                a = MovimentacoesCliente.objects.for_tenant(tenants.nome).filter(cliente_id=cliente, banco_id=banco,
                                                                                    data=dado['data'],
                                                                                    descricao=descricao,
                                                                                    valor=dado['valor'])
@@ -322,7 +322,7 @@ def recice_webhook(request):
                 for mov in movimentacoes_to_create
             )
 
-            datafinal = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente,
+            datafinal = MovimentacoesCliente.objects.for_tenant(tenants.nome).filter(cliente_id=cliente,
                                                                                        banco_id=banco).order_by(
                 '-data').first()
             datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(
@@ -330,13 +330,13 @@ def recice_webhook(request):
 
             while datainicial <= datafinal:
                 # Calcula o saldo inicial e final do dia
-                saldo_inicial = Saldo.objects.for_tenant(tenant).get(
+                saldo_inicial = Saldo.objects.for_tenant(tenants.nome).get(
                     cliente_id=cliente, banco_id=banco,data=datainicial - timedelta(days=1))
 
                 saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
 
                 saldo_movimentacoes = \
-                    MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
+                    MovimentacoesCliente.objects.for_tenant(tenants.nome).filter(cliente_id=cliente, banco_id=banco,
                                                                                    data=datainicial).aggregate(
                         total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
 
