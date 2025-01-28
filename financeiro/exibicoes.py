@@ -19,7 +19,7 @@ def formatar_valor(valor):
 
 def extrato(cliente, banco, mes):
     # Conectar ao banco de dados PostgreSQL
-    db_url = "postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
+    db_url = "postgresql://postgres:mdcOQHlvdMKsOBUxIBQJgeuDcugbAhjh@postgres.railway.internal:5432/railway"
     engine = create_engine(db_url)
 
     # Ler tabelas do banco de dados
@@ -125,7 +125,7 @@ def extrato(cliente, banco, mes):
 def gerar_grafico(cliente, banco, mes):
     try:
         # Conectar ao banco de dados PostgreSQL
-        db_url = "postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
+        db_url = "postgresql://postgres:mdcOQHlvdMKsOBUxIBQJgeuDcugbAhjh@postgres.railway.internal:5432/railway"
         engine = create_engine(db_url)
 
         # Ler tabelas do banco de dados
@@ -246,7 +246,7 @@ def dreresumida(cliente):
         mes = datetime.now().month
 
         # Conectar ao banco de dados PostgreSQL
-        db_url = "postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
+        db_url = "postgresql://postgres:mdcOQHlvdMKsOBUxIBQJgeuDcugbAhjh@postgres.railway.internal:5432/railway"
         engine = create_engine(db_url)
 
         with engine.connect() as conexao:
@@ -293,7 +293,7 @@ def dreprincipal(cliente, ano, centrocusto=None):
     ano = int(ano)
 
     # Conectar ao banco de dados PostgreSQL
-    db_url = "postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
+    db_url = "postgresql://postgres:mdcOQHlvdMKsOBUxIBQJgeuDcugbAhjh@postgres.railway.internal:5432/railway"
     engine = create_engine(db_url)
 
     with engine.connect() as conexao:
@@ -491,7 +491,7 @@ def dreprincipal(cliente, ano, centrocusto=None):
 def drecomp(mes1, ano1, mes2, ano2, cliente, centrocusto=None):
 
     # Conectar ao banco de dados PostgreSQL
-    db_url = "postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
+    db_url = "postgresql://postgres:mdcOQHlvdMKsOBUxIBQJgeuDcugbAhjh@postgres.railway.internal:5432/railway"
     engine = create_engine(db_url)
 
     with engine.connect() as conexao:

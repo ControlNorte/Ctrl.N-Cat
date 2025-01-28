@@ -247,121 +247,119 @@ def recice_webhook(request):
 
                 dados.append(registro)
 
-                # Criar o autômato Aho-Corasick
-                A = ahocorasick.Automaton()
-                regras = Regra.objects.for_tenant(tenant).filter(cliente_id=cliente).select_related('categoria',
-                                                                                                         'subcategoria',
-                                                                                                         'centrodecusto')
-                for idx, regra in enumerate(regras):
-                    A.add_word(str(regra.descricao).upper(),
-                               (idx, regra))  # Adiciona as descrições das regras no autômato
-                A.make_automaton()  # Compila o autômato para otimizar a pesquisa
+        # Criar o autômato Aho-Corasick
+        A = ahocorasick.Automaton()
+        regras = Regra.objects.for_tenant(tenant).filter(cliente_id=cliente).select_related('categoria',
+                                                                                                 'subcategoria',
+                                                                                                 'centrodecusto')
+        for idx, regra in enumerate(regras):
+            A.add_word(str(regra.descricao).upper(),
+                       (idx, regra))  # Adiciona as descrições das regras no autômato
+        A.make_automaton()  # Compila o autômato para otimizar a pesquisa
 
-                movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
-                transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
-                conciliados = 0  # Contador para o número de movimentações conciliadas
+        movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
+        transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
+        conciliados = 0  # Contador para o número de movimentações conciliadas
 
-                # Processamento das transações
-                for dado in dados:
-                    descricao = dado['descricao'].upper()
+        # Processamento das transações
+        for dado in dados:
+            descricao = dado['descricao'].upper()
 
-                    # Verifica se já existe uma movimentação com a mesma data, descrição e valor
-                    if MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
-                                                                                      data=dado['data'],
-                                                                                      descricao=descricao,
-                                                                                      valor=dado['valor']).exists():
-                        a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
-                                                                                           data=dado['data'],
-                                                                                           descricao=descricao,
-                                                                                           valor=dado['valor'])
+            # Verifica se já existe uma movimentação com a mesma data, descrição e valor
+            if MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
+                                                                              data=dado['data'],
+                                                                              descricao=descricao,
+                                                                              valor=dado['valor']).exists():
+                a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
+                                                                                   data=dado['data'],
+                                                                                   descricao=descricao,
+                                                                                   valor=dado['valor'])
 
-                        continue  # Pula para o próximo dado se já existir uma movimentação igual
+                continue  # Pula para o próximo dado se já existir uma movimentação igual
 
-                    matched = False  # Indicador de correspondência
+            matched = False  # Indicador de correspondência
 
-                    # Itera pelas correspondências usando o autômato
-                    for _, (_, regra) in A.iter(descricao):
-                        movimentacoes_to_create.append(MovimentacoesCliente(
-                            tenant_id=tenant,
-                            cliente_id=cliente,
-                            banco_id=banco,
-                            data=data,
-                            descricao=descricao,
-                            detalhe='Sem Detalhe',
-                            valor=dado['valor'],
-                            categoria=regra.categoria,
-                            subcategoria=regra.subcategoria,
-                            centrodecusto=regra.centrodecusto
-                        ))
-                        matched = True  # Marca como correspondido
-                        conciliados += 1  # Incrementa o contador de movimentações conciliadas
-                        break  # Sai do loop após a primeira correspondência
+            # Itera pelas correspondências usando o autômato
+            for _, (_, regra) in A.iter(descricao):
+                movimentacoes_to_create.append(MovimentacoesCliente(
+                    tenant_id=tenant,
+                    cliente_id=cliente,
+                    banco_id=banco,
+                    data=data,
+                    descricao=descricao,
+                    detalhe='Sem Detalhe',
+                    valor=dado['valor'],
+                    categoria=regra.categoria,
+                    subcategoria=regra.subcategoria,
+                    centrodecusto=regra.centrodecusto
+                ))
+                matched = True  # Marca como correspondido
+                conciliados += 1  # Incrementa o contador de movimentações conciliadas
+                break  # Sai do loop após a primeira correspondência
 
-                    if not matched:  # Se nenhuma correspondência foi encontrada
-                        transicoes_to_create.append(TransicaoCliente(
-                            tenant_id=tenant,
-                            cliente_id=cliente,
-                            banco_id=banco,
-                            data=data,
-                            descricao=descricao,
-                            valor=dado['valor']
-                        ))
+            if not matched:  # Se nenhuma correspondência foi encontrada
+                transicoes_to_create.append(TransicaoCliente(
+                    tenant_id=tenant,
+                    cliente_id=cliente,
+                    banco_id=banco,
+                    data=data,
+                    descricao=descricao,
+                    valor=dado['valor']
+                ))
 
-                # Inserção em batch das movimentações no banco de dados
-                if movimentacoes_to_create:
-                    MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
+        # Inserção em batch das movimentações no banco de dados
+        if movimentacoes_to_create:
+            MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
 
-                # Inserção em batch das transições no banco de dados
-                if transicoes_to_create:
-                    TransicaoCliente.objects.bulk_create(transicoes_to_create)
+        # Inserção em batch das transições no banco de dados
+        if transicoes_to_create:
+            TransicaoCliente.objects.bulk_create(transicoes_to_create)
 
-                # Atualização do saldo baseado nas novas movimentações
-                if movimentacoes_to_create:
-                    datainicial = min(
-                        mov.data for mov in movimentacoes_to_create)  # Determina a menor data entre as movimentações
-                    datafinal = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente,
-                                                                                               banco_id=banco).order_by(
-                        '-data').first()
-                    datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial,
-                                                                                                        "%Y-%m-%d") + timedelta(
-                        days=31)  # Determina a maior data entre as movimentações
+        # Atualização do saldo baseado nas novas movimentações
+        if movimentacoes_to_create:
+            datainicial = min(
+                mov.data for mov in movimentacoes_to_create)  # Determina a menor data entre as movimentações
+            datafinal = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente,
+                                                                                       banco_id=banco).order_by(
+                '-data').first()
+            datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial,
+                                                                                                "%Y-%m-%d") + timedelta(
+                days=31)  # Determina a maior data entre as movimentações
 
-                    while datainicial <= datafinal:
-                        # Calcula o saldo inicial e final do dia
-                        saldo_inicial = Saldo.objects.for_tenant(tenant).get(cliente_id=cliente, banco_id=banco,
-                                                                                     data=datainicial - timedelta(
-                                                                                         days=1))
+            while datainicial <= datafinal:
+                # Calcula o saldo inicial e final do dia
+                saldo_inicial = Saldo.objects.for_tenant(tenant).get(cliente_id=cliente, banco_id=banco,
+                                                                             data=datainicial - timedelta(
+                                                                                 days=1))
 
-                        saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
+                saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
 
-                        saldo_movimentacoes = \
-                            MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
-                                                                                           data=datainicial).aggregate(
-                                total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
+                saldo_movimentacoes = \
+                    MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
+                                                                                   data=datainicial).aggregate(
+                        total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
 
-                        saldo_final = saldo_inicial + saldo_movimentacoes
+                saldo_final = saldo_inicial + saldo_movimentacoes
 
-                        with connection.cursor() as cursor:
-                            insert_query = """
-                                                INSERT INTO financeiro_saldo (tenant_id, cliente_id, banco_id, data, saldoinicial, saldofinal)
-                                                VALUES (%s, %s, %s, %s, %s, %s)
-                                                ON CONFLICT (tenant_id, cliente_id, banco_id, data)
-                                                DO UPDATE SET saldoinicial = EXCLUDED.saldoinicial, saldofinal = EXCLUDED.saldofinal;
-                                            """
+                with connection.cursor() as cursor:
+                    insert_query = """
+                                        INSERT INTO financeiro_saldo (tenant_id, cliente_id, banco_id, data, saldoinicial, saldofinal)
+                                        VALUES (%s, %s, %s, %s, %s, %s)
+                                        ON CONFLICT (tenant_id, cliente_id, banco_id, data)
+                                        DO UPDATE SET saldoinicial = EXCLUDED.saldoinicial, saldofinal = EXCLUDED.saldofinal;
+                                    """
 
-                            cursor.execute(insert_query, [
-                                tenant,
-                                cliente,
-                                banco,
-                                datainicial,
-                                saldo_inicial,
-                                saldo_final
-                            ])
+                    cursor.execute(insert_query, [
+                        tenant,
+                        cliente,
+                        banco,
+                        datainicial,
+                        saldo_inicial,
+                        saldo_final
+                    ])
 
-                        datainicial += timedelta(days=1)  # Incrementa o dia
+                datainicial += timedelta(days=1)  # Incrementa o dia
 
-                return print(
-                    f'Importação concluída. {conciliados} movimentações conciliadas.')  # Retorna uma mensagem de sucesso
-
+        print(f'Importação concluída. {conciliados} movimentações conciliadas.') # Retorna uma mensagem de sucesso
 
     return JsonResponse({'status': 'success', 'message': 'Webhook received successfully'}, status=200)
