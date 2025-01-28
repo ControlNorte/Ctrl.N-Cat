@@ -176,10 +176,10 @@ def recice_webhook(request):
 
 
         print(dados_banco)
-        dados_banco = dados_banco['results'][0]['number']
-
+        agencia_conta = dados_banco['results'][0]['number']
+        accountId = dados_banco['results'][0]['id']
         # Pegar o primeiro número
-        first_number = dados_banco
+        first_number = agencia_conta
 
         # Separar usando regex
         separated_parts = re.split(r'[/-]', first_number)
