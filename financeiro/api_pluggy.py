@@ -318,7 +318,10 @@ def recice_webhook(request):
         # Atualização do saldo baseado nas novas movimentações
         if movimentacoes_to_create:
             datainicial = min(
-                mov.data for mov in movimentacoes_to_create)  # Determina a menor data entre as movimentações
+                mov.data if isinstance(mov.data, date) else datetime.strptime(mov.data, "%Y-%m-%d").date()
+                for mov in movimentacoes_to_create
+            )
+
             datafinal = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente,
                                                                                        banco_id=banco).order_by(
                 '-data').first()
