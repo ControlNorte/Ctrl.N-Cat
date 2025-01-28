@@ -108,6 +108,8 @@ def recice_webhook(request):
     event = webhook['event']
 
     if event == 'item/updated':
+
+        # Criando acess_token
         url = "https://api.pluggy.ai/auth"
 
         payload = {
@@ -139,8 +141,21 @@ def recice_webhook(request):
         access_token = response.text
         access_token = json.loads(access_token)
 
-        itemId =webhook['itemId']
+        # Requisitando nome da conta
+        itemId = webhook['itemId']
 
+        url = f"https://api.pluggy.ai/items/{itemId}"
+
+        headers = {
+            "accept": "application/json",
+            "X-API-KEY": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiYmNjODRlNDI0MzRmYTBhOTY2M2JhMWNjNDk1ZGY2Zjk6M2QzMjVhZjJkMWNjOTIzOGE4MDliMDZiNzBiOGExYzNhN2I3NDQ3OTBjMjQzMjRlYTViODlhMjlkNGUwMzI1Yzg0MzQ5MjgzZWZhMjM0ZDk1NmU3OTAyYmM3NDJmOWVlYTI2MTY2N2ZiZjQyZmFiNDcyZjQyYWUwNjFlZmJlM2Q0MGFhZjQwZWJjYjQ5YThiMzRiMmFmMzBmMjYyN2E3OSIsImlhdCI6MTczODAxNjc0OCwiZXhwIjoxNzM4MDIzOTQ4fQ.iDJMbrOd-r3AU_F3E7iNlfuA_TrHL5GL_PHnQtxAjYuOcDvVFWAPtogQVb9fcs-z3rtmKyXge0zSIx5El2SWOIsyX82p9uZmEDhYGFV0JlQRGdygLEUQwAjVAlgETesQVAqqjTK0knat5hQm0oOa1Dgv7dMhGfyIKC9TB78P9KUD9N0bMxVKnEB_LHAl4bkxQUm3QMcX8L4v_S4GXxtvAE0YAl_jBE4gYDVwI8Bwjtw0-Q51zs3tQLxGWqM6AABVtJRhhrEf83lb-f76Nf8jAR4RCzyITumyPmN_LuUfTYdl862Dn0qx1dk8Ck3HbraBU01o5iVAE1bdAb1Dr1KmCA"
+        }
+
+        response = requests.get(url, headers=headers)
+        banco = response.json()
+        banco = banco['item']['connector']['name']
+
+        # Requisitando dados da conta
         url = f"https://api.pluggy.ai/accounts"
 
         params = {"itemId": itemId,
@@ -172,12 +187,12 @@ def recice_webhook(request):
         digito = separated_parts[2]
 
         # Criando banco no banco de dados
-        pk = request.session.get('dadoscliente')
-        if not pk:
-            print("sem pk")
-        dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
+        # pk = request.session.get('dadoscliente')
+        # if not pk:
+        #     print("sem pk")
+        # dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
-        banco = BancosCliente.objects.filter(tenant=request.tenant, cliente=dadoscliente, agencia=agencia, conta=conta,
+        banco = BancosCliente.objects.filter(tenant=request.tenant, agencia=agencia, conta=conta, banco=banco,
                                              digito=digito)
 
         url = "https://api.pluggy.ai/transactions?&&to=fwef"
