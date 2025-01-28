@@ -68,6 +68,7 @@ def handle_item_data(request):
                 print('erro')
 
             dados_banco = response.json()
+            print(dados_banco)
             dados_banco = dados_banco['results'][0]['number']
 
             # Pegar o primeiro número
