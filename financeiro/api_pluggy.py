@@ -6,6 +6,7 @@ from .models import BancosCliente, cadastro_de_cliente
 import requests, json, re
 from urllib.parse import urlencode
 
+
 @csrf_exempt  # Use apenas para testes; idealmente, configure o CSRF corretamente.
 def handle_item_data(request):
     # Converte o corpo da requisição JSON em dicionário Python
