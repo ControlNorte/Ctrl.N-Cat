@@ -189,10 +189,10 @@ def recice_webhook(request):
         digito = int(separated_parts[2])
 
         # TODO criar filtro para o taxNumber
-        BancosCliente.objects.get(agencia=agencia, conta=conta, banco=banco, digito=digito)
+        bancos = BancosCliente.objects.get(agencia=agencia, conta=conta, banco=banco, digito=digito)
 
-        dadosclinete = banco.cliente
-        tenant = banco.tenant
+        dadosclinete = bancos.cliente
+        tenant = bancos.tenant
         print(dadosclinete)
         print(tenant)
 
