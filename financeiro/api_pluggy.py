@@ -325,7 +325,7 @@ def recice_webhook(request):
             datafinal = MovimentacoesCliente.objects.for_tenant(tenant).filter(
                 cliente_id=cliente, banco_id=banco).order_by('-data').first()
 
-            print(datainicial)
+            print(datainicial - timedelta(days=1))
             print(type(datainicial))
 
             datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(
