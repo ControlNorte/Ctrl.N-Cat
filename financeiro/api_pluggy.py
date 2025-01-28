@@ -106,7 +106,7 @@ def recice_webhook(request):
     webhook = json.loads(request.body)
 
     event = webhook['event']
-    print(event)
+
     if event == 'item/updated':
         url = "https://api.pluggy.ai/auth"
 
