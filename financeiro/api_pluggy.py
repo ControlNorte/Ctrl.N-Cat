@@ -1,5 +1,6 @@
 import ahocorasick
 import requests, json, re
+from hpinicial.models import Tenant
 from .models import BancosCliente, cadastro_de_cliente, Regra, MovimentacoesCliente, TransicaoCliente, Saldo
 from dask.array import empty
 from datetime import *
@@ -317,8 +318,11 @@ def recice_webhook(request):
                                                                                                         "%Y-%m-%d") + timedelta(
                         days=31)  # Determina a maior data entre as movimentações
 
-                    tenant = int(request.tenant.id)
+                    tenant = Tenant.objects.get(nome=tenant)
+                    tenant = tenant.id
+                    cliente = cadastro_de_cliente.objects.get(razao_social=cliente)
                     cliente = cliente.id
+                    banco = BancosCliente.objects.get(banco=banco)
                     banco = banco.id
 
                     while datainicial <= datafinal:
