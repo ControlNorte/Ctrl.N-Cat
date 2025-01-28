@@ -282,7 +282,7 @@ def recice_webhook(request):
                     # Itera pelas correspondências usando o autômato
                     for _, (_, regra) in A.iter(descricao):
                         movimentacoes_to_create.append(MovimentacoesCliente(
-                            tenant=tenant,
+                            tenant_id=tenant,
                             cliente=cliente,
                             banco=banco,
                             data=data,
@@ -299,7 +299,7 @@ def recice_webhook(request):
 
                     if not matched:  # Se nenhuma correspondência foi encontrada
                         transicoes_to_create.append(TransicaoCliente(
-                            tenant=tenant,
+                            tenant_id=tenant,
                             cliente=cliente,
                             banco=banco,
                             data=data,
