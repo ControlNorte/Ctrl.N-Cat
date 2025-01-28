@@ -337,7 +337,7 @@ def recice_webhook(request):
             while datainicial <= datafinal:
                 # Calcula o saldo inicial e final do dia
                 saldo_inicial = Saldo.objects.for_tenant(tenant).get(
-                    cliente_id=cliente, banco_id=banco,data=str(datainicial - timedelta(days=1)))
+                    cliente_id=cliente, banco_id=banco,data=datainicial - timedelta(days=1))
 
                 saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
 

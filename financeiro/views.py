@@ -595,7 +595,8 @@ def bancosaldo(request, id):
             cliente=dadoscliente,
             defaults={
                 'saldoinicial': float(0.0),
-                'saldofinal': float(saldofinal)
+                'saldofinal': float(saldofinal),
+                'tenant': request.tenant
             }
         )
         saldodiario(banco=banco.id, cliente=dadoscliente, data=data, request=request)
