@@ -106,4 +106,4 @@ def handle_item_data(request):
 def recice_webhook(request):
     webhook = json.loads(request.body)
     print(webhook)
-    return JsonResponse(request)
+    return JsonResponse(webhook)
