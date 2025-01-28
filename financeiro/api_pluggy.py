@@ -266,11 +266,11 @@ def recice_webhook(request):
                     descricao = dado['descricao'].upper()
 
                     # Verifica se já existe uma movimentação com a mesma data, descrição e valor
-                    if MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco=banco,
+                    if MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
                                                                                       data=dado['data'],
                                                                                       descricao=descricao,
                                                                                       valor=dado['valor']).exists():
-                        a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco=banco,
+                        a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
                                                                                            data=dado['data'],
                                                                                            descricao=descricao,
                                                                                            valor=dado['valor'])
@@ -284,7 +284,7 @@ def recice_webhook(request):
                         movimentacoes_to_create.append(MovimentacoesCliente(
                             tenant_id=tenant,
                             cliente_id=cliente,
-                            banco=banco,
+                            banco_id=banco,
                             data=data,
                             descricao=descricao,
                             detalhe='Sem Detalhe',
@@ -301,7 +301,7 @@ def recice_webhook(request):
                         transicoes_to_create.append(TransicaoCliente(
                             tenant_id=tenant,
                             cliente_id=cliente,
-                            banco=banco,
+                            banco_id=banco,
                             data=data,
                             descricao=descricao,
                             valor=dado['valor']
@@ -320,7 +320,7 @@ def recice_webhook(request):
                     datainicial = min(
                         mov.data for mov in movimentacoes_to_create)  # Determina a menor data entre as movimentações
                     datafinal = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente,
-                                                                                               banco=banco).order_by(
+                                                                                               banco_id=banco).order_by(
                         '-data').first()
                     datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial,
                                                                                                         "%Y-%m-%d") + timedelta(
@@ -328,14 +328,14 @@ def recice_webhook(request):
 
                     while datainicial <= datafinal:
                         # Calcula o saldo inicial e final do dia
-                        saldo_inicial = Saldo.objects.for_tenant(tenant).get(cliente_id=cliente, banco=banco,
+                        saldo_inicial = Saldo.objects.for_tenant(tenant).get(cliente_id=cliente, banco_id=banco,
                                                                                      data=datainicial - timedelta(
                                                                                          days=1))
 
                         saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
 
                         saldo_movimentacoes = \
-                            MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco=banco,
+                            MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
                                                                                            data=datainicial).aggregate(
                                 total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
 
