@@ -350,7 +350,7 @@ def recice_webhook(request):
 
                 with connection.cursor() as cursor:
                     insert_query = """
-                                        INSERT INTO financeiro_saldo (tenant_id, cliente_id, banco_id, data, saldoinicial, saldofinal)
+                                        INSERT INTO financeiro_saldo (tenant, cliente, banco, data, saldoinicial, saldofinal)
                                         VALUES (%s, %s, %s, %s, %s, %s)
                                         ON CONFLICT (tenant_id, cliente_id, banco_id, data)
                                         DO UPDATE SET saldoinicial = EXCLUDED.saldoinicial, saldofinal = EXCLUDED.saldofinal;
