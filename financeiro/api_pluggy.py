@@ -285,7 +285,7 @@ def recice_webhook(request):
                             tenant=tenant,
                             cliente=cliente,
                             banco=banco,
-                            data=dado['data'].date(),
+                            data=data,
                             descricao=descricao,
                             detalhe='Sem Detalhe',
                             valor=dado['valor'],
@@ -302,7 +302,7 @@ def recice_webhook(request):
                             tenant=tenant,
                             cliente=cliente,
                             banco=banco,
-                            data=dado['data'].date(),
+                            data=data,
                             descricao=descricao,
                             valor=dado['valor']
                         ))
