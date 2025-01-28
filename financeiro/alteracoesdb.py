@@ -26,7 +26,7 @@ def saldodiario(banco, cliente, data, request):
 
     for data_ord in range(datainicialord, datafinal):
         # Configurar a string de conexão com o SQLAlchemy
-        db_url = "postgresql://postgres:rJAVyBfPxCTZWlHqnAOTZpmwABaKyaWg@postgres.railway.internal:5432/railway"
+        db_url = "postgresql://postgres:mdcOQHlvdMKsOBUxIBQJgeuDcugbAhjh@postgres.railway.internal:5432/railway"
         engine = create_engine(db_url)
 
         with engine.connect() as conexao:
