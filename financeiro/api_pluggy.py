@@ -104,5 +104,6 @@ def handle_item_data(request):
 
 @csrf_exempt
 def recice_webhook(request):
-    print(request)
+    webhook = json.loads(request.body)
+    print(webhook)
     return JsonResponse({'status': 'true', 'messege':'worked'})
