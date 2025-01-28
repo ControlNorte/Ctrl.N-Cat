@@ -193,7 +193,7 @@ def recice_webhook(request):
         # if not pk:
         #     print("sem pk")
         # dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
-
+        print(request.tenant)
         BancosCliente.objects.get(tenant=request.tenant, agencia=agencia, conta=conta, digito=digito)
 
         dadosclinete = banco.cliente
