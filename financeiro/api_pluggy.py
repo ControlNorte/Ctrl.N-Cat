@@ -254,17 +254,17 @@ def recice_webhook(request):
 
                 # Processamento das transações
                 for dado in dados:
-                    descricao = dado['Descrição'].upper()
+                    descricao = dado['descricao'].upper()
 
                     # Verifica se já existe uma movimentação com a mesma data, descrição e valor
                     if MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco,
-                                                                                      data=dado['Data'],
+                                                                                      data=dado['data'],
                                                                                       descricao=descricao,
-                                                                                      valor=dado['Valor']).exists():
+                                                                                      valor=dado['valor']).exists():
                         a = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=cliente, banco=banco,
-                                                                                           data=dado['Data'],
+                                                                                           data=dado['data'],
                                                                                            descricao=descricao,
-                                                                                           valor=dado['Valor'])
+                                                                                           valor=dado['valor'])
 
                         continue  # Pula para o próximo dado se já existir uma movimentação igual
 
@@ -276,10 +276,10 @@ def recice_webhook(request):
                             tenant=request.tenant,
                             cliente=cliente,
                             banco=banco,
-                            data=dado['Data'].date(),
+                            data=dado['data'].date(),
                             descricao=descricao,
                             detalhe='Sem Detalhe',
-                            valor=dado['Valor'],
+                            valor=dado['valor'],
                             categoria=regra.categoria,
                             subcategoria=regra.subcategoria,
                             centrodecusto=regra.centrodecusto
@@ -293,9 +293,9 @@ def recice_webhook(request):
                             tenant=request.tenant,
                             cliente=cliente,
                             banco=banco,
-                            data=dado['Data'].date(),
+                            data=dado['data'].date(),
                             descricao=descricao,
-                            valor=dado['Valor']
+                            valor=dado['valor']
                         ))
 
                 # Inserção em batch das movimentações no banco de dados
