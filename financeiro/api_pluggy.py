@@ -188,16 +188,13 @@ def recice_webhook(request):
         conta = int(separated_parts[1])
         digito = int(separated_parts[2])
 
-        # Criando banco no banco de dados
-        # pk = request.session.get('dadoscliente')
-        # if not pk:
-        #     print("sem pk")
-        # dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
-        print(request.tenant)
-        BancosCliente.objects.get(tenant=request.tenant, agencia=agencia, conta=conta, digito=digito)
+        # TODO criar filtro para o taxNumber
+        BancosCliente.objects.get(agencia=agencia, conta=conta, banco=banco, digito=digito)
 
         dadosclinete = banco.cliente
+        tenant = banco.tenant
         print(dadosclinete)
+        print(tenant)
 
         url = "https://api.pluggy.ai/transactions"
 
