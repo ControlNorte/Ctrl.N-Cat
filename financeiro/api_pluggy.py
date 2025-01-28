@@ -1,4 +1,5 @@
 from IPython.terminal.shortcuts.filters import pass_through
+from dask.array import empty
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import BancosCliente, cadastro_de_cliente
@@ -86,12 +87,12 @@ def handle_item_data(request):
                 print("sem pk")
             dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
-            banco = BancosCliente.objects.create(tenant=request.tenant, cliente=dadoscliente, banco=banco,
-                                                 agencia=agencia,
-                                                 conta=conta, digito=digito,
-                                                 ativo=True)
-            banco.save()
-
+            banco = BancosCliente.objects.filter(tenant=request.tenant, cliente=dadoscliente, banco=banco,
+                                                 agencia=agencia, conta=conta, digito=digito,)
+            if banco is empty:
+                banco = BancosCliente.objects.create(tenant=request.tenant, cliente=dadoscliente, banco=banco,
+                                                 agencia=agencia, conta=conta, digito=digito, ativo=True)
+                banco.save()
 
             # Retorna uma resposta de sucesso
             return JsonResponse({'message': 'Dados recebidos com sucesso!'})
