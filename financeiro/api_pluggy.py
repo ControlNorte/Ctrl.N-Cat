@@ -176,7 +176,6 @@ def recice_webhook(request):
 
         agencia_conta = dados_banco['results'][0]['number']
         accountId = dados_banco['results'][0]['id']
-        print(accountId)
 
         # Pegar o primeiro número
         first_number = agencia_conta
@@ -218,6 +217,6 @@ def recice_webhook(request):
 
         response = requests.get(url, headers=headers)
 
-        print(response.text)
+        print(response.json())
 
     return JsonResponse({'status': 'success', 'message': 'Webhook received successfully'}, status=200)
