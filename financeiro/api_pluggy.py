@@ -148,7 +148,7 @@ def recice_webhook(request):
 
         headers = {
             "accept": "application/json",
-            "X-API-KEY": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiYmNjODRlNDI0MzRmYTBhOTY2M2JhMWNjNDk1ZGY2Zjk6M2QzMjVhZjJkMWNjOTIzOGE4MDliMDZiNzBiOGExYzNhN2I3NDQ3OTBjMjQzMjRlYTViODlhMjlkNGUwMzI1Yzg0MzQ5MjgzZWZhMjM0ZDk1NmU3OTAyYmM3NDJmOWVlYTI2MTY2N2ZiZjQyZmFiNDcyZjQyYWUwNjFlZmJlM2Q0MGFhZjQwZWJjYjQ5YThiMzRiMmFmMzBmMjYyN2E3OSIsImlhdCI6MTczODAxNjc0OCwiZXhwIjoxNzM4MDIzOTQ4fQ.iDJMbrOd-r3AU_F3E7iNlfuA_TrHL5GL_PHnQtxAjYuOcDvVFWAPtogQVb9fcs-z3rtmKyXge0zSIx5El2SWOIsyX82p9uZmEDhYGFV0JlQRGdygLEUQwAjVAlgETesQVAqqjTK0knat5hQm0oOa1Dgv7dMhGfyIKC9TB78P9KUD9N0bMxVKnEB_LHAl4bkxQUm3QMcX8L4v_S4GXxtvAE0YAl_jBE4gYDVwI8Bwjtw0-Q51zs3tQLxGWqM6AABVtJRhhrEf83lb-f76Nf8jAR4RCzyITumyPmN_LuUfTYdl862Dn0qx1dk8Ck3HbraBU01o5iVAE1bdAb1Dr1KmCA"
+            "X-API-KEY": access_token['apiKey']
         }
 
         response = requests.get(url, headers=headers)
@@ -173,7 +173,7 @@ def recice_webhook(request):
         response = requests.get(url, headers=headers)
 
         dados_banco = response.json()
-
+        accountId = dados_banco['results'][0]['id']
         dados_banco = dados_banco['results'][0]['number']
 
         # Pegar o primeiro número
@@ -198,7 +198,6 @@ def recice_webhook(request):
 
         url = "https://api.pluggy.ai/transactions?&&to=fwef"
 
-        accountId = dados_banco['results'][0]['id']
         # from_date = ""
         # to_date = ''
 
