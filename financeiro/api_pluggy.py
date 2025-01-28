@@ -153,7 +153,8 @@ def recice_webhook(request):
 
         response = requests.get(url, headers=headers)
         banco = response.json()
-        banco = banco['item']['connector']['name']
+        print(banco)
+        # banco = banco['item']['connector']['name']
 
         # Requisitando dados da conta
         url = f"https://api.pluggy.ai/accounts"
