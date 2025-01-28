@@ -225,6 +225,13 @@ def recice_webhook(request):
 
         dados = []
 
+        tenant = Tenant.objects.get(nome=tenant)
+        tenant = tenant.id
+        cliente = cadastro_de_cliente.objects.get(razao_social=cliente)
+        cliente = cliente.id
+        banco = BancosCliente.objects.get(banco=banco)
+        banco = banco.id
+
         for result in results:
             if result['status'] == 'POSTED':
                 descricao = result['description']
@@ -317,13 +324,6 @@ def recice_webhook(request):
                     datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial,
                                                                                                         "%Y-%m-%d") + timedelta(
                         days=31)  # Determina a maior data entre as movimentações
-
-                    tenant = Tenant.objects.get(nome=tenant)
-                    tenant = tenant.id
-                    cliente = cadastro_de_cliente.objects.get(razao_social=cliente)
-                    cliente = cliente.id
-                    banco = BancosCliente.objects.get(banco=banco)
-                    banco = banco.id
 
                     while datainicial <= datafinal:
                         # Calcula o saldo inicial e final do dia
