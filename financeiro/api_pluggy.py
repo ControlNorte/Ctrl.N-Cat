@@ -194,11 +194,11 @@ def recice_webhook(request):
         #     print("sem pk")
         # dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
-        banco = BancosCliente.objects.filter(tenant=request.tenant, agencia=agencia, conta=conta, banco=banco,
+        banco = BancosCliente.objects.get(tenant=request.tenant, agencia=agencia, conta=conta, banco=banco,
                                              digito=digito)
 
         dadosclinete = banco.cliente
-
+        print(dadosclinete)
 
         url = "https://api.pluggy.ai/transactions"
 
