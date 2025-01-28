@@ -249,7 +249,7 @@ def recice_webhook(request):
 
                 # Criar o autômato Aho-Corasick
                 A = ahocorasick.Automaton()
-                regras = Regra.objects.for_tenant(tenant).filter(cliente=cliente).select_related('categoria',
+                regras = Regra.objects.for_tenant(tenant).filter(cliente_id=cliente).select_related('categoria',
                                                                                                          'subcategoria',
                                                                                                          'centrodecusto')
                 for idx, regra in enumerate(regras):
@@ -266,11 +266,11 @@ def recice_webhook(request):
                     descricao = dado['descricao'].upper()
 
                     # Verifica se já existe uma movimentação com a mesma data, descrição e valor
-                    if MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente=cliente, banco=banco,
+                    if MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco=banco,
                                                                                       data=dado['data'],
                                                                                       descricao=descricao,
                                                                                       valor=dado['valor']).exists():
-                        a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente=cliente, banco=banco,
+                        a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco=banco,
                                                                                            data=dado['data'],
                                                                                            descricao=descricao,
                                                                                            valor=dado['valor'])
@@ -283,7 +283,7 @@ def recice_webhook(request):
                     for _, (_, regra) in A.iter(descricao):
                         movimentacoes_to_create.append(MovimentacoesCliente(
                             tenant_id=tenant,
-                            cliente=cliente,
+                            cliente_id=cliente,
                             banco=banco,
                             data=data,
                             descricao=descricao,
@@ -300,7 +300,7 @@ def recice_webhook(request):
                     if not matched:  # Se nenhuma correspondência foi encontrada
                         transicoes_to_create.append(TransicaoCliente(
                             tenant_id=tenant,
-                            cliente=cliente,
+                            cliente_id=cliente,
                             banco=banco,
                             data=data,
                             descricao=descricao,
@@ -319,7 +319,7 @@ def recice_webhook(request):
                 if movimentacoes_to_create:
                     datainicial = min(
                         mov.data for mov in movimentacoes_to_create)  # Determina a menor data entre as movimentações
-                    datafinal = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente=cliente,
+                    datafinal = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente,
                                                                                                banco=banco).order_by(
                         '-data').first()
                     datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(datainicial,
@@ -328,14 +328,14 @@ def recice_webhook(request):
 
                     while datainicial <= datafinal:
                         # Calcula o saldo inicial e final do dia
-                        saldo_inicial = Saldo.objects.for_tenant(tenant).get(cliente=cliente, banco=banco,
+                        saldo_inicial = Saldo.objects.for_tenant(tenant).get(cliente_id=cliente, banco=banco,
                                                                                      data=datainicial - timedelta(
                                                                                          days=1))
 
                         saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
 
                         saldo_movimentacoes = \
-                            MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente=cliente, banco=banco,
+                            MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco=banco,
                                                                                            data=datainicial).aggregate(
                                 total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
 
