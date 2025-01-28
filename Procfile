@@ -1,1 +1,1 @@
-web: python manage.py makemigrations && gunicorn --timeout 60 ControlNorte.wsgi --log-file -
+web: python manage.py migrate && gunicorn --timeout 60 ControlNorte.wsgi --log-file -
