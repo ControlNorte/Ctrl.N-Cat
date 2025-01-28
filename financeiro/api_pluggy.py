@@ -174,10 +174,10 @@ def recice_webhook(request):
 
         dados_banco = response.json()
 
-
-        print(dados_banco)
         agencia_conta = dados_banco['results'][0]['number']
         accountId = dados_banco['results'][0]['id']
+        print(accountId)
+
         # Pegar o primeiro número
         first_number = agencia_conta
 
@@ -198,7 +198,7 @@ def recice_webhook(request):
         banco = BancosCliente.objects.filter(tenant=request.tenant, agencia=agencia, conta=conta, banco=banco,
                                              digito=digito)
 
-        url = "https://api.pluggy.ai/transactions?&&to=fwef"
+        url = "https://api.pluggy.ai/transactions"
 
         # from_date = ""
         # to_date = ''
