@@ -154,7 +154,7 @@ def recice_webhook(request):
         response = requests.get(url, headers=headers)
 
         banco = response.json()
-        banco = banco['connector']['name']
+        banco = str(banco['connector']['name'])
 
         # Requisitando dados da conta
         url = f"https://api.pluggy.ai/accounts"
@@ -184,9 +184,9 @@ def recice_webhook(request):
         separated_parts = re.split(r'[/-]', first_number)
 
         # Atribuir às variáveis
-        agencia = separated_parts[0]
-        conta = separated_parts[1]
-        digito = separated_parts[2]
+        agencia = int(separated_parts[0])
+        conta = int(separated_parts[1])
+        digito = int(separated_parts[2])
 
         # Criando banco no banco de dados
         # pk = request.session.get('dadoscliente')
@@ -194,8 +194,7 @@ def recice_webhook(request):
         #     print("sem pk")
         # dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
-        banco = BancosCliente.objects.get(tenant=request.tenant, agencia=agencia, conta=conta, banco=banco,
-                                             digito=digito)
+        BancosCliente.objects.get(tenant=request.tenant, agencia=agencia, conta=conta, banco=banco, digito=digito)
 
         dadosclinete = banco.cliente
         print(dadosclinete)
