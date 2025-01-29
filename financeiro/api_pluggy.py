@@ -243,6 +243,8 @@ def process_webhook(webhook):
                 data = result['date']
                 data = datetime.strptime(data, '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%Y-%m-%d')
 
+                print(data)
+
                 registro = {
                     'data': data,
                     'descricao': descricao,
@@ -329,14 +331,8 @@ def process_webhook(webhook):
             datafinal = MovimentacoesCliente.objects.for_tenant(tenant).filter(
                 cliente_id=cliente, banco_id=banco).order_by('-data').first()
 
-            print(datainicial - timedelta(days=1))
-            print(type(datainicial))
-
             datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(
                 datainicial,"%Y-%m-%d") + timedelta(days=31)  # Determina a maior data entre as movimentações
-
-            print(datafinal)
-            print(type(datafinal))
 
             while datainicial <= datafinal:
                 # Calcula o saldo inicial e final do dia
