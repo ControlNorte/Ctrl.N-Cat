@@ -1,5 +1,4 @@
-import ahocorasick
-import requests, json, re
+import requests, json, re, threading, ahocorasick
 from hpinicial.models import Tenant
 from .models import BancosCliente, cadastro_de_cliente, Regra, MovimentacoesCliente, TransicaoCliente, Saldo
 from dask.array import empty
@@ -107,8 +106,13 @@ def handle_item_data(request):
 
 @csrf_exempt
 def recice_webhook(request):
-    webhook = json.loads(request.body)
+    webhook = request.body
+    threading.Thread(target=process_webhook, args=(webhook,)).start()
+    return JsonResponse({'status': 'success', 'message': 'Webhook received successfully'}, status=200)
 
+
+def process_webhook(webhook):
+    webhook = json.loads(webhook)
     event = webhook['event']
 
     if event == 'item/updated':
@@ -370,5 +374,3 @@ def recice_webhook(request):
                 datainicial += timedelta(days=1)  # Incrementa o dia
 
         print(f'Importação concluída. {conciliados} movimentações conciliadas.') # Retorna uma mensagem de sucesso
-
-    return JsonResponse({'status': 'success', 'message': 'Webhook received successfully'}, status=200)
