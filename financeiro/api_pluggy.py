@@ -285,12 +285,12 @@ def process_webhook(webhook):
 
             # Itera pelas correspondências usando o autômato
             for _, (_, regra) in A.iter(descricao):
-                print(data)
+
                 movimentacoes_to_create.append(MovimentacoesCliente(
                     tenant_id=tenant,
                     cliente_id=cliente,
                     banco_id=banco,
-                    data=data,
+                    data=dado['data'],
                     descricao=descricao,
                     detalhe='Sem Detalhe',
                     valor=dado['valor'],
@@ -307,7 +307,7 @@ def process_webhook(webhook):
                     tenant_id=tenant,
                     cliente_id=cliente,
                     banco_id=banco,
-                    data=data,
+                    data=dado['data'],
                     descricao=descricao,
                     valor=dado['valor']
                 ))
