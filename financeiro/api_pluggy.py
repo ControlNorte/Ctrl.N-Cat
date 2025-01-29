@@ -268,7 +268,7 @@ def process_webhook(webhook):
         # Processamento das transações
         for dado in dados:
             descricao = dado['descricao'].upper()
-            print(dado['data'])
+
             # Verifica se já existe uma movimentação com a mesma data, descrição e valor
             if MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
                                                                               data=dado['data'],
@@ -285,6 +285,7 @@ def process_webhook(webhook):
 
             # Itera pelas correspondências usando o autômato
             for _, (_, regra) in A.iter(descricao):
+                print(data)
                 movimentacoes_to_create.append(MovimentacoesCliente(
                     tenant_id=tenant,
                     cliente_id=cliente,
