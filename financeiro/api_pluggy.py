@@ -243,8 +243,6 @@ def process_webhook(webhook):
                 data = result['date']
                 data = datetime.strptime(data, '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%Y-%m-%d')
 
-                print(data)
-
                 registro = {
                     'data': data,
                     'descricao': descricao,
@@ -270,7 +268,7 @@ def process_webhook(webhook):
         # Processamento das transações
         for dado in dados:
             descricao = dado['descricao'].upper()
-
+            print(dado['data'])
             # Verifica se já existe uma movimentação com a mesma data, descrição e valor
             if MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
                                                                               data=dado['data'],
