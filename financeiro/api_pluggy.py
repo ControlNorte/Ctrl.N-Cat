@@ -97,12 +97,10 @@ def handle_item_data(request):
             banco = BancosCliente.objects.filter(tenant=request.tenant, cliente=dadoscliente, banco=banco,
                                                  agencia=agencia, conta=conta, digito=digito)
 
-            if banco is empty:
-                print("opa")
-                banco = BancosCliente.objects.create(tenant=request.tenant, cliente=dadoscliente, banco=banco,
-                                                 agencia=agencia, conta=conta, digito=digito, ativo=True)
-                banco.save()
-                print("salvo")
+            banco = BancosCliente.objects.create(tenant=request.tenant, cliente=dadoscliente, banco=banco,
+                                             agencia=agencia, conta=conta, digito=digito, ativo=True)
+            banco.save()
+            print("salvo")
 
             # Retorna uma resposta de sucesso
             return JsonResponse({'message': 'Dados recebidos com sucesso!'})
