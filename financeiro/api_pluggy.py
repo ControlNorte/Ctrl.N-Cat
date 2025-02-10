@@ -94,9 +94,6 @@ def handle_item_data(request):
                 print("sem pk")
             dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
-            banco = BancosCliente.objects.filter(tenant=request.tenant, cliente=dadoscliente, banco=banco,
-                                                 agencia=agencia, conta=conta, digito=digito)
-
             banco = BancosCliente.objects.create(tenant=request.tenant, cliente=dadoscliente, banco=banco,
                                              agencia=agencia, conta=conta, digito=digito, ativo=True)
             banco.save()
