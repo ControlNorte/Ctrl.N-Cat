@@ -32,7 +32,7 @@ def handle_item_data(request):
     response = requests.post(url, json=payload, headers=headers)
 
     api_key = response.text
-    print(api_key)
+
     payload = {
         "clientId": "226a2d88-095c-4469-9943-1a3e6e3ae477",
         "clientSecret": "58b103c9-2272-4f7d-a1ef-80dd015704dc"
@@ -48,7 +48,7 @@ def handle_item_data(request):
 
     access_token = response.text
     access_token = json.loads(access_token)
-    print(access_token)
+
     if request.method == 'POST':
         try:
             # Lista de contas
@@ -82,6 +82,10 @@ def handle_item_data(request):
             conta = separated_parts[1]
             digito = separated_parts[2]
 
+            print(agencia)
+            print(conta)
+            print(digito)
+
             # Criando banco no banco de dados
             pk = request.session.get('dadoscliente')
             if not pk:
@@ -94,6 +98,7 @@ def handle_item_data(request):
                 banco = BancosCliente.objects.create(tenant=request.tenant, cliente=dadoscliente, banco=banco,
                                                  agencia=agencia, conta=conta, digito=digito, ativo=True)
                 banco.save()
+                print("salvo")
 
             # Retorna uma resposta de sucesso
             return JsonResponse({'message': 'Dados recebidos com sucesso!'})
