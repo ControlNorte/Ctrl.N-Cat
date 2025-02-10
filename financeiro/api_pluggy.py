@@ -74,13 +74,19 @@ def handle_item_data(request):
             # Pegar o primeiro número
             first_number = dados_banco
 
-            # Separar usando regex
-            separated_parts = re.split(r'[/-]', first_number)
+            if '/' in dados_banco:
+                # Separar usando regex
+                separated_parts = re.split(r'[/-]', first_number)
 
-            # Atribuir às variáveis
-            agencia = separated_parts[0]
-            conta = separated_parts[1]
-            digito = separated_parts[2]
+                # Atribuir às variáveis
+                agencia = separated_parts[0]
+                conta = separated_parts[1]
+                digito = separated_parts[2]
+
+            else:
+                agencia = 0
+                conta = dados_banco
+                digito = 0
 
             print(agencia)
             print(conta)
