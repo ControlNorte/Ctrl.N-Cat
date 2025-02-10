@@ -70,7 +70,7 @@ def handle_item_data(request):
             dados_banco = response.json()
 
             dados_banco = dados_banco['results'][0]['number']
-            print(dados_banco)
+
             # Pegar o primeiro número
             first_number = dados_banco
 
@@ -88,18 +88,22 @@ def handle_item_data(request):
                 conta = dados_banco
                 digito = 0
 
-            print(agencia)
-            print(conta)
-            print(digito)
-
             # Criando banco no banco de dados
             pk = request.session.get('dadoscliente')
             if not pk:
                 print("sem pk")
             dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
+            print(request.tenant)
+            print(dadoscliente)
+            print(banco)
+            print(agencia)
+            print(conta)
+            print(digito)
+
             banco = BancosCliente.objects.filter(tenant=request.tenant, cliente=dadoscliente, banco=banco,
-                                                 agencia=agencia, conta=conta, digito=digito,)
+                                                 agencia=agencia, conta=conta, digito=digito)
+            print(banco)
             if banco is empty:
                 banco = BancosCliente.objects.create(tenant=request.tenant, cliente=dadoscliente, banco=banco,
                                                  agencia=agencia, conta=conta, digito=digito, ativo=True)
