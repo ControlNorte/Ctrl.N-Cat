@@ -10,8 +10,6 @@ from django.views.decorators.csrf import csrf_exempt
 from urllib.parse import urlencode
 
 
-
-
 @csrf_exempt  # Use apenas para testes; idealmente, configure o CSRF corretamente.
 def handle_item_data(request):
     # Converte o corpo da requisição JSON em dicionário Python
@@ -34,7 +32,7 @@ def handle_item_data(request):
     response = requests.post(url, json=payload, headers=headers)
 
     api_key = response.text
-
+    print(api_key)
     payload = {
         "clientId": "226a2d88-095c-4469-9943-1a3e6e3ae477",
         "clientSecret": "58b103c9-2272-4f7d-a1ef-80dd015704dc"
@@ -50,7 +48,7 @@ def handle_item_data(request):
 
     access_token = response.text
     access_token = json.loads(access_token)
-
+    print(access_token)
     if request.method == 'POST':
         try:
             # Lista de contas
