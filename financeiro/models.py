@@ -13,6 +13,8 @@ class BancosCliente(models.Model):
     conta = models.IntegerField()
     digito = models.IntegerField()
     ativo = models.BooleanField(null=True, blank=True)
+    transferNumber = models.CharField(max_length=100, null=True, default=None)
+    isConnected = models.BooleanField(null=True, default=None)
 
     objects = TenantManager()
 

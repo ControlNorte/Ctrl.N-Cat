@@ -81,9 +81,9 @@ def handle_item_data(request):
                 separated_parts = re.split(r'[/-]', first_number)
 
                 # Atribuir às variáveis
-                agencia = separated_parts[0]
-                conta = separated_parts[1]
-                digito = separated_parts[2]
+                agencia = separated_parts[1]
+                conta = separated_parts[2]
+                digito = separated_parts[3]
 
             else:
                 agencia = 0
