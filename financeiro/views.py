@@ -36,6 +36,7 @@ def financeirocliente(request, pk):
 
 def caixa(request):
     pk = request.session.get('dadoscliente')
+    print(pk)
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
