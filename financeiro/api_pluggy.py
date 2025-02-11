@@ -112,13 +112,14 @@ def handle_item_data(request):
                     isConnected = True,
                 )
                 banco.save()
-                print("salvo")
+                print("Banco cadastrado com sucesso!")
 
             else:
+                print("Banco já cadastrado!")
                 return JsonResponse({'message': 'Banco já cadastrado!'})
 
             # Retorna uma resposta de sucesso
-            return JsonResponse({'message': 'Dados recebidos com sucesso!'})
+            return JsonResponse({'message': 'Banco cadastrado com sucesso!'})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'Método não permitido'}, status=405)
