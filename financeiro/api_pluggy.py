@@ -70,6 +70,7 @@ def handle_item_data(request):
             dados_banco = response.json()
 
             dados_banco = dados_banco['results'][0]['bankData']['transferNumber']
+            transferNumber = dados_banco
 
             print(dados_banco)
 
@@ -96,10 +97,25 @@ def handle_item_data(request):
                 print("sem pk")
             dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
-            banco = BancosCliente.objects.create(tenant=request.tenant, cliente=dadoscliente, banco=banco,
-                                             agencia=agencia, conta=conta, digito=digito, ativo=True)
-            banco.save()
-            print("salvo")
+            banco = BancosCliente.objects.filter(transferNumber=transferNumber)
+
+            if not banco.exists():
+                banco = BancosCliente.objects.create(
+                    tenant=request.tenant,
+                    cliente=dadoscliente,
+                    banco=banco,
+                    agencia=agencia,
+                    conta=conta,
+                    digito=digito,
+                    ativo=True,
+                    transferNumber=transferNumber,
+                    isConnected = True,
+                )
+                banco.save()
+                print("salvo")
+
+            else:
+                return JsonResponse({'message': 'Banco já cadastrado!'})
 
             # Retorna uma resposta de sucesso
             return JsonResponse({'message': 'Dados recebidos com sucesso!'})
