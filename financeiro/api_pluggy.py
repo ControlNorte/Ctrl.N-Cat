@@ -125,6 +125,7 @@ def handle_item_data(request):
     return JsonResponse({'error': 'Método não permitido'}, status=405)
 
 
+
 @csrf_exempt
 def recice_webhook(request):
     webhook = request.body
