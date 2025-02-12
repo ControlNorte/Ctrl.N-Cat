@@ -97,10 +97,10 @@ def handle_item_data(request):
                 print("sem pk")
             dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
-            banco = BancosCliente.objects.filter(transferNumber=transferNumber)
-            print(banco)
+            bancos = BancosCliente.objects.filter(transferNumber=transferNumber)
+            print(bancos)
 
-            if not banco.exists():
+            if not bancos.exists():
                 print("opa")
                 print(request.tenant)
                 banco = BancosCliente.objects.create(
