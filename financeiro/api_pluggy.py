@@ -202,7 +202,7 @@ def process_webhook(webhook):
         response = requests.get(url, headers=headers)
 
         dados_banco = response.json()
-
+        print(dados_banco)
         agencia_conta = dados_banco['results'][0]['number']
         accountId = dados_banco['results'][0]['id']
         print(agencia_conta)
