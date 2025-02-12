@@ -101,6 +101,7 @@ def handle_item_data(request):
             print(banco)
 
             if not banco.exists():
+                print("opa")
                 banco = BancosCliente.objects.create(
                     tenant=request.tenant,
                     cliente=dadoscliente,
