@@ -203,24 +203,14 @@ def process_webhook(webhook):
 
         dados_banco = response.json()
         print(dados_banco)
-        agencia_conta = dados_banco['results'][0]['number']
+        transferNumber = dados_banco['results'][0]['bankData']['transferNumber']
         accountId = dados_banco['results'][0]['id']
-        print(agencia_conta)
 
-        # # Pegar o primeiro número
-        # first_number = agencia_conta
-        #
-        # # Separar usando regex
-        # separated_parts = re.split(r'[/-]', first_number)
-        #
-        # # Atribuir às variáveis
-        # agencia = int(separated_parts[0])
-        # conta = int(separated_parts[1])
-        # digito = int(separated_parts[2])
-        #
-        # # TODO criar filtro para o taxNumber
-        # bancos = BancosCliente.objects.get(agencia=agencia, conta=conta, banco=banco, digito=digito)
-        #
+        # TODO criar filtro para o taxNumber
+        bancos = BancosCliente.objects.get(transferNumber=transferNumber)
+
+        print(bancos)
+
         # cliente = bancos.cliente
         # tenant = bancos.tenant
         # print(cliente)
@@ -389,5 +379,5 @@ def process_webhook(webhook):
         #             ])
         #
         #         datainicial += timedelta(days=1)  # Incrementa o dia
-
+        #
         # print(f'Importação concluída. {conciliados} movimentações conciliadas.') # Retorna uma mensagem de sucesso
