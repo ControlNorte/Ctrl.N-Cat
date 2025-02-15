@@ -124,6 +124,8 @@ def handle_item_data(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
+    print('continua')
+
     # Requisitando nome da conta
     url = f"https://api.pluggy.ai/items/{itemId}"
 
