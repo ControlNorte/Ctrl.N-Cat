@@ -325,8 +325,8 @@ def handle_item_data(request):
 
                     datainicial += timedelta(days=1)  # Incrementa o dia
 
-            print(f'Importação concluída. {conciliados} movimentações conciliadas.') # Retorna uma mensagem de sucesso
-            return JsonResponse({'message': f'Banco cadastrado com seucesso! Importação concluída. {conciliados} movimentações conciliadas.'}, status=200)
+            print(f'Banco cadastrado com seucesso! Importamos {conciliados} movimentações para te ajudar!.') # Retorna uma mensagem de sucesso
+            return JsonResponse({'message': f'Banco cadastrado com seucesso! Importamos {conciliados} movimentações para te ajudar!'}, status=200)
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
@@ -590,3 +590,6 @@ def process_webhook(webhook):
                 datainicial += timedelta(days=1)  # Incrementa o dia
 
         print(f'Importação concluída. {conciliados} movimentações conciliadas.') # Retorna uma mensagem de sucesso
+        return JsonResponse(
+            data={'message': f'Importação concluída. {conciliados} movimentações conciliadas '},
+            status=200)
