@@ -1,3 +1,5 @@
+import datetime
+
 import requests, json, re, threading, ahocorasick
 from hpinicial.models import Tenant
 from .models import BancosCliente, cadastro_de_cliente, Regra, MovimentacoesCliente, TransicaoCliente, Saldo
@@ -202,182 +204,180 @@ def process_webhook(webhook):
         response = requests.get(url, headers=headers)
 
         dados_banco = response.json()
-        print(dados_banco)
+
         transferNumber = dados_banco['results'][0]['bankData']['transferNumber']
         accountId = dados_banco['results'][0]['id']
 
-        # TODO criar filtro para o taxNumber
         bancos = BancosCliente.objects.get(transferNumber=transferNumber)
 
-        print(bancos)
+        cliente = bancos.cliente
+        tenant = bancos.tenant
+        print(cliente)
+        print(tenant)
 
-        # cliente = bancos.cliente
-        # tenant = bancos.tenant
-        # print(cliente)
-        # print(tenant)
-        #
-        # url = "https://api.pluggy.ai/transactions"
-        #
-        # # from_date = ""
-        # # to_date = ''
-        #
-        # params = {"accountId": accountId,
-        #           # "from": from_date,
-        #           # "to": to_date,
-        #           }
-        #
-        # query_string = urlencode(params)
-        # url = f"{url}?{query_string}"
-        #
-        # headers = {
-        #     "accept": "application/json",
-        #     "X-API-KEY": access_token['apiKey']
-        # }
-        #
-        # response = requests.get(url, headers=headers)
-        #
-        # results = (response.json())
-        # results = results['results']
-        #
-        # dados = []
-        #
-        # tenant = Tenant.objects.get(nome=tenant)
-        # tenant = tenant.id
-        # cliente = cadastro_de_cliente.objects.get(razao_social=cliente)
-        # cliente = cliente.id
-        # banco = BancosCliente.objects.get(banco=banco)
-        # banco = banco.id
-        #
-        # for result in results:
-        #     if result['status'] == 'POSTED':
-        #         descricao = result['description']
-        #         valor = result['amount']
-        #         data = result['date']
-        #         data = datetime.strptime(data, '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%Y-%m-%d')
-        #
-        #         registro = {
-        #             'data': data,
-        #             'descricao': descricao,
-        #             'valor': valor
-        #         }
-        #
-        #         dados.append(registro)
-        #
-        # # Criar o autômato Aho-Corasick
-        # A = ahocorasick.Automaton()
-        # regras = Regra.objects.for_tenant(tenant).filter(cliente_id=cliente).select_related('categoria',
-        #                                                                                          'subcategoria',
-        #                                                                                          'centrodecusto')
-        # for idx, regra in enumerate(regras):
-        #     A.add_word(str(regra.descricao).upper(),
-        #                (idx, regra))  # Adiciona as descrições das regras no autômato
-        # A.make_automaton()  # Compila o autômato para otimizar a pesquisa
-        #
-        # movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
-        # transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
-        # conciliados = 0  # Contador para o número de movimentações conciliadas
-        #
-        # # Processamento das transações
-        # for dado in dados:
-        #     descricao = dado['descricao'].upper()
-        #
-        #     # Verifica se já existe uma movimentação com a mesma data, descrição e valor
-        #     if MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
-        #                                                                       data=dado['data'],
-        #                                                                       descricao=descricao,
-        #                                                                       valor=dado['valor']).exists():
-        #         a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
-        #                                                                            data=dado['data'],
-        #                                                                            descricao=descricao,
-        #                                                                            valor=dado['valor'])
-        #
-        #         continue  # Pula para o próximo dado se já existir uma movimentação igual
-        #
-        #     matched = False  # Indicador de correspondência
-        #
-        #     # Itera pelas correspondências usando o autômato
-        #     for _, (_, regra) in A.iter(descricao):
-        #
-        #         movimentacoes_to_create.append(MovimentacoesCliente(
-        #             tenant_id=tenant,
-        #             cliente_id=cliente,
-        #             banco_id=banco,
-        #             data=dado['data'],
-        #             descricao=descricao,
-        #             detalhe='Sem Detalhe',
-        #             valor=dado['valor'],
-        #             categoria=regra.categoria,
-        #             subcategoria=regra.subcategoria,
-        #             centrodecusto=regra.centrodecusto
-        #         ))
-        #         matched = True  # Marca como correspondido
-        #         conciliados += 1  # Incrementa o contador de movimentações conciliadas
-        #         break  # Sai do loop após a primeira correspondência
-        #
-        #     if not matched:  # Se nenhuma correspondência foi encontrada
-        #         transicoes_to_create.append(TransicaoCliente(
-        #             tenant_id=tenant,
-        #             cliente_id=cliente,
-        #             banco_id=banco,
-        #             data=dado['data'],
-        #             descricao=descricao,
-        #             valor=dado['valor']
-        #         ))
-        #
-        # # Inserção em batch das movimentações no banco de dados
-        # if movimentacoes_to_create:
-        #     MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
-        #
-        # # Inserção em batch das transições no banco de dados
-        # if transicoes_to_create:
-        #     TransicaoCliente.objects.bulk_create(transicoes_to_create)
-        #
-        # # Atualização do saldo baseado nas novas movimentações
-        # if movimentacoes_to_create:
-        #     datainicial = min(
-        #         mov.data if isinstance(mov.data, date) else datetime.strptime(mov.data, "%Y-%m-%d").date()
-        #         for mov in movimentacoes_to_create
-        #     )
-        #
-        #     datafinal = MovimentacoesCliente.objects.for_tenant(tenant).filter(
-        #         cliente_id=cliente, banco_id=banco).order_by('-data').first()
-        #
-        #     datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(
-        #         datainicial,"%Y-%m-%d") + timedelta(days=31)  # Determina a maior data entre as movimentações
-        #
-        #     while datainicial <= datafinal:
-        #         # Calcula o saldo inicial e final do dia
-        #         saldo_inicial = Saldo.objects.for_tenant(tenant).get(
-        #             cliente_id=cliente, banco_id=banco,data=datainicial - timedelta(days=1))
-        #
-        #         saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
-        #
-        #         saldo_movimentacoes = \
-        #             MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
-        #                                                                            data=datainicial).aggregate(
-        #                 total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
-        #
-        #         saldo_final = saldo_inicial + saldo_movimentacoes
-        #
-        #
-        #
-        #         with connection.cursor() as cursor:
-        #             insert_query = """
-        #                                 INSERT INTO financeiro_saldo (tenant_id, cliente_id, banco_id, data, saldoinicial, saldofinal)
-        #                                 VALUES (%s, %s, %s, %s, %s, %s)
-        #                                 ON CONFLICT(cliente_id, banco_id, data)
-        #                                 DO UPDATE SET saldoinicial = EXCLUDED.saldoinicial, saldofinal = EXCLUDED.saldofinal;
-        #                             """
-        #
-        #             cursor.execute(insert_query, [
-        #                 tenant,
-        #                 cliente,
-        #                 banco,
-        #                 datainicial,
-        #                 saldo_inicial,
-        #                 saldo_final
-        #             ])
-        #
-        #         datainicial += timedelta(days=1)  # Incrementa o dia
-        #
-        # print(f'Importação concluída. {conciliados} movimentações conciliadas.') # Retorna uma mensagem de sucesso
+        url = "https://api.pluggy.ai/transactions"
+
+        to_date = date.today()
+        from_date = to_date - timedelta(days=3)
+
+        params = {"accountId": accountId,
+                  "from": from_date,
+                  "to": to_date,
+                  }
+
+        query_string = urlencode(params)
+        url = f"{url}?{query_string}"
+
+        headers = {
+            "accept": "application/json",
+            "X-API-KEY": access_token['apiKey']
+        }
+
+        response = requests.get(url, headers=headers)
+
+        results = (response.json())
+        print(results)
+        results = results['results']
+
+        dados = []
+
+        tenant = Tenant.objects.get(nome=tenant)
+        tenant = tenant.id
+        cliente = cadastro_de_cliente.objects.get(razao_social=cliente)
+        cliente = cliente.id
+        banco = BancosCliente.objects.get(banco=banco)
+        banco = banco.id
+
+        for result in results:
+            if result['status'] == 'POSTED':
+                descricao = result['description']
+                valor = result['amount']
+                data = result['date']
+                data = datetime.strptime(data, '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%Y-%m-%d')
+
+                registro = {
+                    'data': data,
+                    'descricao': descricao,
+                    'valor': valor
+                }
+
+                dados.append(registro)
+
+        # Criar o autômato Aho-Corasick
+        A = ahocorasick.Automaton()
+        regras = Regra.objects.for_tenant(tenant).filter(cliente_id=cliente).select_related('categoria',
+                                                                                                 'subcategoria',
+                                                                                                 'centrodecusto')
+        for idx, regra in enumerate(regras):
+            A.add_word(str(regra.descricao).upper(),
+                       (idx, regra))  # Adiciona as descrições das regras no autômato
+        A.make_automaton()  # Compila o autômato para otimizar a pesquisa
+
+        movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
+        transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
+        conciliados = 0  # Contador para o número de movimentações conciliadas
+
+        # Processamento das transações
+        for dado in dados:
+            descricao = dado['descricao'].upper()
+
+            # Verifica se já existe uma movimentação com a mesma data, descrição e valor
+            if MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
+                                                                              data=dado['data'],
+                                                                              descricao=descricao,
+                                                                              valor=dado['valor']).exists():
+                a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
+                                                                                   data=dado['data'],
+                                                                                   descricao=descricao,
+                                                                                   valor=dado['valor'])
+
+                continue  # Pula para o próximo dado se já existir uma movimentação igual
+
+            matched = False  # Indicador de correspondência
+
+            # Itera pelas correspondências usando o autômato
+            for _, (_, regra) in A.iter(descricao):
+
+                movimentacoes_to_create.append(MovimentacoesCliente(
+                    tenant_id=tenant,
+                    cliente_id=cliente,
+                    banco_id=banco,
+                    data=dado['data'],
+                    descricao=descricao,
+                    detalhe='Sem Detalhe',
+                    valor=dado['valor'],
+                    categoria=regra.categoria,
+                    subcategoria=regra.subcategoria,
+                    centrodecusto=regra.centrodecusto
+                ))
+                matched = True  # Marca como correspondido
+                conciliados += 1  # Incrementa o contador de movimentações conciliadas
+                break  # Sai do loop após a primeira correspondência
+
+            if not matched:  # Se nenhuma correspondência foi encontrada
+                transicoes_to_create.append(TransicaoCliente(
+                    tenant_id=tenant,
+                    cliente_id=cliente,
+                    banco_id=banco,
+                    data=dado['data'],
+                    descricao=descricao,
+                    valor=dado['valor']
+                ))
+
+        # Inserção em batch das movimentações no banco de dados
+        if movimentacoes_to_create:
+            MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
+
+        # Inserção em batch das transições no banco de dados
+        if transicoes_to_create:
+            TransicaoCliente.objects.bulk_create(transicoes_to_create)
+
+        # Atualização do saldo baseado nas novas movimentações
+        if movimentacoes_to_create:
+            datainicial = min(
+                mov.data if isinstance(mov.data, date) else datetime.strptime(mov.data, "%Y-%m-%d").date()
+                for mov in movimentacoes_to_create
+            )
+
+            datafinal = MovimentacoesCliente.objects.for_tenant(tenant).filter(
+                cliente_id=cliente, banco_id=banco).order_by('-data').first()
+
+            datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(
+                datainicial,"%Y-%m-%d") + timedelta(days=31)  # Determina a maior data entre as movimentações
+
+            while datainicial <= datafinal:
+                # Calcula o saldo inicial e final do dia
+                saldo_inicial = Saldo.objects.for_tenant(tenant).get(
+                    cliente_id=cliente, banco_id=banco,data=datainicial - timedelta(days=1))
+
+                saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
+
+                saldo_movimentacoes = \
+                    MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
+                                                                                   data=datainicial).aggregate(
+                        total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
+
+                saldo_final = saldo_inicial + saldo_movimentacoes
+
+
+
+                with connection.cursor() as cursor:
+                    insert_query = """
+                                        INSERT INTO financeiro_saldo (tenant_id, cliente_id, banco_id, data, saldoinicial, saldofinal)
+                                        VALUES (%s, %s, %s, %s, %s, %s)
+                                        ON CONFLICT(cliente_id, banco_id, data)
+                                        DO UPDATE SET saldoinicial = EXCLUDED.saldoinicial, saldofinal = EXCLUDED.saldofinal;
+                                    """
+
+                    cursor.execute(insert_query, [
+                        tenant,
+                        cliente,
+                        banco,
+                        datainicial,
+                        saldo_inicial,
+                        saldo_final
+                    ])
+
+                datainicial += timedelta(days=1)  # Incrementa o dia
+
+        print(f'Importação concluída. {conciliados} movimentações conciliadas.') # Retorna uma mensagem de sucesso
