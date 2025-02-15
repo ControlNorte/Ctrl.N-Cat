@@ -1,15 +1,19 @@
 import datetime
-
-import requests, json, re, threading, ahocorasick
-from hpinicial.models import Tenant
-from .models import BancosCliente, cadastro_de_cliente, Regra, MovimentacoesCliente, TransicaoCliente, Saldo
-from dask.array import empty
 from datetime import *
+from urllib.parse import urlencode
+
+import ahocorasick
+import json
+import re
+import requests
+import threading
 from django.db import connection
 from django.db.models import Sum
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from urllib.parse import urlencode
+
+from hpinicial.models import Tenant
+from .models import BancosCliente, cadastro_de_cliente, Regra, MovimentacoesCliente, TransicaoCliente, Saldo
 
 
 @csrf_exempt  # Use apenas para testes; idealmente, configure o CSRF corretamente.

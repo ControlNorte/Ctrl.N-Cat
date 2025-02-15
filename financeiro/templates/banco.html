@@ -191,6 +191,27 @@ Financeiro | {{ dadoscliente }}
           }
           return cookieValue;
         }
+
+        fetch('https://controlnorte-producao.up.railway.app/api/item-data/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})  // Enviar algum dado se necessário
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Resposta do backend:', data);
+            alert(data.message || data.error);
+        })
+        .catch(error => {
+            console.error('Erro na requisição:', error);
+        });
     </script>
 
 </main>
