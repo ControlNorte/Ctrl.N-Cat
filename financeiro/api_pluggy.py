@@ -18,7 +18,7 @@ def handle_item_data(request):
     data = json.loads(request.body)
 
     itemId = data['item']['id']
-    event = data['event']
+    print(data)
     banco = data['item']['connector']['name']
 
     url = "https://api.pluggy.ai/auth"
@@ -113,7 +113,7 @@ def handle_item_data(request):
                     transferNumber=transferNumber,
                     isConnected = True,
                 )
-                banco.save()
+                # banco.save()
                 print("Banco cadastrado com sucesso!")
 
             else:
