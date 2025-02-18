@@ -11,6 +11,8 @@ from django.db import connection
 from django.db.models import Sum
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 from hpinicial.models import Tenant
 from .models import BancosCliente, cadastro_de_cliente, Regra, MovimentacoesCliente, TransicaoCliente, Saldo
@@ -328,6 +330,19 @@ def handle_item_data(request):
                         ])
 
                     datainicial += timedelta(days=1)  # Incrementa o dia
+
+            # Envia a notificação para todos os clientes conectados
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "notifications",
+                {
+                    "type": "send.notification",
+                    "message": {
+                        "type": "success",
+                        "text": f"Banco cadastrado com sucesso! Importamos {conciliados} movimentações para te ajudar!"
+                    }
+                }
+            )
 
             print(f'Banco cadastrado com seucesso! Importamos {conciliados} movimentações para te ajudar!.') # Retorna uma mensagem de sucesso
             return JsonResponse({'message': f'Banco cadastrado com seucesso! Importamos {conciliados} movimentações para te ajudar!'}, status=200)
