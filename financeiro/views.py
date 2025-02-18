@@ -1,16 +1,14 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views.decorators.csrf import csrf_exempt
-from cliente.models import cadastro_de_cliente
-from .models import *
-from .alteracoesdb import *
-from .exibicoes import *
-from datetime import *
-from .teste import *
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.http import JsonResponse
-from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
+
+from .exibicoes import *
+from .teste import *
+
 
 # Create your views here.
 
@@ -35,6 +33,9 @@ def financeirocliente(request, pk):
 
 
 def caixa(request):
+
+    ### TODO COLOCAR UM GRÁFICO INTERATIVO DO FLUXO DE CAIXA IGUAL AO DO NIBO, COM OS CHECKS PARA SELECIONAR OS BANCOS E A PROJEÇÃO DOS VALORES
+
     pk = request.session.get('dadoscliente')
 
     if not pk:
@@ -65,14 +66,19 @@ def movimentacao(request, banco):
     errosaida = ''
     df = ''
     form = UploadFileForm(request.POST, request.FILES)
+
+    ### IMPORTAR PLNILHA DE EXCEL (FORMATO: DATA/DESCRIÇÃO/VALOR) ###
     if form.is_valid():
         form.save()
         file = request.FILES['file']
         df = importar_arquivo_excel(file, cliente=dadoscliente, banco=bancoatual, request=request)
 
+
+    ### FUNÇÕES DE LANÇAR MANUALMENTE UMA ENTRADA, SAÍDA OU TRANSFERENCIA ###
     if request.method == 'POST':
         dados = request.POST.dict()
 
+        ###
         if dados.get('tipo') == 'mes':
             mesfiltro = messtr(dados.get('mesfiltro'))
             mesatual = dados.get('mesfiltro')
@@ -159,7 +165,7 @@ def movimentacao(request, banco):
                'grafico': grafico, 'transicoes': transicoes, 'format_date': format_date,
                'format_currency': format_currency, 'bancodestinos': bancodestinos}
 
-    return render(request, 'caixa.html', context)
+    return render(request, 'visualizacao/caixa.html', context)
 
 
 def save_data(request):
