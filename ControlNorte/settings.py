@@ -61,7 +61,6 @@ CHANNEL_LAYERS = {
     },
 }
 
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
