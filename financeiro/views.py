@@ -2,15 +2,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
-from django.http import JsonResponse
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
 from .exibicoes import *
 from .teste import *
-
-
-# Create your views here.
 
 
 @login_required
@@ -74,311 +70,150 @@ def movimentacao(request, banco):
         df = importar_arquivo_excel(file, cliente=dadoscliente, banco=bancoatual, request=request)
 
 
-    ### FUNÇÕES DE LANÇAR MANUALMENTE UMA ENTRADA, SAÍDA OU TRANSFERENCIA ###
+    ### FUNÇÕES DE LANÇAR MANUALMENTE UMA ENTRADA, SAÍDA OU TRANSFERENCIA E RENDERIZAR O GRÁFICO ###
     if request.method == 'POST':
         dados = request.POST.dict()
 
-        ###
+        ### FUNÇÃO DE RENDERIZAR O GRÁFICO ###
         if dados.get('tipo') == 'mes':
             mesfiltro = messtr(dados.get('mesfiltro'))
             mesatual = dados.get('mesfiltro')
             grafico = gerar_grafico(cliente=dadoscliente, banco=bancoatual.id, mes=mesfiltro)
             exbextrato = extrato(cliente=dadoscliente, banco=bancoatual.id, mes=mesfiltro)
 
+        ### FUNÇÃO DE CADASTRO ENTRADA MANUALMENTE ###
         elif dados.get('tipo') == 'entrada':
             valor = float(dados.get('valor').replace(',', '.'))
 
+            ### SALVA A ENTRADA NO BC MovimentacoesCliente ###
             if valor >= 0:
-                movimentacoes = MovimentacoesCliente.objects.create(tenant=request.tenant,
-                                                                    cliente=dadoscliente,
-                                                                    banco=BancosCliente.objects.get(id=bancoatual.id),
-                                                                    data=dados.get('data'),
-                                                                    descricao=dados.get('descricao'),
-                                                                    detalhe=dados.get('detalhe'),
-                                                                    valor=valor,
-                                                                    categoria=Categoria.objects.get(id=dados.get("categoria")),
-                                                                    subcategoria=SubCategoria.objects.get(id=dados.get("subcategoria")),
-                                                                    centrodecusto=CentroDeCusto.objects.get(id=dados.get("centrocusto")))
+                movimentacoes = MovimentacoesCliente.objects.create(
+                    tenant=request.tenant,
+                    cliente=dadoscliente,
+                    banco=BancosCliente.objects.get(id=bancoatual.id),
+                    data=dados.get('data'),
+                    descricao=dados.get('descricao'),
+                    detalhe=dados.get('detalhe'),
+                    valor=valor,
+                    categoria=Categoria.objects.get(id=dados.get("categoria")),
+                    subcategoria=SubCategoria.objects.get(id=dados.get("subcategoria")),
+                    centrodecusto=CentroDeCusto.objects.get(id=dados.get("centrocusto")),
+
+                )
+
                 movimentacoes.save()
+
+                ### ALTERA O SALDO DO BANCO RESPCTO DE ACORDO COM A MOVIMENTACAO CADASTRADA ANTERIORMENTE ###
                 alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente.id, data=dados.get('data'), request=request)
+
             else:
                 erroentrada = 'Valor de Entrada Tem que ser maior que 0,0'
 
+        ### FUNÇÃO DE CADASTRO SAÍDA MANUALMENTE ###
         elif dados.get('tipo') == 'saida':
+
+            ### FUNÇÃO DE CONVERTER VALORES CADASTRADOS ###
             if float(dados.get('valor').replace(',', '.')) <= 0:
                 valor = float(dados.get('valor').replace(',', '.'))
+
             else:
                 valor = float(dados.get('valor').replace(',', '.')) * - 1.0
-            movimentacoes = MovimentacoesCliente.objects.create(tenant=request.tenant,
-                                                                cliente=dadoscliente,
-                                                                banco=BancosCliente.objects.get(id=bancoatual.id, cliente=dadoscliente),
-                                                                data=dados.get('data'),
-                                                                descricao=dados.get('descricao'),
-                                                                detalhe=dados.get('detalhe'),
-                                                                valor=valor,
-                                                                categoria=Categoria.objects.get(
-                                                                    id=dados.get("categoria"), cliente=dadoscliente),
-                                                                subcategoria=SubCategoria.objects.get
-                                                                (id=dados.get("subcategoria"), cliente=dadoscliente),
-                                                                centrodecusto=CentroDeCusto.objects.get
-                                                                (id=dados.get("centrocusto"), cliente=dadoscliente))
+
+            ### SALVA A SAÍDA NO BC MovimentacoesCliente ###
+            movimentacoes = MovimentacoesCliente.objects.create(
+                tenant=request.tenant,
+                cliente=dadoscliente,
+                banco=BancosCliente.objects.get(id=bancoatual.id, cliente=dadoscliente),
+                data=dados.get('data'),
+                descricao=dados.get('descricao'),
+                detalhe=dados.get('detalhe'),
+                valor=valor,
+                categoria=Categoria.objects.get(id=dados.get("categoria"), cliente=dadoscliente),
+                subcategoria=SubCategoria.objects.get(id=dados.get("subcategoria"), cliente=dadoscliente),
+                centrodecusto=CentroDeCusto.objects.get(id=dados.get("centrocusto"), cliente=dadoscliente))
+
             movimentacoes.save()
+
+            ### ALTERA O SALDO DO BANCO RESPCTO DE ACORDO COM A MOVIMENTACAO CADASTRADA ANTERIORMENTE ###
             alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente.id, data=dados.get('data'), request=request)
 
+        ### FUNÇÃO DE CADASTRO TRANSFERENCIA MANUALMENTE ###
         elif dados.get('tipo') == 'transf':
+
+            ### CONVERTE O VALOR DE POSITIVO PARA NEGARIVO PARA SALVAR A SAÍDA ###
             valor = float(dados.get('valor')) * -1.0
-            saida = MovimentacoesCliente.objects.create(tenant=request.tenant,
-                                                        cliente=dadoscliente,
-                                                        banco=BancosCliente.objects.get(id=bancoatual.id, cliente=dadoscliente),
-                                                        data=dados.get('data'),
-                                                        descricao=dados.get('descricao'),
-                                                        detalhe=dados.get('detalhe'),
-                                                        valor=valor,
-                                                        categoria=None,
-                                                        subcategoria=None,
-                                                        centrodecusto=None)
+
+            ### SALVA A SAÍDA NO DB ###
+            saida = MovimentacoesCliente.objects.create(
+                tenant=request.tenant,
+                cliente=dadoscliente,
+                banco=BancosCliente.objects.get(id=bancoatual.id, cliente=dadoscliente),
+                data=dados.get('data'),
+                descricao=dados.get('descricao'),
+                detalhe=dados.get('detalhe'),
+                valor=valor,
+                categoria=None,
+                subcategoria=None,
+                centrodecusto=None
+            )
+
             saida.save()
+
+            ### ALTERA O SALDO DE ACORDO COM AS INFORMAÇÕES ACIMA ###
             alteracaosaldo(banco=bancoatual.id, cliente=dadoscliente.id, data=dados.get('data'), request=request)
-            entrada = MovimentacoesCliente.objects.create(tenant=request.tenant,
-                                                          cliente=dadoscliente,
-                                                          banco=BancosCliente.objects.get(id=dados.get('bancoentrada'), cliente=dadoscliente),
-                                                          data=dados.get('data'),
-                                                          descricao=dados.get('descricao'),
-                                                          detalhe=dados.get('detalhe'),
-                                                          valor=dados.get('valor'),
-                                                          categoria=None,
-                                                          subcategoria=None,
-                                                          centrodecusto=None)
+
+            ### SALVA A ENTRADA NO DB ###
+            entrada = MovimentacoesCliente.objects.create(
+                tenant=request.tenant,
+                cliente=dadoscliente,
+                banco=BancosCliente.objects.get(id=dados.get('bancoentrada'), cliente=dadoscliente),
+                data=dados.get('data'),
+                descricao=dados.get('descricao'),
+                detalhe=dados.get('detalhe'),
+                valor=dados.get('valor'),
+                categoria=None,
+                subcategoria=None,
+                centrodecusto=None
+            )
+
             entrada.save()
+
+            ### CONFIRMA OS DADOS DO BANCO DE ENTRADA(DESTINO) DO VALOR ###
             bancoentrada = BancosCliente.objects.for_tenant(request.tenant).get(id=dados.get('bancoentrada'), cliente=dadoscliente)
+
+            ### ALTERA O SALDO DE ACORDO COM AS INFORMAÇÕES ACIMA ###
             alteracaosaldo(banco=bancoentrada.id, cliente=dadoscliente.id, data=dados.get('data'), request=request)
 
+    ### QUERYS FILTRADAS EXIBIÇÃO E CADASTROS ###
     categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     transicoes = TransicaoCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente, banco=bancoatual).order_by('data')
     bancodestinos = BancosCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente, ativo=True).order_by('banco')
 
-    context = {'dadoscliente': dadoscliente, 'banco': bancoatual, 'categorias': categorias,
-               'subcategorias': subcategorias, 'centrodecustos': centrodecustos, 'bancos': bancos, 'mesatual': mesatual,
-               'exbextrato': exbextrato, 'erroentrada': erroentrada, 'errosaida': errosaida, 'form': form, 'df': df,
-               'grafico': grafico, 'transicoes': transicoes, 'format_date': format_date,
-               'format_currency': format_currency, 'bancodestinos': bancodestinos}
+    ### CONTEXTS MOVIMENTACAO ###
+    context = {
+        'dadoscliente': dadoscliente,
+        'banco': bancoatual,
+        'categorias': categorias,
+        'subcategorias': subcategorias,
+        'centrodecustos': centrodecustos,
+        'bancos': bancos,
+        'mesatual': mesatual,
+        'exbextrato': exbextrato,
+        'erroentrada': erroentrada,
+        'errosaida': errosaida,
+        'form': form,
+        'df': df,
+        'grafico': grafico,
+        'transicoes': transicoes,
+        'format_date': format_date,
+        'format_currency': format_currency,
+        'bancodestinos': bancodestinos,
+
+    }
 
     return render(request, 'visualizacao/caixa.html', context)
-
-
-def save_data(request):
-    pk = request.session.get('dadoscliente')
-    if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
-
-    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
-
-    bancoatual = request.session.get('bancoatual')
-    if not bancoatual:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
-
-    bancoatual = BancosCliente.objects.for_tenant(request.tenant).get(pk=bancoatual)
-
-    movimentacoes_to_create = []
-    if request.method == 'POST':
-        cliente = dadoscliente  # Aqui, dadoscliente já é a instância correta de cadastro_de_cliente
-        banco = bancoatual.id
-        data = request.POST.get('data')
-        data = datetime.strptime(data, '%d/%m/%Y').strftime('%Y-%m-%d')
-        descricao = request.POST.get('descricao')
-        categoria = request.POST.get('categoria')
-        subcategoria = request.POST.get('subcategoria')
-        detalhe = request.POST.get('detalhe')
-        centrocusto = request.POST.get('centrocusto')
-        valor = request.POST.get('valor')
-        id = request.POST.get('id')
-        valor = float(valor.replace('.', '').replace(',', '.'))
-
-        try:
-            movimentacoes_to_create.append(MovimentacoesCliente(
-                        tenant=request.tenant,
-                        cliente=cliente,
-                        banco=BancosCliente.objects.get(id=banco),
-                        data=data,
-                        descricao=descricao,
-                        detalhe=detalhe,
-                        valor=valor,
-                        categoria=Categoria.objects.get(id=categoria),
-                        subcategoria=SubCategoria.objects.get(id=subcategoria),
-                        centrodecusto=CentroDeCusto.objects.get(id=centrocusto)
-            ))
-        except:
-            movimentacoes_to_create.append(MovimentacoesCliente(
-                            tenant=request.tenant,
-                            cliente=cliente,
-                            banco=BancosCliente.objects.get(id=banco),
-                            data=data,
-                            descricao=descricao,
-                            detalhe=detalhe,
-                            valor=valor,
-                            categoria=Categoria.objects.get(id=categoria),
-                            subcategoria=SubCategoria.objects.get(id=subcategoria),
-                            centrodecusto=None
-            ))
-
-        MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
-        if movimentacoes_to_create:
-            for movimentacao in movimentacoes_to_create:
-                alteracaosaldo(banco=banco, cliente=dadoscliente.id, data=movimentacao.data, request=request)
-        TransicaoCliente.objects.for_tenant(request.tenant).get(id=id).delete()
-
-        return JsonResponse({'success': True})
-
-    return JsonResponse({'success': False})
-
-
-def delete(request):
-    if request.method == 'POST':
-        id = request.POST.get('id')
-        TransicaoCliente.objects.for_tenant(request.tenant).get(id=id).delete()
-
-        return JsonResponse({'success': True})
-
-    return JsonResponse({'success': False})
-
-
-def save_data_rule(request):
-    pk = request.session.get('dadoscliente')
-    if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
-
-    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
-
-    bancoatual = request.session.get('bancoatual')
-    if not bancoatual:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
-
-    bancoatual = BancosCliente.objects.for_tenant(request.tenant).get(pk=bancoatual)
-
-    movimentacoes_to_create = []
-    if request.method == 'POST':
-        banco = bancoatual.id
-        data = request.POST.get('data')
-        id = request.POST.get('id')
-        data = datetime.strptime(data, '%d/%m/%Y').strftime('%Y-%m-%d')
-        descricao = request.POST.get('descricao')
-        categoria = request.POST.get('categoria')
-        subcategoria = request.POST.get('subcategoria')
-        detalhe = request.POST.get('detalhe')
-        centrocusto = request.POST.get('centrocusto')
-        valor = request.POST.get('valor')
-        valor = float(valor.replace('.', '').replace(',', '.'))
-        regras = Regra.objects.create(tenant=request.tenant, cliente=dadoscliente, categoria=Categoria.objects.get(id=categoria, cliente=dadoscliente),
-                                      subcategoria=SubCategoria.objects.get(id=subcategoria, cliente=dadoscliente),
-                                      centrodecusto=CentroDeCusto.objects.get(id=centrocusto, cliente=dadoscliente),
-                                      descricao=descricao, ativo=True)
-        regras.save()
-        try:
-            movimentacoes_to_create.append(MovimentacoesCliente(
-                        tenant=request.tenant,
-                        cliente=dadoscliente,
-                        banco=BancosCliente.objects.get(id=banco),
-                        data=data,
-                        descricao=descricao,
-                        detalhe=detalhe,
-                        valor=valor,
-                        categoria=Categoria.objects.get(id=categoria),
-                        subcategoria=SubCategoria.objects.get(id=subcategoria),
-                        centrodecusto=CentroDeCusto.objects.get(id=centrocusto)
-            ))
-        except:
-            movimentacoes_to_create.append(MovimentacoesCliente(
-                            tenant=request.tenant,
-                            cliente=dadoscliente,
-                            banco=BancosCliente.objects.get(id=banco),
-                            data=data,
-                            descricao=descricao,
-                            detalhe=detalhe,
-                            valor=valor,
-                            categoria=Categoria.objects.get(id=categoria),
-                            subcategoria=SubCategoria.objects.get(id=subcategoria),
-                            centrodecusto=None
-            ))
-        
-        MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
-
-        for movimentacao in movimentacoes_to_create:
-            alteracaosaldo(banco=banco, cliente=dadoscliente.id, data=str(movimentacao.data), request=request)
-
-        TransicaoCliente.objects.for_tenant(request.tenant).get(id=id).delete()
-
-        return JsonResponse({'success': True})
-
-    return JsonResponse({'success': False})
-
-
-def transf(request):
-    pk = request.session.get('dadoscliente')
-    if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
-
-    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
-
-    bancoatual = request.session.get('bancoatual')
-    if not bancoatual:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
-
-    bancoatual = BancosCliente.objects.for_tenant(request.tenant).get(pk=bancoatual)
-
-    saida_to_create = []
-    entrada_to_create = []
-    if request.method == 'POST':
-        cliente = dadoscliente
-        banco = bancoatual.id
-        id = request.POST.get('id')
-        bancodestino = request.POST.get('bancodestino')
-        data = request.POST.get('data')
-        data = datetime.strptime(data, '%d/%m/%Y').strftime('%Y-%m-%d')
-        descricao = request.POST.get('descricao')
-        detalhe = request.POST.get('detalhe')
-        valor = request.POST.get('valor')
-        valor = float(valor.replace('.', '').replace(',', '.'))
-        saida_to_create.append(MovimentacoesCliente(
-                        tenant=request.tenant,
-                        cliente=cliente,
-                        banco=BancosCliente.objects.get(id=banco),
-                        data=data,
-                        descricao=descricao,
-                        detalhe=detalhe,
-                        valor=valor,
-                        categoria=None,
-                        subcategoria=None,
-                        centrodecusto=None
-        ))
-        MovimentacoesCliente.objects.bulk_create(saida_to_create)
-        for movimentacao in saida_to_create:
-            alteracaosaldo(banco=banco, cliente=dadoscliente.id, data=movimentacao.data, request=request)
-        valor = valor * -1.0
-        nova_transf = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(data=data, cliente=cliente, banco=bancodestino, valor=valor)
-        if not nova_transf:
-            entrada_to_create.append(MovimentacoesCliente(
-                            tenant=request.tenant,
-                            cliente=cliente,
-                            banco=BancosCliente.objects.get(id=bancodestino),
-                            data=data,
-                            descricao=descricao,
-                            detalhe=detalhe,
-                            valor=valor,
-                            categoria=None,
-                            subcategoria=None,
-                            centrodecusto=None
-            ))
-
-        MovimentacoesCliente.objects.bulk_create(entrada_to_create)
-        for movimentacao in entrada_to_create:
-            alteracaosaldo(banco=bancodestino, cliente=dadoscliente.id, data=movimentacao.data, request=request)
-        TransicaoCliente.objects.for_tenant(request.tenant).get(id=id).delete()
-
-        return JsonResponse({'success': True})
-
-    return JsonResponse({'success': False})
 
 
 def dre(request):
