@@ -11,25 +11,46 @@ from .teste import *
 
 @login_required
 def financeiro_view(request):
+    ### HOMEPAGE FINANCEIRO ###
     if request.tenant:
         clientes = cadastro_de_cliente.objects.for_tenant(request.tenant).filter(ativo=True).order_by('razao_social')
+
     else:
         clientes = "Sem Clientes Cadastrados"
-    context = {'object_list': clientes}
+
+    context = {
+        'object_list': clientes,
+    }
+
     return render(request, 'visualizacao/homepagefinanceiro.html', context)
 
 
 def financeirocliente(request, pk):
+    ### TELA DE RESUMO DOS DADOS FINANCEIRO DO CLIENTE ###
+
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
-    request.session['dadoscliente'] = pk  # Armazena o pk na sessão
+    request.session['dadoscliente'] = pk  # Armazena o pk do cliente na sessão
+
+    ### RESUMO DA DRE/DASHBOARD/ORÇAMENTO/CONTAS PAGAS E RECEBIDAS DO MÊS CORRENTE ###
+
+    ### RESUMO DA DRE DO MÊS CORRENTE ###
     if request.method == 'GET':
         dreresumo = dreresumida(cliente=dadoscliente)
-    context = {'dadoscliente': dadoscliente, 'dreresumo': dreresumo}
+
+    ### TODO FAZER O BACKEND E FRONTEND DO RESUMO DO DASHBOARD/ORÇAMENTO/CONTAS PAGAS E RECEBIDAS
+
+    ### CONTEXTS FINANCEIRO CLIENTE ###
+    context = {
+        'dadoscliente': dadoscliente,
+        'dreresumo': dreresumo,
+
+    }
+
     return render(request, 'visualizacao/financeirocliente.html', context)
 
 
 def caixa(request):
-
+    ### EXIBIR O GRÁFICO COM O FLUXO DE CAIXA DE TODOS OS BANCOS E COM OS ULTIMOS 3 MESES E OS PRÓXIMOS 3 MESES ###
     ### TODO COLOCAR UM GRÁFICO INTERATIVO DO FLUXO DE CAIXA IGUAL AO DO NIBO, COM OS CHECKS PARA SELECIONAR OS BANCOS E A PROJEÇÃO DOS VALORES
 
     pk = request.session.get('dadoscliente')
@@ -38,13 +59,22 @@ def caixa(request):
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
+
     bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente).order_by('banco')
-    context = {'dadoscliente': dadoscliente, 'bancos': bancos}
+
+    ### CONTEXTS CAIXA ###
+    context = {
+        'dadoscliente': dadoscliente,
+        'bancos': bancos,
+    }
+
     return render(request, 'visualizacao/caixa.html', context)
 
 
 @csrf_exempt
 def movimentacao(request, banco):
+    ### EXIBE AS MOVIMENTAÇÕES DOS CLIENTES FILTADAS POR BANCO E CADASTRAR MOVIMENTAÇÕES ###
+
     pk = request.session.get('dadoscliente')
     if not pk:
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
