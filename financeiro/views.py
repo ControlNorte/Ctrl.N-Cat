@@ -68,7 +68,7 @@ def caixa(request):
         'bancos': bancos,
     }
 
-    return render(request, 'visualizacao/caixa.html', context)
+    return render(request, 'visualizacao/movimentacao.html', context)
 
 
 @csrf_exempt
@@ -243,7 +243,7 @@ def movimentacao(request, banco):
 
     }
 
-    return render(request, 'visualizacao/caixa.html', context)
+    return render(request, 'visualizacao/movimentacao.html', context)
 
 
 def dre(request):

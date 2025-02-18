@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 import psycopg2
 from sqlalchemy import create_engine
 
-# EXTRATO NO HTML: caixa.html
+# EXTRATO NO HTML: movimentacao.html
 
 
 def formatar_valor(valor):
