@@ -150,6 +150,437 @@ Financeiro | {{ dadoscliente }}
                     {% autoescape off %}{{ exbextrato }}{% endautoescape %}
                 </section>
 
+
+                <section id="conciliar">
+                    <div class="p-4">
+                        <div class="text-xl text-violet-900 p-2">Conciliação</div>
+                        <br>
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden"
+                                   name="tipo"
+                                   value="import">
+                            <div class="flex flex-nowrap justify-between items-center">
+                                {{ form.as_p }}
+                                <button class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md" type="submit">
+                                    Importar
+                                </button>
+                            </div>
+                        </form>
+                        <form method="post">
+                            <input type="hidden" name="tipo" value="api">
+                            <button>
+                                API
+                            </button>
+                        </form>
+                        <hr>
+                        <br>
+                        {% if transicoes %}
+                            {% for transicao in transicoes %}
+                                <form method="POST" class="dataForm">
+                                    <div class="wrapper2">
+                                        <section id="movi-{{ transicao.id }}">
+                                            <div class="flex flex-nowrap pb-2">
+                                                {% if transicao.valor < 0 %}
+                                                    <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2">
+                                                        <a href="#movi" data-form-id="{{ transicao.id }}">Saída</a>
+                                                    </div>
+                                                    <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2">
+                                                        <a href="#transf" data-form-id="{{ transicao.id }}">Transferência</a>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2">
+                                                        <a href="#movi" data-form-id="{{ transicao.id }}">Entrada</a>
+                                                    </div>
+                                                    <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2">
+                                                        <a href="#transf" data-form-id="{{ transicao.id }}">Transferência</a>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="flex flex-nowrap gap-2">
+                                                <div class="border col-md-4 bg-violet-100 text-violet-900 p-2">
+                                                    <div class="flex flex-nowrap justify-between pt-2">
+                                                        <div class="flex flex-nowrap">
+                                                            Data:
+                                                            <div class="text-gray-700 pl-1">{{ transicao.data|format_date }}</div>
+                                                        </div>
+                                                        <div class="flex flex-nowrap">
+                                                            Valor:
+                                                            {% if transicao.valor >= 0 %}
+                                                                <div class="text-green-700 pl-1">{{ transicao.valor|format_currency }}</div>
+                                                            {% else %}
+                                                                <div class="text-red-700 pl-1">{{ transicao.valor|format_currency }}</div>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="flex flex-nowrap pt-2">
+                                                            Descrição:
+                                                            <div class="text-gray-700">{{ transicao.descricao }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex flex-nowrap justify-between border col-md-6 bg-violet-100 text-violet-900">
+                                                    <div class="content-start p-2">
+                                                        <div class="flex flex-nowrap">
+                                                            <label class="p-2">Categoria:</label>
+                                                            <select name="categoria"
+                                                                    class="selectconci"
+                                                                    required>
+                                                                    <option selected></option>
+                                                                    {% for categoria in categorias %}
+                                                                    <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                                                                    {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="flex flex-nowrap pt-2">
+                                                            <label class="p-2">Descrição:</label>
+                                                            <input type="text"
+                                                                   name="descricao"
+                                                                   class="text-gray-700 "
+                                                                   value="{{ transicao.descricao }}"
+                                                                   required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="w-5/5 grid justify-items-end p-2">
+                                                        <div class="flex flex-nowrap">
+                                                            <label class="p-2">Sub-Categoria:</label>
+                                                            <select name="subcategoria"
+                                                                    class="selectconci"
+                                                                    required>
+                                                                    <option selected></option>
+                                                                    {% for subcategoria in subcategorias %}
+                                                                    <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
+                                                                    {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="flex flex-nowrap pt-2">
+                                                            <label class="p-2">Centro de Custo:</label>
+                                                            <select name="centrocusto"
+                                                                    class="selectconci"
+                                                                    required>
+                                                                    <option selected></option>
+                                                                    {% for centrodecusto in centrodecustos %}
+                                                                    <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
+                                                                    {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex flex-nowrap gap-3 col-md-1">
+                                                    <button class="text-violet-600 hover:text-violet-800 text-2xl saveBtn" type="button" name="action" value="save">
+                                                        <ion-icon name="checkmark-circle-outline"></ion-icon>
+                                                    </button>
+                                                    <button class="text-red-600 hover:text-red-800 text-2xl deleteBtn" type="button" name="action" value="delete">
+                                                        <ion-icon name="trash-outline"></ion-icon>
+                                                    </button>
+                                                    <button class="text-yellow-600 hover:text-yellow-800 text-2xl ruleBtn" type="button" name="action" value="star">
+                                                        <ion-icon name="star"></ion-icon>
+                                                    </button>
+                                                </div>
+                                                <input type="hidden" name="data" value="{{ transicao.data|format_date }}">
+                                                <input type="hidden" name="id" value="{{ transicao.id }}">
+                                                <input type="hidden" name="detalhe" value="Sem Detalhe">
+                                                <input type="hidden" name="tipo" value="import">
+                                                <input type="hidden" name="valor" value="{{ transicao.valor }}">
+                                                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                                            </div>
+                                        </section>
+
+                                        <section id="transf-{{ transicao.id }}">
+                                            <div class="flex flex-nowrap pb-2">
+                                                {% if transicao.valor < 0 %}
+                                                    <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2">
+                                                        <a href="#movi" data-form-id="{{ transicao.id }}">Saída</a>
+                                                    </div>
+                                                    <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2">
+                                                        <a href="#transf" data-form-id="{{ transicao.id }}">Transferência</a>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="text-lg text-violet-900 hover:border-b-4 border-violet-300 p-2">
+                                                        <a href="#movi" data-form-id="{{ transicao.id }}">Entrada</a>
+                                                    </div>
+                                                    <div class="text-lg text-violet-900 border-b-4 border-violet-800 p-2">
+                                                        <a href="#transf" data-form-id="{{ transicao.id }}">Transferência</a>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="flex flex-nowrap gap-2">
+                                                <div class="border col-md-4 bg-violet-100 text-violet-900 p-2">
+                                                    <div class="flex flex-nowrap justify-between pt-2">
+                                                        <div class="flex flex-nowrap">
+                                                            Data:
+                                                            <div class="text-gray-700 pl-1">{{ transicao.data|format_date }}</div>
+                                                        </div>
+                                                        <div class="flex flex-nowrap">
+                                                            Valor:
+                                                            {% if transicao.valor >= 0 %}
+                                                                <div class="text-green-700 pl-1">{{ transicao.valor|format_currency }}</div>
+                                                            {% else %}
+                                                                <div class="text-red-700 pl-1">{{ transicao.valor|format_currency }}</div>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="flex flex-nowrap pt-2">
+                                                            Descrição:
+                                                            <div class="text-gray-700">{{ transicao.descricao }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex flex-nowrap justify-between border col-md-6 bg-violet-100 text-violet-900">
+                                                    <div class="content-start p-2">
+                                                        <div class="flex flex-nowrap">
+                                                            <label class="p-2">Banco Destino:</label>
+                                                            <select name="bancodestino"
+                                                                    class="selectconci"
+                                                                    required>
+                                                                    <option selected></option>
+                                                                    {% for bancodestino in bancodestinos %}
+                                                                    <option value="{{ bancodestino.id }}">{{ bancodestino.banco }}</option>
+                                                                    {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="flex flex-nowrap pt-2">
+                                                            <label class="p-2">Descrição:</label>
+                                                            <input
+                                                                type="text"
+                                                                name="descricao"
+                                                                class="text-gray-700"
+                                                                value="{{ transicao.descricao }}"
+                                                                id="descricaoInput"
+                                                                required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex flex-nowrap gap-3 col-md-1">
+                                                    <button class="text-violet-600 hover:text-violet-800 text-2xl transfBtn" type="button" name="action" value="save">
+                                                        <ion-icon name="checkmark-circle-outline"></ion-icon>
+                                                    </button>
+                                                    <button class="text-red-600 hover:text-red-800 text-2xl deleteBtn" type="button" name="action" value="delete">
+                                                        <ion-icon name="trash-outline"></ion-icon>
+                                                    </button>
+                                                    <button class="text-yellow-600 hover:text-yellow-800 text-2xl ruleBtn" type="button" name="action" value="star">
+                                                        <ion-icon name="star"></ion-icon>
+                                                    </button>
+                                                </div>
+                                                <input type="hidden" name="data" value="{{ transicao.data|format_date }}">
+                                                <input type="hidden" name="id" value="{{ transicao.id }}">
+                                                <input type="hidden" name="detalhe" value="Sem Detalhe">
+                                                <input type="hidden" name="tipo" value="import">
+                                                <input type="hidden" name="valor" value="{{ transicao.valor }}">
+                                                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                                            </div>
+                                        </section>
+                                    </div>
+                                </form>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </section>
+                <section id="novaentrada">
+                    <div class="p-4">
+                        <div class="container w-4/5 p-4 bg-violet-100 rounded">
+                            <div class="py-2 px-4 text-2xl text-violet-900 text-center">Nova Entrada - {{ banco.banco }}</div>
+                            {% if erroentrada %}{{ erroentrada }}{% endif %}
+                            <form method="POST">
+                                {% csrf_token %}
+                                <input type="hidden"
+                                       name='tipo'
+                                       value="entrada">
+                                <div class="text-violet-800">
+                                    <div class="col-md-3 pb-2">
+                                        <label class="p-2">Data:</label>
+                                        <input type="date"
+                                               name="data"
+                                               class="form-control"
+                                               required>
+                                    </div>
+                                    <div class="row g-3 grid grid-cols-3">
+                                        <div>
+                                            <label class="p-2">Descrição:</label>
+                                            <input type="text"
+                                                   name="descricao"
+                                                   placeholder="Descrição"
+                                                   class="form-control"
+                                                   required>
+                                            <label class="p-2">Detalhes:</label>
+                                            <input type="text"
+                                                   name="detalhe"
+                                                   placeholder="Detalhes"
+                                                   class="form-control">
+                                        </div>
+                                        <div>
+                                            <label class="p-2">Categoria:</label>
+                                            <select name="categoria"
+                                                    class="form-control"
+                                                    required>
+                                                    {% for categoria in categorias %}
+                                                    <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                                                    {% endfor %}
+                                            </select>
+                                            <label class="p-2">Sub-Categoria:</label>
+                                            <select name="subcategoria"
+                                                    class="form-control"
+                                                    required>
+                                                    {% for subcategoria in subcategorias %}
+                                                    <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
+                                                    {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="p-2">Centro de Custo:</label>
+                                            <select name="centrocusto"
+                                                    class="form-control"
+                                                    required>
+                                                    {% for centrodecusto in centrodecustos %}
+                                                    <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
+                                                    {% endfor %}
+                                            </select>
+                                            <label class="p-2">Valor:</label>
+                                            <input type="text"
+                                                   name="valor"
+                                                   placeholder="0,00"
+                                                   oninput="formatValue(this)"
+                                                   required/>
+                                        </div>
+                                        <div class="col-start-3 flex justify-end">
+                                            <button
+                                                class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md"
+                                                type="submit">Salvar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+                <section id="novasaida">
+                    <div class="p-4">
+                        <div class="container w-4/5 p-4 bg-violet-100 rounded">
+                            <div class="py-2 px-4 text-2xl text-violet-900 text-center">Nova Saída - {{ banco.banco }}</div>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name='tipo' value="saida">
+                                <div class="text-violet-800">
+                                    <div class="col-md-3 pb-2">
+                                        <label class="p-2">Data:</label>
+                                        <input type="date"
+                                               name="data"
+                                               class="form-control"
+                                               required>
+                                    </div>
+                                    <div class="row g-3 grid grid-cols-3">
+                                        <div>
+                                            <label class="p-2">Descrição:</label>
+                                            <input type="text"
+                                                   name="descricao"
+                                                   placeholder="Descrição"
+                                                   class="form-control"
+                                                   required>
+                                            <label class="p-2">Detalhes:</label>
+                                            <input type="text"
+                                                   name="detalhe"
+                                                   placeholder="Detalhes"
+                                                   class="form-control">
+                                        </div>
+                                        <div>
+                                            <label class="p-2">Categoria:</label>
+                                            <select name="categoria"
+                                                    class="form-control"
+                                                    required>
+                                                    {% for categoria in categorias %}
+                                                    <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+                                                    {% endfor %}
+                                            </select>
+                                            <label class="p-2">Sub-Categoria:</label>
+                                            <select name="subcategoria"
+                                                    class="form-control"
+                                                    required>
+                                                    {% for subcategoria in subcategorias %}
+                                                    <option value="{{ subcategoria.id }}">{{ subcategoria.nome }}</option>
+                                                    {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="p-2">Centro de Custo:</label>
+                                            <select name="centrocusto"
+                                                    class="form-control"
+                                                    required>
+                                                    {% for centrodecusto in centrodecustos %}
+                                                    <option value="{{ centrodecusto.id }}">{{ centrodecusto.nome }}</option>
+                                                    {% endfor %}
+                                            </select>
+                                            <label class="p-2">Valor:</label>
+                                            <input type="text"
+                                                   name="valor"
+                                                   placeholder="0,00"
+                                                   oninput="formatValue(this)"
+                                                   required/>
+                                        </div>
+                                        <div class="col-start-3 flex justify-end">
+                                            <button
+                                                class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md"
+                                                type="submit">Salvar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+                <section id="novatransf">
+                    <div class="p-4">
+                        <div class="container w-4/5 p-4 bg-violet-100 rounded">
+                            <div class="py-2 px-4 text-2xl text-violet-900 text-center">Nova Transferência - {{ banco.banco }}</div>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name='tipo' value="transf">
+                                <div class="text-violet-800">
+                                    <div class="col-md-3 pb-2">
+                                        <label class="p-2">Data:</label>
+                                        <input type="date"
+                                               name="data"
+                                               class="form-control"
+                                               required>
+                                        <label class="p-2">Banco Destino:</label>
+                                        <select name="bancoentrada"
+                                                class="form-control"
+                                                required>
+                                                {% for item in bancos %}
+                                                <option value="{{ item.id }}">{{ item.banco }}</option>
+                                                {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="flex flex-nowrap gap-2">
+                                        <div>
+                                            <label class="p-2">Descrição:</label>
+                                            <input type="text"
+                                                   name="descricao"
+                                                   placeholder="Descrição"
+                                                   class="form-control"
+                                                   required>
+                                        </div>
+                                        <div>
+                                            <label class="p-2">Valor:</label>
+                                            <input type="number"
+                                                   name="valor"
+                                                   placeholder="Valor"
+                                                   class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-start-3 flex justify-end">
+                                        <button
+                                            class="bg-violet-600 hover:bg-violet-800 text-white py-1 my-2 px-3 md:text-lg rounded-md"
+                                            type="submit">Salvar</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
     </div>
 
     </div>
