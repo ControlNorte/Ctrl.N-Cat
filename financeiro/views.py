@@ -22,7 +22,7 @@ def financeiro_view(request):
     else:
         clientes = "Sem Clientes Cadastrados"
     context = {'object_list': clientes}
-    return render(request, 'homepagefinanceiro.html', context)
+    return render(request, 'visualizacao/homepagefinanceiro.html', context)
 
 
 def financeirocliente(request, pk):
@@ -31,7 +31,7 @@ def financeirocliente(request, pk):
     if request.method == 'GET':
         dreresumo = dreresumida(cliente=dadoscliente)
     context = {'dadoscliente': dadoscliente, 'dreresumo': dreresumo}
-    return render(request, 'financeirocliente.html', context)
+    return render(request, 'visualizacao/financeirocliente.html', context)
 
 
 def caixa(request):
@@ -43,7 +43,7 @@ def caixa(request):
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente).order_by('banco')
     context = {'dadoscliente': dadoscliente, 'bancos': bancos}
-    return render(request, 'caixa.html', context)
+    return render(request, 'visualizacao/caixa.html', context)
 
 
 @csrf_exempt
@@ -427,7 +427,7 @@ def dre(request):
                'mes2': mes2, 'ano2': ano2, 'dreexb': dreexb, 'centrodecustos': centrodecustos, 'cdcseleted': cdcseleted,
                'cdcseleted2': cdcseleted2}
 
-    return render(request, 'dre.html', context)
+    return render(request, 'visualizacao/dre.html', context)
 
 
 def dashboard(request):
@@ -437,7 +437,7 @@ def dashboard(request):
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     context = {'dadoscliente': dadoscliente}
-    return render(request, 'dashboard.html', context)
+    return render(request, 'visualizacao/dashboard.html', context)
 
 
 def orcamento(request):
@@ -447,7 +447,7 @@ def orcamento(request):
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     context = {'dadoscliente': dadoscliente}
-    return render(request, 'orcamento.html', context)
+    return render(request, 'visualizacao/orcamento.html', context)
 
 
 def cadastrarorcamento(request):
@@ -457,7 +457,7 @@ def cadastrarorcamento(request):
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     context = {'dadoscliente': dadoscliente}
-    return render(request, 'cadastrarorcamento.html', context)
+    return render(request, 'cadastros/cadastrarorcamento.html', context)
 
 
 def contas(request):
@@ -547,7 +547,7 @@ def contas(request):
                'banco_selecionado': banco_selecionado, 'centro_custo_selecionado': centro_custo_selecionado,
                'categoria_selecionada': categoria_selecionada, 'sub_categoria_selecionada': sub_categoria_selecionada,
                'vl_i': vl_i, 'vl_f': vl_f, 'tenant': tenant, 'cliente': dadoscliente}
-    return render(request, 'contas.html', context)
+    return render(request, 'visualizacao/contas.html', context)
 
 
 def maisopicoes(request):
@@ -557,7 +557,7 @@ def maisopicoes(request):
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     context = {'dadoscliente': dadoscliente}
-    return render(request, 'maisopicoes.html', context)
+    return render(request, 'visualizacao/maisopicoes.html', context)
 
 
 def banco(request):
@@ -603,7 +603,7 @@ def bancosaldo(request, id):
         saldodiario(banco=banco.id, cliente=dadoscliente, data=data, request=request)
         return redirect('financeiro:banco')
     context = {'dadoscliente': dadoscliente, 'banco': banco}
-    return render(request, 'bancosaldo.html', context)
+    return render(request, 'cadastros/bancosaldo.html', context)
 
 
 def editarbanco(request, id):
@@ -628,7 +628,7 @@ def editarbanco(request, id):
 
         return redirect('financeiro:banco')
     context = {'dadoscliente': dadoscliente, 'bancos': bancos, 'bancoeditado': bancoeditado}
-    return render(request, 'editarbanco.html', context)
+    return render(request, 'cadastros/editarbanco.html', context)
 
 
 def categoria(request):
@@ -656,7 +656,7 @@ def categoria(request):
         'categorias': categorias,
         'categoriasmae': categoriasmae
     }
-    return render(request, 'categoria.html', context)
+    return render(request, 'cadastros/categoria.html', context)
 
 
 def editarcategoria(request, id):
@@ -677,7 +677,7 @@ def editarcategoria(request, id):
     categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     context = {'dadoscliente': dadoscliente, 'categorias': categorias, 'categoriasmae': categoriasmae,
                'categoriaeditada': categoriaeditada}
-    return render(request, 'editarcategoria.html', context)
+    return render(request, 'cadastros/editarcategoria.html', context)
 
 
 def subcategoria(request):
@@ -707,7 +707,7 @@ def subcategoria(request):
         'categoriasmae': categoriasmae,
         'subcategorias': subcategorias
     }
-    return render(request, 'subcategoria.html', context)
+    return render(request, 'cadastros/subcategoria.html', context)
 
 
 def editarsubcategoria(request, id):
@@ -729,7 +729,7 @@ def editarsubcategoria(request, id):
     subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     context = {'dadoscliente': dadoscliente, 'categorias': categorias, 'categoriasmae': categoriasmae, 'subcategorias':
         subcategorias, 'subcategoriaeditada': subcategoriaeditada}
-    return render(request, 'editarsubcategoria.html', context)
+    return render(request, 'cadastros/editarsubcategoria.html', context)
 
 
 def centrocusto(request):
@@ -752,7 +752,7 @@ def centrocusto(request):
 
     centrocustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     context = {'dadoscliente': dadoscliente, 'centrocustos': centrocustos}
-    return render(request, 'centrocusto.html', context)
+    return render(request, 'cadastros/centrocusto.html', context)
 
 
 def editarcentrocusto(request, id):
@@ -771,7 +771,7 @@ def editarcentrocusto(request, id):
         return redirect('financeiro:centrocusto')
     centrocustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     context = {'dadoscliente': dadoscliente, 'centrocustos': centrocustos, 'centrocustoeditado': centrocustoeditado}
-    return render(request, 'editarcentrocusto.html', context)
+    return render(request, 'cadastros/editarcentrocusto.html', context)
 
 
 def editarregra(request, id):
@@ -808,7 +808,7 @@ def editarregra(request, id):
         'centrodecustos': centrodecustos,
         'regras': regras
     }
-    return render(request, 'editarregra.html', context)
+    return render(request, 'cadastros/editarregra.html', context)
 
 
 def regra(request):
@@ -851,7 +851,7 @@ def regra(request):
 
     context = {'dadoscliente': dadoscliente, 'categorias': categorias, 'subcategorias': subcategorias,
                'centrodecustos': centrodecustos, 'regras': regras}
-    return render(request, 'regra.html', context)
+    return render(request, 'cadastros/regra.html', context)
 
 
 def get_movimentacao(request, id):
