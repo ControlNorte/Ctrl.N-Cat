@@ -68,7 +68,7 @@ def caixa(request):
         'bancos': bancos,
     }
 
-    return render(request, 'visualizacao/movimentacao.html', context)
+    return render(request, 'visualizacao/caixa.html', context)
 
 
 @csrf_exempt
