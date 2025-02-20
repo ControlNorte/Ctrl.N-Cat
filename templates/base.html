@@ -22,7 +22,7 @@
      {% endblock %}
 <script>
     // Conectar ao WebSocket
-    const socket = new WebSocket("ws://localhost:8000/ws/notificacao/");
+    const socket = new WebSocket("wss://" + window.location.host + "/ws/notificacao/");
 
     socket.onmessage = function(event) {
         const data = JSON.parse(event.data);
