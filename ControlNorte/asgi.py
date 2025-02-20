@@ -12,7 +12,7 @@ from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from financeiro.routing import websocket_urlpatterns  # Definiremos esse arquivo depois
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'seu_projeto.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ControlNorte.settings')
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
