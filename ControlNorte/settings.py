@@ -49,17 +49,9 @@ INSTALLED_APPS = [
     'financeiro',
     'crispy_forms',
     'crispy_bootstrap5',
-    'channels',
 
 ]
 
-ASGI_APPLICATION = 'seu_projeto.routing.application'
-
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",  # Use Redis em produção
-    },
-}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
