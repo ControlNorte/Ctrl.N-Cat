@@ -49,9 +49,16 @@ INSTALLED_APPS = [
     'financeiro',
     'crispy_forms',
     'crispy_bootstrap5',
-
+    'channels',
 ]
 
+ASGI_APPLICATION = "ControlNorte.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

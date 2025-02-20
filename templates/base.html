@@ -20,6 +20,21 @@
      <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
      {% block content %}
      {% endblock %}
+<script>
+    // Conectar ao WebSocket
+    const socket = new WebSocket("ws://localhost:8000/ws/notificacao/");
+
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        Swal.fire({
+            title: 'Nova Notificação!',
+            text: data.message,
+            icon: 'info',
+            confirmButtonText: 'Ok'
+        });
+    };
+</script>
+
 </body>
 
 </html>
