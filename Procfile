@@ -1,1 +1,1 @@
-web: daphne -b 0.0.0.0 -p $PORT ControlNorte.asgi:application
+web: python manage.py migrate && gunicorn --timeout 60 ControlNorte.wsgi --log-file -
