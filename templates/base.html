@@ -15,16 +15,60 @@
     {% endblock %}
 </head>
 <body class="text-gray-700 font-sans z-100">
+
+<div id="notificacao-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;"></div>
+
      {% include 'navbar.html' %}
      <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
      <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
      {% block content %}
      {% endblock %}
 <script>
+
+function mostrarNotificacao(mensagem) {
+    const container = document.getElementById("notificacao-container");
+
+    // Criar o elemento do popup
+    const popup = document.createElement("div");
+    popup.innerText = mensagem;
+    popup.style.cssText = `
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        margin: 10px;
+        border-radius: 5px;
+        font-size: 16px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        opacity: 1;
+        transition: opacity 0.5s ease-out;
+    `;
+
+    container.appendChild(popup);
+
+    // Remover a notificação após 15 segundos
+    setTimeout(() => {
+        popup.style.opacity = "0";
+        setTimeout(() => container.removeChild(popup), 500); // Espera a animação antes de remover
+    }, 15000);
+}
+
 const socket = new WebSocket("wss://" + window.location.host + "/ws/notificacao/");
 
 socket.onmessage = function(event) {
-    console.log("Nova notificação:", event.data);
+    const data = JSON.parse(event.data);
+    mostrarNotificacao(data.mensagem);  // Exibir a notificação recebida
+};
+
+socket.onopen = function() {
+    console.log("WebSocket conectado!");
+};
+
+socket.onerror = function(error) {
+    console.error("Erro no WebSocket:", error);
+};
+
+socket.onclose = function() {
+    console.warn("WebSocket desconectado!");
 };
 </script>
 
