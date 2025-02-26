@@ -21,18 +21,11 @@
      {% block content %}
      {% endblock %}
 <script>
-    // Conectar ao WebSocket
-    const socket = new WebSocket("wss://" + window.location.host + "/ws/notificacao/");
+const socket = new WebSocket("wss://" + window.location.host + "/ws/notificacao/");
 
-    socket.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        Swal.fire({
-            title: 'Nova Notificação!',
-            text: data.message,
-            icon: 'info',
-            confirmButtonText: 'Ok'
-        });
-    };
+socket.onmessage = function(event) {
+    console.log("Nova notificação:", event.data);
+};
 </script>
 
 </body>
