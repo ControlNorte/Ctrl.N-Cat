@@ -28,7 +28,6 @@
 function mostrarNotificacao(mensagem) {
     const container = document.getElementById("notificacao-container");
 
-    // Criar o elemento do popup
     const popup = document.createElement("div");
     popup.innerText = mensagem;
     popup.style.cssText = `
@@ -45,10 +44,9 @@ function mostrarNotificacao(mensagem) {
 
     container.appendChild(popup);
 
-    // Remover a notificação após 15 segundos
     setTimeout(() => {
         popup.style.opacity = "0";
-        setTimeout(() => container.removeChild(popup), 500); // Espera a animação antes de remover
+        setTimeout(() => container.removeChild(popup), 500);
     }, 15000);
 }
 
@@ -56,7 +54,11 @@ const socket = new WebSocket("wss://" + window.location.host + "/ws/notificacao/
 
 socket.onmessage = function(event) {
     const data = JSON.parse(event.data);
-    mostrarNotificacao(data.mensagem);  // Exibir a notificação recebida
+
+    // Verifica se há mensagem antes de exibir
+    if (data.mensagem && data.mensagem.trim() !== "") {
+        mostrarNotificacao(data.mensagem);
+    }
 };
 
 socket.onopen = function() {
