@@ -24,9 +24,14 @@
      {% block content %}
      {% endblock %}
 <script>
-
 function mostrarNotificacao(mensagem) {
-    const container = document.getElementById("notificacao-container");
+const container = document.getElementById("notificacao-container");
+
+    // Verifica se o container existe antes de adicionar notificações
+    if (!container) {
+        console.error("Erro: Container de notificações não encontrado.");
+        return;
+    }
 
     const popup = document.createElement("div");
     popup.innerText = mensagem;
@@ -40,37 +45,50 @@ function mostrarNotificacao(mensagem) {
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         opacity: 1;
         transition: opacity 0.5s ease-out;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
     `;
 
     container.appendChild(popup);
 
     setTimeout(() => {
         popup.style.opacity = "0";
-        setTimeout(() => container.removeChild(popup), 500);
+        setTimeout(() => {
+            if (popup.parentNode) {
+                container.removeChild(popup);
+            }
+        }, 500);
     }, 15000);
 }
 
-const socket = new WebSocket("wss://" + window.location.host + "/ws/notificacao/");
+    // Criando a conexão WebSocket de forma segura
+    const socket = new WebSocket(`wss://${encodeURIComponent(window.location.host)}/ws/notificacao/`);
 
-socket.onmessage = function(event) {
-    const data = JSON.parse(event.data);
+    socket.onmessage = function(event) {
+        try {
+            const data = JSON.parse(event.data);
 
-    // Verifica se há mensagem antes de exibir
-    if (data.mensagem && data.mensagem.trim() !== "") {
-        mostrarNotificacao(data.mensagem);
-    }
-};
+            // Verifica se há mensagem antes de exibir
+            if (data.mensagem && data.mensagem.trim() !== "") {
+                mostrarNotificacao(data.mensagem);
+            }
+        } catch (error) {
+            console.error("Erro ao processar mensagem WebSocket:", error);
+        }
+    };
 
-socket.onopen = function() {
-    console.log("WebSocket conectado!");
-};
+    socket.onopen = function() {
+        console.log("WebSocket conectado!");
+    };
 
-socket.onerror = function(error) {
-    console.error("Erro no WebSocket:", error);
-};
+    socket.onerror = function(error) {
+        console.error("Erro no WebSocket:", error);
+    };
 
-socket.onclose = function() {
-    console.warn("WebSocket desconectado!");
+    socket.onclose = function() {
+        console.warn("WebSocket desconectado!");
 };
 </script>
 
