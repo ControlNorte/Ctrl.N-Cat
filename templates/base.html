@@ -16,55 +16,60 @@
 </head>
 <body class="text-gray-700 font-sans z-100">
 
-<div id="notificacao-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;"></div>
-
      {% include 'navbar.html' %}
+
      <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
      <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-     {% block content %}
-     {% endblock %}
-<script>
-function mostrarNotificacao(mensagem) {
-const container = document.getElementById("notificacao-container");
+    {% block content %}
 
-    // Verifica se o container existe antes de adicionar notificações
-    if (!container) {
-        console.error("Erro: Container de notificações não encontrado.");
-        return;
+    <!-- Container para notificações -->
+    <div id="notificacao-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;"></div>
+
+    {% endblock %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    function mostrarNotificacao(mensagem) {
+        const container = document.getElementById("notificacao-container");
+
+        // Verifica se o container existe antes de adicionar notificações
+        if (!container) {
+            console.error("Erro: Container de notificações não encontrado.");
+            return;
+        }
+
+        const popup = document.createElement("div");
+        popup.innerText = mensagem;
+        popup.style.cssText = `
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        `;
+
+        container.appendChild(popup);
+
+        setTimeout(() => {
+            popup.style.opacity = "0";
+            setTimeout(() => {
+                if (popup.parentNode) {
+                    container.removeChild(popup);
+                }
+            }, 500);
+        }, 15000);
     }
 
-    const popup = document.createElement("div");
-    popup.innerText = mensagem;
-    popup.style.cssText = `
-        background-color: #28a745;
-        color: white;
-        padding: 10px 20px;
-        margin: 10px;
-        border-radius: 5px;
-        font-size: 16px;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        opacity: 1;
-        transition: opacity 0.5s ease-out;
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 1000;
-    `;
-
-    container.appendChild(popup);
-
-    setTimeout(() => {
-        popup.style.opacity = "0";
-        setTimeout(() => {
-            if (popup.parentNode) {
-                container.removeChild(popup);
-            }
-        }, 500);
-    }, 15000);
-}
-
-    // Criando a conexão WebSocket de forma segura
-    const socket = new WebSocket(`wss://${encodeURIComponent(window.location.host)}/ws/notificacao/`);
+    // Criando a conexão WebSocket
+    const socket = new WebSocket(`wss://${window.location.host}/ws/notificacao/`);
 
     socket.onmessage = function(event) {
         try {
@@ -89,7 +94,8 @@ const container = document.getElementById("notificacao-container");
 
     socket.onclose = function() {
         console.warn("WebSocket desconectado!");
-};
+    };
+});
 </script>
 
 </body>
