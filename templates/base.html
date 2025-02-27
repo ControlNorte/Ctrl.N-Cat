@@ -28,59 +28,54 @@
     {% endblock %}
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    function mostrarNotificacao(mensagem) {
-        const container = document.getElementById("notificacao-container");
+function mostrarNotificacao(mensagem) {
+    let container = document.getElementById("notificacao-container");
 
-        // Verifica se o container existe antes de adicionar notificações
-        if (!container) {
-            console.error("Erro: Container de notificações não encontrado.");
-            return;
-        }
-
-        const popup = document.createElement("div");
-        popup.innerText = mensagem;
-
-        container.appendChild(popup);
-
-        setTimeout(() => {
-            popup.style.opacity = "0";
-            setTimeout(() => {
-                if (popup.parentNode) {
-                    container.removeChild(popup);
-                }
-            }, 500);
-        }, 15000);
+    // Verifica se o container existe, caso contrário, cria um novo
+    if (!container) {
+        container = document.createElement("div");
+        container.id = "notificacao-container";
+        container.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        `;
+        document.body.appendChild(container);
     }
 
-    // Criando a conexão WebSocket
-    const socket = new WebSocket(`wss://${window.location.host}/ws/notificacao/`);
+    // Criar popup de notificação
+    const popup = document.createElement("div");
+    popup.innerText = mensagem;
+    popup.style.cssText = `
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 5px;
+        font-size: 16px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        opacity: 1;
+        transition: opacity 0.5s ease-out;
+        min-width: 250px;
+        text-align: center;
+    `;
 
-    socket.onmessage = function(event) {
-        try {
-            const data = JSON.parse(event.data);
+    container.appendChild(popup);
 
-            // Verifica se há mensagem antes de exibir
-            if (data.mensagem && data.mensagem.trim() !== "") {
-                mostrarNotificacao(data.mensagem);
+    // Remover a notificação após 15 segundos
+    setTimeout(() => {
+        popup.style.opacity = "0";
+        setTimeout(() => {
+            if (popup.parentNode) {
+                container.removeChild(popup);
             }
-        } catch (error) {
-            console.error("Erro ao processar mensagem WebSocket:", error);
-        }
-    };
-
-    socket.onopen = function() {
-        console.log("WebSocket conectado!");
-    };
-
-    socket.onerror = function(error) {
-        console.error("Erro no WebSocket:", error);
-    };
-
-    socket.onclose = function() {
-        console.warn("WebSocket desconectado!");
-    };
-});
+        }, 500);
+    }, 15000);
+}
 </script>
 
 </body>
