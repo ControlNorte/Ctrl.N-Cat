@@ -136,7 +136,7 @@ Financeiro | {{ dadoscliente }}
             },
           }),
         })
-           condole.log(accessToken)
+           console.log(accessToken)
           .then((response) => response.json())
           .then(({ accessToken }) => {
             const pluggyConnect = new PluggyConnect({
