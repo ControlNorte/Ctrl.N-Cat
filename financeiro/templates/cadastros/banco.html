@@ -132,7 +132,7 @@ Financeiro | {{ dadoscliente }}
           },
           body: JSON.stringify({
             options: {
-              clientUserId: 'user@example.com',
+              clientUserId: {{ pk }},
             },
           }),
         })
