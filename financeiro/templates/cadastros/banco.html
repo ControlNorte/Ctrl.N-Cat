@@ -136,9 +136,9 @@ Financeiro | {{ dadoscliente }}
             },
           }),
         })
-           console.log(accessToken)
           .then((response) => response.json())
           .then(({ accessToken }) => {
+            console.log(accessToken)
             const pluggyConnect = new PluggyConnect({
               connectToken: accessToken,
               includeSandbox: true,
