@@ -446,7 +446,7 @@ def banco(request):
         banco.save()
         return redirect('financeiro:banco')
     bancos = BancosCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('banco')
-    context = {'dadoscliente': dadoscliente, 'bancos': bancos, 'pk': str(pk)}
+    context = {'dadoscliente': dadoscliente, 'bancos': bancos, 'pk': pk}
     return render(request, 'cadastros/banco.html', context)
 
 

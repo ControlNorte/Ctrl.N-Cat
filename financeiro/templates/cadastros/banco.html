@@ -131,7 +131,7 @@ Financeiro | {{ dadoscliente }}
           },
           body: JSON.stringify({
             options: {
-              clientUserId: {{ pk }},
+              clientUserId: String({{ pk }}),
             },
           }),
         })
