@@ -362,7 +362,7 @@ def recice_webhook(request):
 def process_webhook(webhook):
     webhook = json.loads(webhook)
     event = webhook['event']
-
+    print(webhook)
     if event == 'transactions/created':
 
         # Criando acess_token
