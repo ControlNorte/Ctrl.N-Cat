@@ -22,7 +22,7 @@ from .models import BancosCliente, cadastro_de_cliente, Regra, MovimentacoesClie
 def handle_item_data(request):
     # Converte o corpo da requisição JSON em dicionário Python
     data = json.loads(request.body)
-
+    print(data)
     itemId = data['item']['id']
     banco = data['item']['connector']['name']
 
