@@ -22,7 +22,7 @@ from .models import BancosCliente, cadastro_de_cliente, Regra, MovimentacoesClie
 def handle_item_data(request):
     # Converte o corpo da requisição JSON em dicionário Python
     data = json.loads(request.body)
-    print(data)
+
     itemId = data['item']['id']
     banco = data['item']['connector']['name']
 
@@ -410,7 +410,7 @@ def process_webhook(webhook):
         response = requests.get(url, headers=headers)
 
         dados_banco = response.json()
-
+        print(dados_banco)
         transferNumber = dados_banco['results'][0]['bankData']['transferNumber']
 
         bancos = BancosCliente.objects.get(transferNumber=transferNumber)
