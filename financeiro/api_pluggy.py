@@ -399,9 +399,10 @@ def process_webhook(webhook):
 
         # Requisitando dados da conta
         accountId = webhook['accountId']
-        print(accountId)
 
         url = f"https://api.pluggy.ai/accounts/{accountId}"
+
+        print(url)
 
         headers = {
             "accept": "application/json",
