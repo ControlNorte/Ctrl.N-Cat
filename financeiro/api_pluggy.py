@@ -399,6 +399,7 @@ def process_webhook(webhook):
 
         # Requisitando dados da conta
         accountId = webhook['accountId']
+        print(accountId)
 
         url = f"https://api.pluggy.ai/accounts/{accountId}"
 
@@ -410,7 +411,7 @@ def process_webhook(webhook):
         response = requests.get(url, headers=headers)
 
         dados_banco = response.json()
-        print(dados_banco)
+
         transferNumber = dados_banco['results'][0]['bankData']['transferNumber']
 
         bancos = BancosCliente.objects.get(transferNumber=transferNumber)
