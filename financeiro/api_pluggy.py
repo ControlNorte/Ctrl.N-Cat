@@ -17,9 +17,21 @@ from asgiref.sync import async_to_sync
 from hpinicial.models import Tenant
 from .models import BancosCliente, cadastro_de_cliente, Regra, MovimentacoesCliente, TransicaoCliente, Saldo
 
+ambiente = "Teste"
+payload = {}
 
-@csrf_exempt  # Use apenas para testes; idealmente, configure o CSRF corretamente.
-def handle_item_data(request):
+if ambiente == "Teste":
+    payload = {
+        "clientId": "226a2d88-095c-4469-9943-1a3e6e3ae477",
+        "clientSecret": "58b103c9-2272-4f7d-a1ef-80dd015704dc"}
+else:
+    payload = {
+        "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
+        "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"}
+
+
+@csrf_exempt # Use apenas para testes; idealmente, configure o CSRF corretamente.
+def handle_item_data(request, payload):
     # Converte o corpo da requisição JSON em dicionário Python
     data = json.loads(request.body)
 
@@ -28,10 +40,10 @@ def handle_item_data(request):
 
     url = "https://api.pluggy.ai/auth"
 
-    payload = {
-        "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
-        "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
-    }
+    # payload = {
+    #     "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
+    #     "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
+    # }
     headers = {
         "accept": "application/json",
         "content-type": "application/json"
@@ -41,10 +53,10 @@ def handle_item_data(request):
 
     api_key = response.text
 
-    payload = {
-        "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
-        "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
-    }
+    # payload = {
+    #     "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
+    #     "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
+    # }
 
     headers = {
         "accept": "application/json",
@@ -359,7 +371,7 @@ def recice_webhook(request):
     return JsonResponse({'status': 'success', 'message': 'Webhook received successfully'}, status=200)
 
 
-def process_webhook(webhook):
+def process_webhook(webhook, payload):
     webhook = json.loads(webhook)
     event = webhook['event']
     print(webhook)
@@ -368,10 +380,10 @@ def process_webhook(webhook):
         # Criando acess_token
         url = "https://api.pluggy.ai/auth"
 
-        payload = {
-            "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
-            "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
-        }
+        # payload = {
+        #     "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
+        #     "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
+        # }
         headers = {
             "accept": "application/json",
             "content-type": "application/json"
@@ -381,10 +393,10 @@ def process_webhook(webhook):
 
         api_key = response.text
 
-        payload = {
-            "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
-            "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
-        }
+        # payload = {
+        #     "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
+        #     "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
+        # }
 
         headers = {
             "accept": "application/json",
@@ -579,10 +591,10 @@ def process_webhook(webhook):
         # Criando acess_token
         url = "https://api.pluggy.ai/auth"
 
-        payload = {
-            "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
-            "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
-        }
+        # payload = {
+        #     "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
+        #     "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
+        # }
         headers = {
             "accept": "application/json",
             "content-type": "application/json"
@@ -592,10 +604,10 @@ def process_webhook(webhook):
 
         api_key = response.text
 
-        payload = {
-            "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
-            "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
-        }
+        # payload = {
+        #     "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
+        #     "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
+        # }
 
         headers = {
             "accept": "application/json",
