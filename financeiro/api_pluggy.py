@@ -20,7 +20,7 @@ from .models import BancosCliente, cadastro_de_cliente, Regra, MovimentacoesClie
 @csrf_exempt # Use apenas para testes; idealmente, configure o CSRF corretamente.
 def handle_item_data(request):
 
-    ambiente = "Teste"
+    ambiente = "Desenvolvimento"
 
     if ambiente == "Teste":
         payload = {
