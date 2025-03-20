@@ -457,6 +457,8 @@ def process_webhook(webhook):
                 data = result['date']
                 data = datetime.strptime(data, '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%Y-%m-%d')
 
+                print(valor)
+
                 registro = {
                     'data': data,
                     'descricao': descricao,
@@ -499,7 +501,6 @@ def process_webhook(webhook):
 
             # Itera pelas correspondências usando o autômato
             for _, (_, regra) in A.iter(descricao):
-                print(dado['valor'])
                 movimentacoes_to_create.append(MovimentacoesCliente(
                     tenant_id=tenant,
                     cliente_id=cliente,
