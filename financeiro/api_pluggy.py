@@ -355,7 +355,8 @@ def handle_item_data(request):
 @csrf_exempt
 def recice_webhook(request):
     webhook = request.body
-    if webhook == "":
+
+    if not webhook:
         print("Vazio")
     else:
         print("diferente")
