@@ -357,9 +357,7 @@ def recice_webhook(request):
     webhook = request.body
 
     if not webhook:
-        print("Vazio")
-    else:
-        print("diferente")
+        webhook = "Sem transações a serem lançadas"
 
     print(webhook)
     threading.Thread(target=process_webhook, args=(webhook,)).start()
@@ -367,6 +365,9 @@ def recice_webhook(request):
 
 
 def process_webhook(webhook):
+    if webhook == "Sem transações a serem lançadas":
+        return print(webhook)
+
     webhook = json.loads(webhook)
     event = webhook['event']
 
@@ -421,7 +422,7 @@ def process_webhook(webhook):
         response = requests.get(url, headers=headers)
 
         dados_banco = response.json()
-
+        print(dados_banco)
         transferNumber = dados_banco['results'][0]['bankData']['transferNumber']
 
         bancos = BancosCliente.objects.get(transferNumber=transferNumber)
