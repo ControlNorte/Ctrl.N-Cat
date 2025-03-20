@@ -355,6 +355,7 @@ def handle_item_data(request):
 @csrf_exempt
 def recice_webhook(request):
     webhook = request.body
+    print(webhook)
     threading.Thread(target=process_webhook, args=(webhook,)).start()
     return JsonResponse({'status': 'success', 'message': 'Webhook received successfully'}, status=200)
 
