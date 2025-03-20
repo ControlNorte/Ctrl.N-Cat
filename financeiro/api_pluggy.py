@@ -357,6 +357,8 @@ def recice_webhook(request):
     webhook = request.body
     if webhook == "":
         print("Vazio")
+    else:
+        print("diferente")
 
     print(webhook)
     threading.Thread(target=process_webhook, args=(webhook,)).start()
