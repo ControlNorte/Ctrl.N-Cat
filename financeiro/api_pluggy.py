@@ -17,22 +17,20 @@ from asgiref.sync import async_to_sync
 from hpinicial.models import Tenant
 from .models import BancosCliente, cadastro_de_cliente, Regra, MovimentacoesCliente, TransicaoCliente, Saldo
 
-ambiente = "Teste"
-payload = {}
-
-if ambiente == "Teste":
-    payload = {
-        "clientId": "226a2d88-095c-4469-9943-1a3e6e3ae477",
-        "clientSecret": "58b103c9-2272-4f7d-a1ef-80dd015704dc"}
-else:
-    payload = {
-        "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
-        "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"}
-
-print(payload)
-
 @csrf_exempt # Use apenas para testes; idealmente, configure o CSRF corretamente.
-def handle_item_data(request, payload):
+def handle_item_data(request):
+
+    ambiente = "Teste"
+
+    if ambiente == "Teste":
+        payload = {
+            "clientId": "226a2d88-095c-4469-9943-1a3e6e3ae477",
+            "clientSecret": "58b103c9-2272-4f7d-a1ef-80dd015704dc"}
+    else:
+        payload = {
+            "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
+            "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"}
+
     # Converte o corpo da requisição JSON em dicionário Python
     data = json.loads(request.body)
 
@@ -372,10 +370,21 @@ def recice_webhook(request):
     return JsonResponse({'status': 'success', 'message': 'Webhook received successfully'}, status=200)
 
 
-def process_webhook(webhook, payload):
+def process_webhook(webhook):
     webhook = json.loads(webhook)
     event = webhook['event']
-    print(webhook)
+
+    ambiente = "Teste"
+
+    if ambiente == "Teste":
+        payload = {
+            "clientId": "226a2d88-095c-4469-9943-1a3e6e3ae477",
+            "clientSecret": "58b103c9-2272-4f7d-a1ef-80dd015704dc"}
+    else:
+        payload = {
+            "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
+            "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"}
+
     if event == 'transactions/created':
 
         # Criando acess_token
