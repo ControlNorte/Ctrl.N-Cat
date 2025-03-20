@@ -423,7 +423,7 @@ def process_webhook(webhook):
 
         dados_banco = response.json()
         print(dados_banco)
-        transferNumber = dados_banco['results'][0]['bankData']['transferNumber']
+        transferNumber = dados_banco['bankData']['transferNumber']
 
         bancos = BancosCliente.objects.get(transferNumber=transferNumber)
         cliente = bancos.cliente
