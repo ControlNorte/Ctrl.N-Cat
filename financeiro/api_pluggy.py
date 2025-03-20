@@ -359,7 +359,7 @@ def recice_webhook(request):
     if not webhook:
         webhook = "Sem transações a serem lançadas"
 
-    print(webhook)
+    # print(webhook)
     threading.Thread(target=process_webhook, args=(webhook,)).start()
     return JsonResponse({'status': 'success', 'message': 'Webhook received successfully'}, status=200)
 
@@ -371,7 +371,7 @@ def process_webhook(webhook):
     webhook = json.loads(webhook)
     event = webhook['event']
 
-    print(webhook)
+    # print(webhook)
 
     ambiente = "Teste"
 
@@ -422,7 +422,7 @@ def process_webhook(webhook):
         response = requests.get(url, headers=headers)
 
         dados_banco = response.json()
-        print(dados_banco)
+        # print(dados_banco)
         transferNumber = dados_banco['bankData']['transferNumber']
 
         bancos = BancosCliente.objects.get(transferNumber=transferNumber)
@@ -457,7 +457,7 @@ def process_webhook(webhook):
                 data = result['date']
                 data = datetime.strptime(data, '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%Y-%m-%d')
 
-                print(valor)
+                # print(valor)
 
                 registro = {
                     'data': data,
