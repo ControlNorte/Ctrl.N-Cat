@@ -67,7 +67,8 @@ def cadastrarcliente(request):
                                                             principais_fornecedores=dados.get('fornecedores'),
                                                             observacoes=dados.get('observacoes'),
                                                             sugestoes=dados.get('sugestoes'),
-                                                            historico=dados.get('historico'))
+                                                            historico=dados.get('historico'),
+                                                            tenant=request.tenant)
             novocliente.save()
 
     ramos = Ramo.objects.all()
