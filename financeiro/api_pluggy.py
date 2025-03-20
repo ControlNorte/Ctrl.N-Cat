@@ -39,23 +39,14 @@ def handle_item_data(request):
 
     url = "https://api.pluggy.ai/auth"
 
-    # payload = {
-    #     "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
-    #     "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
-    # }
     headers = {
         "accept": "application/json",
         "content-type": "application/json"
     }
-    print(payload)
+
     response = requests.post(url, json=payload, headers=headers)
 
     api_key = response.text
-
-    # payload = {
-    #     "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
-    #     "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
-    # }
 
     headers = {
         "accept": "application/json",
@@ -173,8 +164,6 @@ def handle_item_data(request):
 
             cliente = bancos.cliente
             tenant = bancos.tenant
-            print(cliente)
-            print(tenant)
 
             url = "https://api.pluggy.ai/transactions"
 
@@ -197,7 +186,7 @@ def handle_item_data(request):
             response = requests.get(url, headers=headers)
 
             results = (response.json())
-            print(results)
+
             results = results['results']
 
             dados = []
@@ -374,6 +363,8 @@ def process_webhook(webhook):
     webhook = json.loads(webhook)
     event = webhook['event']
 
+    print(webhook)
+
     ambiente = "Teste"
 
     if ambiente == "Teste":
@@ -390,10 +381,6 @@ def process_webhook(webhook):
         # Criando acess_token
         url = "https://api.pluggy.ai/auth"
 
-        # payload = {
-        #     "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
-        #     "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
-        # }
         headers = {
             "accept": "application/json",
             "content-type": "application/json"
@@ -402,11 +389,6 @@ def process_webhook(webhook):
         response = requests.post(url, json=payload, headers=headers)
 
         api_key = response.text
-
-        # payload = {
-        #     "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
-        #     "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
-        # }
 
         headers = {
             "accept": "application/json",
@@ -423,8 +405,6 @@ def process_webhook(webhook):
         accountId = webhook['accountId']
 
         url = f"https://api.pluggy.ai/accounts/{accountId}"
-
-        print(url)
 
         headers = {
             "accept": "application/json",
@@ -451,7 +431,7 @@ def process_webhook(webhook):
         response = requests.get(url, headers=headers)
 
         results = (response.json())
-        print(results)
+
         results = results['results']
 
         dados = []
@@ -601,10 +581,6 @@ def process_webhook(webhook):
         # Criando acess_token
         url = "https://api.pluggy.ai/auth"
 
-        # payload = {
-        #     "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
-        #     "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
-        # }
         headers = {
             "accept": "application/json",
             "content-type": "application/json"
@@ -613,11 +589,6 @@ def process_webhook(webhook):
         response = requests.post(url, json=payload, headers=headers)
 
         api_key = response.text
-
-        # payload = {
-        #     "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
-        #     "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"
-        # }
 
         headers = {
             "accept": "application/json",
@@ -670,8 +641,6 @@ def process_webhook(webhook):
 
         cliente = bancos.cliente
         tenant = bancos.tenant
-        print(cliente)
-        print(tenant)
 
         url = "https://api.pluggy.ai/transactions"
 
@@ -694,7 +663,6 @@ def process_webhook(webhook):
         response = requests.get(url, headers=headers)
 
         results = (response.json())
-        print(results)
         results = results['results']
 
         dados = []
