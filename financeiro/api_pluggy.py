@@ -29,6 +29,7 @@ else:
         "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
         "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"}
 
+print(payload)
 
 @csrf_exempt # Use apenas para testes; idealmente, configure o CSRF corretamente.
 def handle_item_data(request, payload):
@@ -48,7 +49,7 @@ def handle_item_data(request, payload):
         "accept": "application/json",
         "content-type": "application/json"
     }
-
+    print(payload)
     response = requests.post(url, json=payload, headers=headers)
 
     api_key = response.text
