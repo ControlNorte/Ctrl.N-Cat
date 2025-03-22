@@ -33,7 +33,7 @@ def handle_item_data(request):
 
     # Converte o corpo da requisição JSON em dicionário Python
     data = json.loads(request.body)
-    print(data)
+
     itemId = data['item']['id']
     banco = data['item']['connector']['name']
 
@@ -336,6 +336,7 @@ def handle_item_data(request):
             return JsonResponse({'message': f'Banco cadastrado com seucesso! Importamos {conciliados} movimentações para te ajudar!'}, status=200)
 
         except Exception as e:
+            print("Erro")
             return JsonResponse({'error': str(e)}, status=400)
 
         # Enviar mensagem via WebSocket
