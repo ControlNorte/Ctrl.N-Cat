@@ -35,6 +35,7 @@ def handle_item_data(request):
     data = json.loads(request.body)
 
     itemId = data['item']['id']
+    print(itemId)
     banco = data['item']['connector']['name']
 
     url = "https://api.pluggy.ai/auth"
@@ -58,7 +59,7 @@ def handle_item_data(request):
 
     access_token = response.text
     access_token = json.loads(access_token)
-
+    print(access_token)
     if request.method == 'POST':
         try:
             # Lista de contas
@@ -74,7 +75,7 @@ def handle_item_data(request):
                 "accept": "application/json",
                 "X-API-KEY": access_token['apiKey']
             }
-
+            print(url)
             response = requests.get(url, headers=headers)
 
             dados_banco = response.json()
