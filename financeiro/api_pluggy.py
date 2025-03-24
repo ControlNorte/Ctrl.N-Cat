@@ -51,7 +51,7 @@ def handle_item_data(request):
         "X-API-KEY": api_key
     }
 
-    response = requests.post(url, json=payload, headers=headers)
+    response = requests.post(url, headers=headers)
 
     access_token = response.text
     access_token = json.loads(access_token)
