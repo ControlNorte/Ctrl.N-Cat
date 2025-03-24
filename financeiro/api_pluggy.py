@@ -55,6 +55,7 @@ def handle_item_data(request):
 
     access_token = response.text
     access_token = json.loads(access_token)
+    print("Sim")
     print(access_token)
 
     if request.method == 'POST':
