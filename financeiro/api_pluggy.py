@@ -50,6 +50,8 @@ def handle_item_data(request):
 
     api_key = response.text
 
+    url = "https://api.pluggy.ai/connect_token"
+
     headers = {
         "accept": "application/json",
         "content-type": "application/json",
