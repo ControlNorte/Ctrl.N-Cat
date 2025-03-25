@@ -139,6 +139,7 @@ Financeiro | {{ dadoscliente }}
           .then(({ accessToken }) => {
             const pluggyConnect = new PluggyConnect({
               connectToken: accessToken,
+              console.log(accessToken),
               includeSandbox: true,
               onSuccess: (itemData) => {
               // Enviar itemData para o backend
