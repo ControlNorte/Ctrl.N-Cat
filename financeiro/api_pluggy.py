@@ -61,7 +61,6 @@ def handle_item_data(request):
 
     access_token = response.text
     access_token = json.loads(access_token)
-    print(access_token)
 
     if request.method == 'POST':
         try:
@@ -76,7 +75,7 @@ def handle_item_data(request):
 
             headers = {
                 "accept": "application/json",
-                "X-API-KEY": access_token['access_token']
+                "X-API-KEY": access_token['accessToken']
             }
 
             response = requests.get(url, headers=headers)
