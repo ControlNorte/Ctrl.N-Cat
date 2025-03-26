@@ -30,10 +30,7 @@ def handle_item_data(request):
     body = json.loads(request.body.decode("utf-8"))  # Converte o corpo da requisição para um dicionário
     accessToken = body.get("accessToken")  # Obtém o token do JSON
 
-
     itemId = data['itemData']['item']['id']
-    print(accessToken)
-    print(itemId)
 
     banco = data['itemData']['item']['connector']['name']
     #
@@ -81,11 +78,9 @@ def handle_item_data(request):
             response = requests.get(url, headers=headers)
 
             dados_banco = response.json()
-            print(dados_banco)
 
-            dados_banco = dados_banco['results']['number']
-            transferNumber = dados_banco
-
+            transferNumber = dados_banco['results']['number']
+            print(transferNumber)
             # Pegar o primeiro número
             first_number = dados_banco
 
