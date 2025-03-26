@@ -29,11 +29,13 @@ def handle_item_data(request):
     data = json.loads(request.body)
     body = json.loads(request.body.decode("utf-8"))  # Converte o corpo da requisição para um dicionário
     accessToken = body.get("accessToken")  # Obtém o token do JSON
-    print(data)
-    print(accessToken)
-    itemId = data['itemData']['item']['id']
 
-    # banco = data['item']['connector']['name']
+
+    itemId = data['itemData']['item']['id']
+    print(accessToken)
+    print(itemId)
+
+    banco = data['item']['connector']['name']
     #
     # url = "https://api.pluggy.ai/auth"
     #
@@ -73,7 +75,7 @@ def handle_item_data(request):
 
             headers = {
                 "accept": "application/json",
-                "X-API-KEY": access_token['accessToken']
+                "X-API-KEY": accessToken
             }
 
             response = requests.get(url, headers=headers)
@@ -133,7 +135,7 @@ def handle_item_data(request):
 
             headers = {
                 "accept": "application/json",
-                "X-API-KEY": access_token['accessToken']
+                "X-API-KEY": accessToken
             }
 
             response = requests.get(url, headers=headers)
@@ -152,7 +154,7 @@ def handle_item_data(request):
 
             headers = {
                 "accept": "application/json",
-                "X-API-KEY": access_token['accessToken']
+                "X-API-KEY": accessToken
             }
 
             response = requests.get(url, headers=headers)
@@ -182,7 +184,7 @@ def handle_item_data(request):
 
             headers = {
                 "accept": "application/json",
-                "X-API-KEY": access_token['accessToken']
+                "X-API-KEY": accessToken
             }
 
             response = requests.get(url, headers=headers)
