@@ -79,7 +79,7 @@ def handle_item_data(request):
 
             headers = {
                 "accept": "application/json",
-                "X-API-KEY": access_token['apiKey']
+                "X-API-KEY": access_token['access_token']
             }
 
             response = requests.get(url, headers=headers)
