@@ -27,7 +27,9 @@ def handle_item_data(request):
 
     # Converte o corpo da requisição JSON em dicionário Python
     data = json.loads(request.body)
+    accessToken = json.loads(request.accessToken)
     print(data)
+    print(accessToken)
     itemId = data['item']['id']
 
     banco = data['item']['connector']['name']

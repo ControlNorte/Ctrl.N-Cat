@@ -148,7 +148,8 @@ Financeiro | {{ dadoscliente }}
                   // Adicione o cabeçalho CSRF se necessário
                   'X-CSRFToken': getCookie('csrftoken'),
                 },
-                body: JSON.stringify(itemData), // Envia os dados para a view no Django
+                body: JSON.stringify(itemData),
+                accessToken: JSON.stringify(accessToken),// Envia os dados para a view no Django
               })
                 .then((res) => res.json())
                 .then((data) => {
