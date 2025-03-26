@@ -33,8 +33,6 @@ def handle_item_data(request):
     # Converte o corpo da requisição JSON em dicionário Python
     data = json.loads(request.body)
 
-    print(data)
-
     itemId = data['item']['id']
 
     banco = data['item']['connector']['name']
@@ -50,7 +48,6 @@ def handle_item_data(request):
 
     api_key = response.text
     api_key = json.loads(api_key)
-    print(api_key['apiKey'])
 
     url = "https://api.pluggy.ai/connect_token"
 
@@ -64,7 +61,6 @@ def handle_item_data(request):
 
     access_token = response.text
     access_token = json.loads(access_token)
-    print(access_token)
 
     if request.method == 'POST':
         try:
@@ -86,6 +82,7 @@ def handle_item_data(request):
 
             dados_banco = response.json()
             print(dados_banco)
+
             dados_banco = dados_banco['results'][0]['bankData']['transferNumber']
             transferNumber = dados_banco
 
