@@ -83,7 +83,7 @@ def handle_item_data(request):
             dados_banco = response.json()
             print(dados_banco)
 
-            dados_banco = dados_banco['results'][0]['bankData']['transferNumber']
+            dados_banco = dados_banco['results']['number']
             transferNumber = dados_banco
 
             # Pegar o primeiro número
