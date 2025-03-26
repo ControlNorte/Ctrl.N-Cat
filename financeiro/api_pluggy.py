@@ -21,8 +21,8 @@ from .models import BancosCliente, cadastro_de_cliente, Regra, MovimentacoesClie
 def handle_item_data(request):
 
     payload = {
-        "clientId": "226a2d88-095c-4469-9943-1a3e6e3ae477",
-        "clientSecret": "58b103c9-2272-4f7d-a1ef-80dd015704dc"}
+        "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
+        "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"}
 
 
     # Converte o corpo da requisição JSON em dicionário Python
@@ -130,7 +130,7 @@ def handle_item_data(request):
 
             headers = {
                 "accept": "application/json",
-                "X-API-KEY": access_token['apiKey']
+                "X-API-KEY": access_token['accessToken']
             }
 
             response = requests.get(url, headers=headers)
@@ -149,7 +149,7 @@ def handle_item_data(request):
 
             headers = {
                 "accept": "application/json",
-                "X-API-KEY": access_token['apiKey']
+                "X-API-KEY": access_token['accessToken']
             }
 
             response = requests.get(url, headers=headers)
@@ -179,7 +179,7 @@ def handle_item_data(request):
 
             headers = {
                 "accept": "application/json",
-                "X-API-KEY": access_token['apiKey']
+                "X-API-KEY": access_token['accessToken']
             }
 
             response = requests.get(url, headers=headers)
