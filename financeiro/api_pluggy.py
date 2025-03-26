@@ -50,14 +50,14 @@ def handle_item_data(request):
 
     api_key = response.text
     api_key = json.loads(api_key)
-    print(api_key)
+    print(api_key['apiKey'])
 
     url = "https://api.pluggy.ai/connect_token"
 
     headers = {
         "accept": "application/json",
         "content-type": "application/json",
-        "X-API-KEY": api_key
+        "X-API-KEY": api_key['apiKey']
     }
 
     response = requests.post(url, headers=headers)
