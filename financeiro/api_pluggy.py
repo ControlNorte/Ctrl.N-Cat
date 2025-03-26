@@ -35,7 +35,7 @@ def handle_item_data(request):
     print(accessToken)
     print(itemId)
 
-    banco = data['item']['connector']['name']
+    banco = data['itemData']['item']['connector']['name']
     #
     # url = "https://api.pluggy.ai/auth"
     #
