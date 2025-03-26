@@ -78,7 +78,7 @@ def handle_item_data(request):
             response = requests.get(url, headers=headers)
 
             dados_banco = response.json()
-
+            print(dados_banco)
             transferNumber = dados_banco['results']['number']
             print(transferNumber)
             # Pegar o primeiro número
