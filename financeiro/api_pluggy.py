@@ -126,7 +126,7 @@ def handle_item_data(request):
 
         headers = {
             "accept": "application/json",
-            "X-API-KEY": api_key['apiKey']
+            "X-API-KEY": api_key
         }
 
         response = requests.get(url, headers=headers)
