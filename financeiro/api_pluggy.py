@@ -21,11 +21,6 @@ from .models import BancosCliente, cadastro_de_cliente, Regra, MovimentacoesClie
 @csrf_exempt # Use apenas para testes; idealmente, configure o CSRF corretamente.
 def handle_item_data(request):
 
-    payload = {
-        "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
-        "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"}
-
-
     # Converte o corpo da requisição JSON em dicionário Python
     data = json.loads(request.body)
     body = json.loads(request.body.decode("utf-8"))  # Converte o corpo da requisição para um dicionário
@@ -34,6 +29,11 @@ def handle_item_data(request):
     itemId = data['itemData']['item']['id']
 
     banco = data['itemData']['item']['connector']['name']
+
+
+    payload = {
+        "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
+        "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"}
 
     url = "https://api.pluggy.ai/auth"
 
@@ -53,14 +53,14 @@ def handle_item_data(request):
         url = f"https://api.pluggy.ai/accounts"
 
         params = {"itemId": itemId,
-                  "type": "BANK"}
+                  }
 
         query_string = urlencode(params)
         url = f"{url}?{query_string}"
 
         headers = {
             "accept": "application/json",
-            "X-API-KEY": api_key['apiKey']
+            "X-API-KEY": accessToken
         }
 
         response = requests.get(url, headers=headers)
