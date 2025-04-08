@@ -13,6 +13,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from win32print import PRINTER_ENUM_CONTAINER
 
 from hpinicial.models import Tenant
 from .models import BancosCliente, cadastro_de_cliente, Regra, MovimentacoesCliente, TransicaoCliente, Saldo
@@ -180,7 +181,7 @@ def handle_item_data(request):
         results = (response.json())
 
         results = results['results']
-
+        print(results)
         dados = []
 
         tenant = Tenant.objects.get(nome=tenant)
