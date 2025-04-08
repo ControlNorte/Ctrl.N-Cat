@@ -84,7 +84,7 @@ def handle_item_data(request):
 
 
         separated_parts = re.split(r'[/-]', transferNumber)
-        print(separated_parts)
+
         # Atribuir às variáveis
         agencia = separated_parts[0]
         conta = separated_parts[1]
@@ -98,8 +98,6 @@ def handle_item_data(request):
         dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
         bancos = BancosCliente.objects.filter(transferNumber=transferNumber)
-
-        print(f'{request.tenant},{dadoscliente}, {banco}, {agencia}, {conta}, {digito}, {transferNumber}')
 
         if not bancos.exists():
             banco = BancosCliente.objects.create(
@@ -152,7 +150,7 @@ def handle_item_data(request):
         #
         # transferNumber = dados_banco['results'][0]['bankData']['transferNumber']
         accountId = dados_banco['results'][0]['id']
-
+        print(accountId)
         bancos = BancosCliente.objects.get(transferNumber=transferNumber)
 
         cliente = bancos.cliente
@@ -161,8 +159,10 @@ def handle_item_data(request):
         url = "https://api.pluggy.ai/transactions"
 
         to_date = date.today()
-        from_date = to_date - timedelta(days=30)
-
+        print(to_date)
+        from_date = to_date - timedelta(days=31)
+        print(from_date)
+        print(accessToken)
         params = {"accountId": accountId,
                   "from": from_date,
                   "to": to_date,
