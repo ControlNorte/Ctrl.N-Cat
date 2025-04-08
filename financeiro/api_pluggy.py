@@ -80,7 +80,7 @@ def handle_item_data(request):
         dados_banco = response.json()
 
         transferNumber = dados_banco['results'][0]['number']
-
+        print(dados_banco)
         # Pegar o primeiro número
         first_number = dados_banco
 
@@ -106,7 +106,7 @@ def handle_item_data(request):
         dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
         bancos = BancosCliente.objects.filter(transferNumber=transferNumber)
-        print(f'{request.tenant}, {dadoscliente}, {banco}, {agencia}, {conta}, {digito}, {transferNumber}')
+        print(f'{conta}')
 
         if not bancos.exists():
             banco = BancosCliente.objects.create(
