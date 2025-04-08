@@ -179,9 +179,9 @@ def handle_item_data(request):
         response = requests.get(url, headers=headers)
 
         results = (response.json())
-
-        results = results['results']
         print(results)
+        results = results['results']
+
         dados = []
 
         tenant = Tenant.objects.get(nome=tenant)
