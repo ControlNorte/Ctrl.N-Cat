@@ -150,7 +150,7 @@ def handle_item_data(request):
         #
         # transferNumber = dados_banco['results'][0]['bankData']['transferNumber']
         accountId = dados_banco['results'][0]['id']
-        print(accountId)
+
         bancos = BancosCliente.objects.get(transferNumber=transferNumber)
 
         cliente = bancos.cliente
@@ -159,10 +159,8 @@ def handle_item_data(request):
         url = "https://api.pluggy.ai/transactions"
 
         to_date = date.today()
-        print(to_date)
         from_date = to_date - timedelta(days=31)
-        print(from_date)
-        print(accessToken)
+
         params = {"accountId": accountId,
                   "from": from_date,
                   "to": to_date,
@@ -179,17 +177,15 @@ def handle_item_data(request):
         response = requests.get(url, headers=headers)
 
         results = (response.json())
-        print(results)
         results = results['results']
 
         dados = []
-
+        print(bancos)
         tenant = Tenant.objects.get(nome=tenant)
         tenant = tenant.id
         cliente = cadastro_de_cliente.objects.get(razao_social=cliente)
         cliente = cliente.id
-        banco = BancosCliente.objects.get(banco=banco)
-        banco = banco.id
+        banco = bancos.id
 
         for result in results:
             if result['status'] == 'POSTED':
