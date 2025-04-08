@@ -1,4 +1,5 @@
 import datetime
+import time
 from datetime import *
 from urllib.parse import urlencode
 
@@ -366,8 +367,7 @@ def process_webhook(webhook):
         else:
             return print("Não é conta bancária")
 
-        print(transferNumber)
-
+        time.sleep(10)
         bancos = BancosCliente.objects.get(transferNumber=transferNumber)
         cliente = bancos.cliente
         tenant = bancos.tenant
