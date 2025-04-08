@@ -83,7 +83,7 @@ def handle_item_data(request):
 
 
         separated_parts = re.split(r'[/-]', transferNumber)
-
+        print(separated_parts)
         # Atribuir às variáveis
         agencia = separated_parts[1]
         conta = separated_parts[2]
