@@ -80,23 +80,14 @@ def handle_item_data(request):
         dados_banco = response.json()
 
         transferNumber = dados_banco['results'][0]['number']
-        print(transferNumber)
-        # Pegar o primeiro número
-        first_number = dados_banco
 
-        if '/' in dados_banco:
-            # Separar usando regex
-            separated_parts = re.split(r'[/-]', first_number)
 
-            # Atribuir às variáveis
-            agencia = separated_parts[1]
-            conta = separated_parts[2]
-            digito = separated_parts[3]
+        separated_parts = re.split(r'[/-]', transferNumber)
 
-        else:
-            agencia = 0
-            conta = dados_banco
-            digito = 0
+        # Atribuir às variáveis
+        agencia = separated_parts[1]
+        conta = separated_parts[2]
+        digito = separated_parts[3]
 
         # Criando banco no banco de dados
         pk = request.session.get('dadoscliente')
@@ -106,7 +97,6 @@ def handle_item_data(request):
         dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
         bancos = BancosCliente.objects.filter(transferNumber=transferNumber)
-        print(f'{conta}')
 
         if not bancos.exists():
             banco = BancosCliente.objects.create(
