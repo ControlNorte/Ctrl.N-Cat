@@ -54,7 +54,7 @@ def handle_item_data(request):
         url = f"https://api.pluggy.ai/accounts"
 
         params = {"itemId": itemId,
-                  }
+                  "type": "BANK"}
 
         query_string = urlencode(params)
         url = f"{url}?{query_string}"
