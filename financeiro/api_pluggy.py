@@ -46,7 +46,7 @@ def handle_item_data(request):
 
     api_key = response.text
     api_key = json.loads(api_key)
-
+    print(api_key)
     if request.method == 'POST':
         # try:
         # Lista de contas
@@ -60,7 +60,7 @@ def handle_item_data(request):
 
         headers = {
             "accept": "application/json",
-            "X-API-KEY": api_key['api_key']
+            "X-API-KEY": api_key
         }
 
         response = requests.get(url, headers=headers)
