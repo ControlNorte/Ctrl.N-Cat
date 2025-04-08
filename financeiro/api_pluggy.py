@@ -367,7 +367,20 @@ def process_webhook(webhook):
         else:
             return print("Não é conta bancária")
 
-        time.sleep(10)
+        timeout = 10
+        start_time = time.time()
+        bancos = None
+
+        while time.time() - start_time < timeout:
+            try:
+                bancos = BancosCliente.objects.get(transferNumber=transferNumber)
+                break
+            except BancosCliente.DoesNotExist:
+                time.sleep(1)  # espera 1 segundo e tenta de novo
+
+        if not bancos:
+            raise Exception("BancosCliente com transferNumber não encontrado após 10 segundos")
+
         bancos = BancosCliente.objects.get(transferNumber=transferNumber)
         cliente = bancos.cliente
         tenant = bancos.tenant
