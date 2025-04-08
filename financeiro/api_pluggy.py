@@ -359,10 +359,14 @@ def process_webhook(webhook):
         response = requests.get(url, headers=headers)
 
         dados_banco = response.json()
+        print(dados_banco)
+
         if dados_banco['type'] == "BANK":
             transferNumber = dados_banco['bankData']['transferNumber']
         else:
             return print("Não é conta bancária")
+
+        print(transferNumber)
 
         bancos = BancosCliente.objects.get(transferNumber=transferNumber)
         cliente = bancos.cliente
