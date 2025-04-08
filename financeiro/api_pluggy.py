@@ -67,11 +67,8 @@ def handle_item_data(request):
         response = requests.get(url, headers=headers)
 
         dados_banco = response.json()
-        print(dados_banco)
-        print(itemId)
-        print(accessToken)
 
-        transferNumber = dados_banco['bankData']['transferNumber']
+        transferNumber = dados_banco['results'][0]['bankData']['transferNumber']
 
         separated_parts = re.split(r'[/-]', transferNumber)
 
