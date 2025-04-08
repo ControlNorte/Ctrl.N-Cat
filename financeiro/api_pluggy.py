@@ -98,6 +98,8 @@ def handle_item_data(request):
 
         bancos = BancosCliente.objects.filter(transferNumber=transferNumber)
 
+        print(f'{request.tenant},{dadoscliente}, {banco}, {agencia}, {conta}, {digito}, {transferNumber}')
+
         if not bancos.exists():
             banco = BancosCliente.objects.create(
                 tenant=request.tenant,
