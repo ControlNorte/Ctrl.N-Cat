@@ -360,7 +360,7 @@ def process_webhook(webhook):
 
     webhook = json.loads(webhook)
     event = webhook['event']
-    print(webhook)
+
     payload = {
         "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
         "clientSecret": "6ec284c2-cc80-4718-a2d2-5efc1aeb6d52"}
@@ -393,7 +393,7 @@ def process_webhook(webhook):
 
         # Requisitando dados da conta
         accountId = webhook['accountId']
-        print(f'accountID: {accountId}')
+
         url = f"https://api.pluggy.ai/accounts/{accountId}"
 
         headers = {
@@ -404,8 +404,10 @@ def process_webhook(webhook):
         response = requests.get(url, headers=headers)
 
         dados_banco = response.json()
-        print(f'dados: {dados_banco}')
-        transferNumber = dados_banco['bankData']['transferNumber']
+        if dados_banco['type'] == "BANK":
+            transferNumber = dados_banco['bankData']['transferNumber']
+        else:
+            return print("Não é conta bancária")
 
         bancos = BancosCliente.objects.get(transferNumber=transferNumber)
         cliente = bancos.cliente
