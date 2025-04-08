@@ -34,18 +34,18 @@ def handle_item_data(request):
     itemId = data['itemData']['item']['id']
 
     banco = data['itemData']['item']['connector']['name']
-    #
-    # url = "https://api.pluggy.ai/auth"
-    #
-    # headers = {
-    #     "accept": "application/json",
-    #     "content-type": "application/json"
-    # }
-    #
-    # response = requests.post(url, json=payload, headers=headers)
-    #
-    # api_key = response.text
-    # api_key = json.loads(api_key)
+
+    url = "https://api.pluggy.ai/auth"
+
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/json"
+    }
+
+    response = requests.post(url, json=payload, headers=headers)
+
+    api_key = response.text
+    api_key = json.loads(api_key)
     #
     # url = "https://api.pluggy.ai/connect_token"
     #
@@ -173,7 +173,7 @@ def handle_item_data(request):
 
         headers = {
             "accept": "application/json",
-            "X-API-KEY": accessToken
+            "X-API-KEY": api_key['apiKey']
         }
 
         response = requests.get(url, headers=headers)
