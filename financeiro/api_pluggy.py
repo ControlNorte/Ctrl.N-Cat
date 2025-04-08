@@ -30,7 +30,7 @@ def handle_item_data(request):
     data = json.loads(request.body)
     body = json.loads(request.body.decode("utf-8"))  # Converte o corpo da requisição para um dicionário
     accessToken = body.get("accessToken")  # Obtém o token do JSON
-
+    print(data)
     itemId = data['itemData']['item']['id']
 
     banco = data['itemData']['item']['connector']['name']

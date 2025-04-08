@@ -150,7 +150,7 @@ Financeiro | {{ dadoscliente }}
                 },
                 body: JSON.stringify({
                     itemData: itemData,
-                    accessToken: accessToken, // Agora está correto
+                    accessToken: accessToken,
                 }), // Envia os dados para a view no Django
               })
                 .then((res) => res.json())
