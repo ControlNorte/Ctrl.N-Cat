@@ -1,5 +1,5 @@
 import datetime
-import time
+import time as tm
 from datetime import *
 from urllib.parse import urlencode
 
@@ -368,15 +368,15 @@ def process_webhook(webhook):
             return print("Não é conta bancária")
 
         timeout = 10
-        start_time = time.time()
+        start_time = tm.time()
         bancos = None
 
-        while time.time() - start_time < timeout:
+        while tm.time() - start_time < timeout:
             try:
                 bancos = BancosCliente.objects.get(transferNumber=transferNumber)
                 break
             except BancosCliente.DoesNotExist:
-                time.sleep(1)  # espera 1 segundo e tenta de novo
+                tm.sleep(1)  # espera 1 segundo e tenta de novo
 
         if not bancos:
             raise Exception("BancosCliente com transferNumber não encontrado após 10 segundos")
