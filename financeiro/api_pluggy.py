@@ -66,9 +66,22 @@ def handle_item_data(request):
         response = requests.get(url, headers=headers)
 
         dados_banco = response.json()
-        print(dados_banco)
-        transferNumber = dados_banco['results'][0]['number']
 
+        accountId = dados_banco['results'][0]['id']
+
+        url = f"https://api.pluggy.ai/accounts/{accountId}"
+
+        headers = {
+            "accept": "application/json",
+            "X-API-KEY": accessToken
+        }
+
+        response = requests.get(url, headers=headers)
+
+        dados_banco = response.json()
+
+        transferNumber = dados_banco['bankData']['transferNumber']
+        print(transferNumber)
 
         separated_parts = re.split(r'[/-]', transferNumber)
 
