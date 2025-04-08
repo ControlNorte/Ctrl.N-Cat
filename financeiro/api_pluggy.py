@@ -46,19 +46,6 @@ def handle_item_data(request):
 
     api_key = response.text
     api_key = json.loads(api_key)
-    #
-    # url = "https://api.pluggy.ai/connect_token"
-    #
-    # headers = {
-    #     "accept": "application/json",
-    #     "content-type": "application/json",
-    #     "X-API-KEY": api_key['apiKey']
-    # }
-    #
-    # response = requests.post(url, headers=headers)
-    #
-    # access_token = response.text
-    # access_token = json.loads(access_token)
 
     if request.method == 'POST':
         # try:
@@ -79,7 +66,7 @@ def handle_item_data(request):
         response = requests.get(url, headers=headers)
 
         dados_banco = response.json()
-
+        print(dados_banco)
         transferNumber = dados_banco['results'][0]['number']
 
 
@@ -117,38 +104,6 @@ def handle_item_data(request):
         else:
             print("Banco já cadastrado!")
 
-        # # Requisitando nome da conta
-        # url = f"https://api.pluggy.ai/items/{itemId}"
-        #
-        # headers = {
-        #     "accept": "application/json",
-        #     "X-API-KEY": accessToken
-        # }
-        #
-        # response = requests.get(url, headers=headers)
-        #
-        # banco = response.json()
-        # banco = str(banco['connector']['name'])
-        #
-        # # Requisitando dados da conta
-        # url = f"https://api.pluggy.ai/accounts"
-        #
-        # params = {"itemId": itemId,
-        #           "type": "BANK"}
-        #
-        # query_string = urlencode(params)
-        # url = f"{url}?{query_string}"
-        #
-        # headers = {
-        #     "accept": "application/json",
-        #     "X-API-KEY": accessToken
-        # }
-        #
-        # response = requests.get(url, headers=headers)
-        #
-        # dados_banco = response.json()
-        #
-        # transferNumber = dados_banco['results'][0]['bankData']['transferNumber']
         accountId = dados_banco['results'][0]['id']
 
         bancos = BancosCliente.objects.get(transferNumber=transferNumber)
