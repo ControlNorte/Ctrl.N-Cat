@@ -582,6 +582,10 @@ def download_modelo_importacao_cadastro_subcategoria(request):
         if field in fields:
             fields.remove(field)
 
+    addfields = ['categoria mãe']
+
+    fields = fields.append(addfields)
+
     # Escrever os nomes dos campos na primeira linha
     for col_num, field in enumerate(fields, 1):
         ws.cell(row=1, column=col_num, value=field)
@@ -592,4 +596,4 @@ def download_modelo_importacao_cadastro_subcategoria(request):
     output.seek(0)
 
     # Retornar o arquivo como resposta para download
-    return FileResponse(output, as_attachment=True, filename='modelo_importacao_clientes.xlsx')
+    return FileResponse(output, as_attachment=True, filename='Modelo de Importação Sub-Categorias.xlsx')
