@@ -637,9 +637,10 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
             retorno = "Categorias Mãe inexistentes:\n" + "\n".join(f" {nome}, " for nome in categoriasmae_nao_encontradas)
         return retorno
 
+    print("Até aqui 1")
     # Retira as Categorias para verificar se precisam ser criadas ou não
     categorias = [item['Categoria'].strip().upper() for item in registros]
-
+    print("Até aqui 2")
     print(categorias)
     categorias_nao_encontradas = []
 
