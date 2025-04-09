@@ -582,11 +582,11 @@ def download_modelo_importacao_cadastro_subcategoria(request):
         if field in fields:
             fields.remove(field)
 
-    fields.insert(0, 'nova_coluna')
+    fields.insert(0, 'categoria mãe')
 
-    # Escrever os nomes dos campos na primeira linha
+    # Escrever os nomes dos campos na primeira linha com letras maiúsculas nas iniciais
     for col_num, field in enumerate(fields, 1):
-        ws.cell(row=1, column=col_num, value=field)
+        ws.cell(row=1, column=col_num, value=field.replace('_', ' ').title())
 
     # Salvar o arquivo Excel em memória
     output = BytesIO()
