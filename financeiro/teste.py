@@ -1,8 +1,10 @@
 import ahocorasick
 from django import forms, template
 from django.db.models import Sum
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, FileResponse
 from django.shortcuts import redirect
+import openpyxl
+from io import BytesIO
 
 from .alteracoesdb import *
 from .models import *
@@ -566,3 +568,28 @@ def transf(request):
 
     return JsonResponse({'success': False})
 
+def download_modelo_importacao_cadastro_subcategoria(request):
+    # Criar um arquivo Excel em memória
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Modelo de Importação Sub-Categorias"
+
+    # Obter os campos do model CadastroClientes
+    fields = [field.name for field in SubCategoria._meta.fields]
+
+    # Verificando se o campo existe antes de remover
+    for field in ['id', 'tenant', 'cliente']:
+        if field in fields:
+            fields.remove(field)
+
+    # Escrever os nomes dos campos na primeira linha
+    for col_num, field in enumerate(fields, 1):
+        ws.cell(row=1, column=col_num, value=field)
+
+    # Salvar o arquivo Excel em memória
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    # Retornar o arquivo como resposta para download
+    return FileResponse(output, as_attachment=True, filename='modelo_importacao_clientes.xlsx')
