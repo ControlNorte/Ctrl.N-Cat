@@ -4,6 +4,7 @@ from django.db.models import Sum
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.shortcuts import redirect
 import openpyxl
+from openpyxl.styles import PatternFill, Font
 from io import BytesIO
 
 from .alteracoesdb import *
@@ -584,9 +585,15 @@ def download_modelo_importacao_cadastro_subcategoria(request):
 
     fields.insert(0, 'categoria mãe')
 
-    # Escrever os nomes dos campos na primeira linha com letras maiúsculas nas iniciais
+    # Definindo estilos
+    header_fill = PatternFill(start_color='7030A0', end_color='7030A0', fill_type='solid')
+    header_font = Font(color='FFFFFF', bold=True)
+
+    # Escrever os nomes dos campos com estilo aplicado
     for col_num, field in enumerate(fields, 1):
-        ws.cell(row=1, column=col_num, value=field.replace('_', ' ').title())
+        cell = ws.cell(row=1, column=col_num, value=field.replace('_', ' ').title())
+        cell.fill = header_fill
+        cell.font = header_font
 
     # Salvar o arquivo Excel em memória
     output = BytesIO()
