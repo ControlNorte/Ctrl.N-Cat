@@ -170,13 +170,14 @@ Financeiro | {{ dadoscliente }}
     {{ importar }}
 </div>
 <script>
-    // Verifica se há uma mensagem na variável 'importar'
     const popup = document.getElementById("popup");
-    if ("{{ importar }}") {
-        popup.style.display = "block"; // Exibe o popup
+    const msg = "{{ importar|escapejs }}";
+
+    if (msg) {
+        popup.style.display = "block";
         setTimeout(() => {
-            popup.style.display = "none"; // Esconde após 3 segundos
-        }, 3000); // 3000 milissegundos = 3 segundos
+            popup.style.display = "none";
+        }, 3000);
     }
 </script>
 {% endblock %}
