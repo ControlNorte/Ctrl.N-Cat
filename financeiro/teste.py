@@ -643,10 +643,11 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
     categorias = [item['Categoria'].strip().upper() for item in registros]
 
     categorias_nao_encontradas = []
-
+    categorias_criadas = 0
     for categoria in categorias:
         if not Categoria.objects.filter(nome=categoria).exists():
             categorias_nao_encontradas.append(categoria)
+
 
     for categoria_mae, categoria in zip(categorias_maes, categorias_nao_encontradas):
         try:
@@ -658,6 +659,7 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
                 nome=categoria
             )
             novacategoria.save()
+            categorias_criadas += 1
         except:
             print(f"Categoria Mãe não encontrada: {categoria_mae}")
 
@@ -665,6 +667,7 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
     sub_categorias = [item['Sub Categoria'].strip().upper() for item in registros]
 
     sub_categorias_nao_encontradas = []
+    sub_categorias_criadas = 0
 
     for sub_categoria in sub_categorias:
         if not SubCategoria.objects.filter(nome=sub_categoria).exists():
@@ -680,7 +683,10 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
                 nome=sub_categoria
             )
             nova_sub_categoria.save()
+            sub_categorias_criadas += 1
         except:
             print(f"Categoria não encontrada: {categoria}")
 
-    return
+    retorno = f'Importação concluidas! Foram criadas {categorias_criadas} Categorias e {sub_categorias_criadas} Sub-Categorias'
+
+    return retorno
