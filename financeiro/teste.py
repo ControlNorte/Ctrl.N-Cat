@@ -649,12 +649,13 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
     for categoria_mae, categoria in zip(categorias_maes, categorias_nao_encontradas):
         # try:
         categoria_mae_obj = CategoriaMae.objects.get(nome=categoria_mae)
-        Categoria.objects.create(
+        novacategoria = Categoria.objects.create(
             tenant=tenant,
             cliente=dadoscliente,
             categoriamae=categoria_mae_obj,
             nome=categoria
         )
+        novacategoria.save()
         # except:
         print(f"Categoria Mãe não encontrada: {categoria_mae}")
 
