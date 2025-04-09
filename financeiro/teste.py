@@ -670,10 +670,10 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
         if not SubCategoria.objects.filter(nome=sub_categoria).exists():
             sub_categorias_nao_encontradas.append(sub_categoria)
 
-    for categoria, sub_categoria in zip(categorias, sub_categorias):
+    for categoria, sub_categoria in zip(categorias, sub_categorias_nao_encontradas):
         try:
             categoria_obj = Categoria.objects.get(nome=categoria)
-            nova_sub_categoria = Categoria.objects.create(
+            nova_sub_categoria = SubCategoria.objects.create(
                 tenant=tenant,
                 cliente=dadoscliente,
                 categoria=categoria_obj,
