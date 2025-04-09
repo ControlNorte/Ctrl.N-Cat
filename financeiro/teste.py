@@ -622,7 +622,7 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
 
     # Ler o arquivo Excel usando pandas
     df = pd.read_excel(arquivo_importacao_cliente)
-    print("Até aqui 0")
+
     # Converter DataFrame para lista de dicionários
     registros = df.to_dict(orient='records')
 
@@ -630,13 +630,13 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
     categorias_maes = [item['Categoria Mãe'].strip().upper() for item in registros]
 
     categoriasmae_nao_encontradas = []
-
+    print(categorias_maes)
     for nome_categoriamae in categorias_maes:
         if not CategoriaMae.objects.filter(nome=nome_categoriamae).exists():
             categoriasmae_nao_encontradas.append(nome_categoriamae)
             retorno = "Categorias Mãe inexistentes:\n" + "\n".join(f" {nome}, " for nome in categoriasmae_nao_encontradas)
         return retorno
-
+    print(categoriasmae_nao_encontradas)
     print("Até aqui 1")
     # Retira as Categorias para verificar se precisam ser criadas ou não
     categorias = [item['Categoria'].strip().upper() for item in registros]
