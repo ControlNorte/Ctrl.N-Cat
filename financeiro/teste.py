@@ -773,3 +773,42 @@ def importar_centrodecustos(arquivo_importacao_cliente, tenant, dadoscliente):
     retorno = f'Importações concluidas! Foram criados {centro_de_custo_criados}'
 
     return retorno
+
+
+def download_modelo_importacao_cadastro_regras(request):
+    # Criar um arquivo Excel em memória
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Modelo de Importação"
+
+    # Obter os campos do model CadastroClientes
+    fields = [field.name for field in Regra._meta.fields]
+
+    # Verificando se o campo existe antes de remover
+    for field in ['id', 'tenant', 'cliente', 'ativo']:
+        if field in fields:
+            fields.remove(field)
+
+    # Definindo estilos
+    header_fill = PatternFill(start_color='7030A0', end_color='7030A0', fill_type='solid')
+    header_font = Font(color='FFFFFF', bold=True)
+
+    # Escrever os nomes dos campos com estilo e ajustar largura das colunas
+    for col_num, field in enumerate(fields, 1):
+        col_letter = get_column_letter(col_num)
+        cell_value = field.replace('_', ' ').title()
+
+        cell = ws.cell(row=1, column=col_num, value=cell_value)
+        cell.fill = header_fill
+        cell.font = header_font
+
+        # Ajustar largura com base no tamanho do texto
+        ws.column_dimensions[col_letter].width = len(cell_value) + 2
+
+    # Salvar o arquivo Excel em memória
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    # Retornar o arquivo como resposta para download
+    return FileResponse(output, as_attachment=True, filename='Modelo de Importação Regra.xlsx')
