@@ -631,10 +631,16 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant):
     categorias_maes = [item['Categoria Mãe'].strip() for item in registros]
     print(categorias_maes)
 
-    for categoria_mae in categorias_maes:
-        categoria_mae = CategoriaMae.objects.get(nome=categoria_mae)
-        if not categoria_mae.exists():
-            return print("Categoria Mae Inexistente")
+    categorias_nao_encontradas = []
+
+    for nome_categoria in categorias_maes:
+        if not CategoriaMae.objects.filter(nome=nome_categoria).exists():
+            categorias_nao_encontradas.append(nome_categoria)
+
+    if categorias_nao_encontradas:
+        print("Categorias Mãe inexistentes:")
+        for c in categorias_nao_encontradas:
+            print("-", c)
 
     print("tem todas")
 
