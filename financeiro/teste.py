@@ -613,13 +613,12 @@ def download_modelo_importacao_cadastro_subcategoria(request):
     return FileResponse(output, as_attachment=True, filename='Modelo de Importação Sub-Categorias.xlsx')
 
 
-def importar_subcategorias(arquivo_importacao_cliente, tenant):
+def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
 
     if not arquivo_importacao_cliente:
         return print("Erro: Nenhum arquivo foi selecionado.")  # Retorna erro se nenhum arquivo foi selecionado
 
     retorno = ''
-    df = pd.read_excel(arquivo_importacao_cliente)
 
     # Ler o arquivo Excel usando pandas
     df = pd.read_excel(arquivo_importacao_cliente)
@@ -628,20 +627,36 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant):
     registros = df.to_dict(orient='records')
 
     # Retira as Categorias Mae para verificar se estão corretas
-    categorias_maes = [item['Categoria Mãe'].strip() for item in registros]
+    categorias_maes = [item['Categoria Mãe'].strip().upper() for item in registros]
+
+    categoriasmae_nao_encontradas = []
+
+    for nome_categoriamae in categorias_maes:
+        if not CategoriaMae.objects.filter(nome=nome_categoriamae).exists():
+            categoriasmae_nao_encontradas.append(nome_categoriamae)
+            retorno = "Categorias Mãe inexistentes:\n" + "\n".join(f" {nome}, " for nome in categoriasmae_nao_encontradas)
+        return retorno
+
+    # Retira as Categorias para verificar se precisam ser criadas ou não
+    categorias = [item['Categoria'].strip().upper() for item in registros]
 
     categorias_nao_encontradas = []
 
-    for nome_categoria in categorias_maes:
-        if not CategoriaMae.objects.filter(nome=nome_categoria).exists():
+    for nome_categoria in categorias:
+        if not Categoria.objects.filter(nome=nome_categoria).exists():
             categorias_nao_encontradas.append(nome_categoria)
-            retorno = "Categorias Mãe inexistentes:\n" + "\n".join(f"- {nome}" for nome in categorias_nao_encontradas)
-        return retorno
 
+    for categoria_mae_nome, categoria_nome in zip(categorias_maes, categorias_nao_encontradas):
+        try:
+            categoria_mae_obj = CategoriaMae.objects.get(nome=categoria_mae_nome)
+            Categoria.objects.create(
+                tenant=tenant,
+                cliente=dadoscliente,
+                categoriamae=categoria_mae_obj,
+                nome=categoria_nome
+            )
+        except:
+            print(f"Categoria Mãe não encontrada: {categoria_mae_nome}")
 
-
-    print("tem todas")
-
-    # Lista para armazenar os objetos do model
 
     return

@@ -564,7 +564,11 @@ def subcategoria(request):
     if form.is_valid():
         form.save()
         file = request.FILES['file']
-        importar = importar_subcategorias(arquivo_importacao_cliente=file, tenant=request.tenant)
+        importar = importar_subcategorias(
+            arquivo_importacao_cliente=file,
+            tenant=request.tenant,
+            dadoscliente=dadoscliente
+        )
         print(f'Erro: {importar}')
 
     if not file:
