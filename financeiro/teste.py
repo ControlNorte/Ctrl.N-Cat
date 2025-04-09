@@ -614,6 +614,20 @@ def download_modelo_importacao_cadastro_subcategoria(request):
 
 
 def importar_subcategorias(arquivo_importacao_cliente, tenant):
-    arquivo_importacao_cliente = pd.read_excel(arquivo_importacao_cliente)
-    print(arquivo_importacao_cliente)
+
+    if not arquivo_importacao_cliente:
+        return print("Erro: Nenhum arquivo foi selecionado.")  # Retorna erro se nenhum arquivo foi selecionado
+
+    retorno = ''
+    df = pd.read_excel(arquivo_importacao_cliente)
+
+    # Ler o arquivo Excel usando pandas
+    df = pd.read_excel(arquivo_importacao_cliente)
+
+    # Converter DataFrame para lista de dicionários
+    registros = df.to_dict(orient='records')
+
+    # Lista para armazenar os objetos do model
+
+    print(registros)
     return
