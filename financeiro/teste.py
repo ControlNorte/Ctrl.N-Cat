@@ -640,6 +640,7 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
     # Retira as Categorias para verificar se precisam ser criadas ou não
     categorias = [item['Categoria'].strip().upper() for item in registros]
 
+    print(categorias)
     categorias_nao_encontradas = []
 
     for categoria in categorias:
