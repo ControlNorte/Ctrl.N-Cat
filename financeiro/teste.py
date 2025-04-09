@@ -642,21 +642,21 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
 
     categorias_nao_encontradas = []
 
-    for nome_categoria in categorias:
-        if not Categoria.objects.filter(nome=nome_categoria).exists():
-            categorias_nao_encontradas.append(nome_categoria)
+    for categoria in categorias:
+        if not Categoria.objects.filter(nome=categoria).exists():
+            categorias_nao_encontradas.append(categoria)
 
-    for categoria_mae_nome, categoria_nome in zip(categorias_maes, categorias_nao_encontradas):
+    for categoria_mae, categoria in zip(categorias_maes, categorias_nao_encontradas):
         try:
-            categoria_mae_obj = CategoriaMae.objects.get(nome=categoria_mae_nome)
+            categoria_mae_obj = CategoriaMae.objects.get(nome=categoria_mae)
             Categoria.objects.create(
                 tenant=tenant,
                 cliente=dadoscliente,
                 categoriamae=categoria_mae_obj,
-                nome=categoria_nome
+                nome=categoria
             )
         except:
-            print(f"Categoria Mãe não encontrada: {categoria_mae_nome}")
+            print(f"Categoria Mãe não encontrada: {categoria_mae}")
 
 
     return
