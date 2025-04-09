@@ -4,6 +4,24 @@
 Financeiro | {{ dadoscliente }}
 {% endblock %}
 
+{% block head %}
+<style>
+    /* Estilo para o popup */
+        #popup {
+            display: none; /* Esconde o popup por padrão */
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000; /* Garante que o popup ficará acima de outros elementos */
+        }
+</style>
+{% endblock %}
+
 {% block content %}
 <main class="py-20 px-10">
 
@@ -102,4 +120,51 @@ Financeiro | {{ dadoscliente }}
             </div>
         </section>
 </main>
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Importar Dados</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-body">
+                <p>Faça o download do modelo de importação e selecione ou arraste o arquivo para importar:</p>
+
+                <!-- Botão para download do modelo -->
+                <a href="{% url 'financeiro:download_modelo_importacao_cadastro_subcategoria' %}" class="btn btn-primary">Baixar modelo de importação</a>
+
+                <br><br>
+
+                <!-- Campo para upload -->
+
+                <div class="mb-3">
+                    <label class="form-label">Selecione o arquivo para importação</label>
+                    {{ form.as_p }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="submit" class="btn btn-primary">Importar</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Popup -->
+<div id="popup">
+    {{ importar }}
+</div>
+<script>
+    const popup = document.getElementById("popup");
+    const msg = "{{ importar|escapejs }}";
+
+    if (msg) {
+        popup.style.display = "block";
+        setTimeout(() => {
+            popup.style.display = "none";
+        }, 3000);
+    }
+</script>
 {% endblock %}

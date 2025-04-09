@@ -628,20 +628,39 @@ def centrocusto(request):
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
-    if request.method == 'POST':
-        dados = request.POST.dict()
-        nome = dados.get("nome")
-        ativo = dados.get("ativo")
 
-        # Verificação se já existe um centro de custo com o mesmo cliente e nome
-        if CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente, nome=nome).exists():
-            messages.error(request, "Centro de Custo já cadastrado")
-        else:
-            centrocusto = CentroDeCusto.objects.create(tenant=request.tenant, cliente=dadoscliente, nome=nome, ativo=ativo)
-            centrocusto.save()
+    file = ""
+    importar = ""
+    form = UploadFileForm(request.POST, request.FILES)
+    if form.is_valid():
+        form.save()
+        file = request.FILES['file']
+        importar = importar_subcategorias(
+            arquivo_importacao_cliente=file,
+            tenant=request.tenant,
+            dadoscliente=dadoscliente
+        )
+
+    if not file:
+
+        if request.method == 'POST':
+            dados = request.POST.dict()
+            nome = dados.get("nome")
+            ativo = dados.get("ativo")
+
+            # Verificação se já existe um centro de custo com o mesmo cliente e nome
+            if CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente, nome=nome).exists():
+                messages.error(request, "Centro de Custo já cadastrado")
+            else:
+                centrocusto = CentroDeCusto.objects.create(tenant=request.tenant, cliente=dadoscliente, nome=nome, ativo=ativo)
+                centrocusto.save()
 
     centrocustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
-    context = {'dadoscliente': dadoscliente, 'centrocustos': centrocustos}
+    context = {'dadoscliente': dadoscliente,
+               'centrocustos': centrocustos,
+               'importar': importar,
+               'form': form
+               }
     return render(request, 'cadastros/centrocusto.html', context)
 
 
