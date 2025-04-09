@@ -633,7 +633,7 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant):
 
     for categoria_mae in categorias_maes:
         categoria_mae = CategoriaMae.objects.get(nome=categoria_mae)
-        if not categoria_mae.exist():
+        if not categoria_mae.exists():
             return print("Categoria Mae Inexistente")
 
     print("tem todas")
