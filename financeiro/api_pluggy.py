@@ -158,21 +158,37 @@ def handle_item_data(request):
 
                 dados.append(registro)
 
+        movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
+        transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
+        conciliados = 0  # Contador para o número de movimentações conciliadas
+
+
         # Criar o autômato Aho-Corasick
         A = ahocorasick.Automaton()
         regras = Regra.objects.for_tenant(tenant).filter(cliente_id=cliente).select_related('categoria',
                                                                                                  'subcategoria',
                                                                                                  'centrodecusto')
-        if regras.exists():
+        if not regras.exists():
+
+            for dado in dados:
+                descricao = dado['descricao'].upper()
+                matched = False
+
+                if not matched:  # Se nenhuma correspondência foi encontrada
+                    transicoes_to_create.append(TransicaoCliente(
+                        tenant_id=tenant,
+                        cliente_id=cliente,
+                        banco_id=banco,
+                        data=dado['data'],
+                        descricao=descricao,
+                        valor=dado['valor']
+                    ))
+                    conciliados += 1
+        else:
+
             for idx, regra in enumerate(regras):
                 A.add_word(str(regra.descricao).upper(), (idx, regra))
             A.make_automaton() # Compila o autômato para otimizar a pesquisa
-        else:
-            A = None
-
-        movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
-        transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
-        conciliados = 0  # Contador para o número de movimentações conciliadas
 
         # Processamento das transações
         for dado in dados:
