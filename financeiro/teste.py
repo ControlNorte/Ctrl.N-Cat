@@ -5,6 +5,7 @@ from django.http import HttpResponse, JsonResponse, FileResponse
 from django.shortcuts import redirect
 import openpyxl
 from openpyxl.styles import PatternFill, Font
+from openpyxl.utils import get_column_letter
 from io import BytesIO
 
 from .alteracoesdb import *
@@ -579,21 +580,28 @@ def download_modelo_importacao_cadastro_subcategoria(request):
     fields = [field.name for field in SubCategoria._meta.fields]
 
     # Verificando se o campo existe antes de remover
-    for field in ['id', 'tenant', 'cliente']:
+    for field in ['id', 'tenant', 'cliente', 'nome']:
         if field in fields:
             fields.remove(field)
 
     fields.insert(0, 'categoria mãe')
+    fields.insert(2, 'sub categoria')
 
     # Definindo estilos
     header_fill = PatternFill(start_color='7030A0', end_color='7030A0', fill_type='solid')
     header_font = Font(color='FFFFFF', bold=True)
 
-    # Escrever os nomes dos campos com estilo aplicado
+    # Escrever os nomes dos campos com estilo e ajustar largura das colunas
     for col_num, field in enumerate(fields, 1):
-        cell = ws.cell(row=1, column=col_num, value=field.replace('_', ' ').title())
+        col_letter = get_column_letter(col_num)
+        cell_value = field.replace('_', ' ').title()
+
+        cell = ws.cell(row=1, column=col_num, value=cell_value)
         cell.fill = header_fill
         cell.font = header_font
+
+        # Ajustar largura com base no tamanho do texto
+        ws.column_dimensions[col_letter].width = len(cell_value) + 2
 
     # Salvar o arquivo Excel em memória
     output = BytesIO()
