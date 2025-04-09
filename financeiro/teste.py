@@ -627,7 +627,17 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant):
     # Converter DataFrame para lista de dicionários
     registros = df.to_dict(orient='records')
 
+    # Retira as Categorias Mae para verificar se estão corretas
+    categorias_maes = [item['Categoria Mãe'].strip() for item in registros]
+    print(categorias_maes)
+
+    for categoria_mae in categorias_maes:
+        categoria_mae = CategoriaMae.objects.get(nome=categoria_mae)
+        if not categoria_mae.exist():
+            return print("Categoria Mae Inexistente")
+
+    print("tem todas")
+
     # Lista para armazenar os objetos do model
 
-    print(registros)
     return
