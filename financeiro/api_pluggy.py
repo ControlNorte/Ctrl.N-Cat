@@ -162,7 +162,6 @@ def handle_item_data(request):
         transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
         conciliados = 0  # Contador para o número de movimentações conciliadas
 
-
         # Criar o autômato Aho-Corasick
         A = ahocorasick.Automaton()
         regras = Regra.objects.for_tenant(tenant).filter(cliente_id=cliente).select_related('categoria',
@@ -441,65 +440,83 @@ def process_webhook(webhook):
 
                 dados.append(registro)
 
+        movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
+        transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
+        conciliados = 0  # Contador para o número de movimentações conciliadas
+
         # Criar o autômato Aho-Corasick
         A = ahocorasick.Automaton()
         regras = Regra.objects.for_tenant(tenant).filter(cliente_id=cliente).select_related('categoria',
                                                                                             'subcategoria',
                                                                                             'centrodecusto')
-        for idx, regra in enumerate(regras):
-            A.add_word(str(regra.descricao).upper(),
-                       (idx, regra))  # Adiciona as descrições das regras no autômato
-        A.make_automaton()  # Compila o autômato para otimizar a pesquisa
+        if not regras.exists():
 
-        movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
-        transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
-        conciliados = 0  # Contador para o número de movimentações conciliadas
+            for dado in dados:
+                descricao = dado['descricao'].upper()
+                matched = False
 
-        # Processamento das transações
-        for dado in dados:
-            descricao = dado['descricao'].upper()
+                if not matched:  # Se nenhuma correspondência foi encontrada
+                    transicoes_to_create.append(TransicaoCliente(
+                        tenant_id=tenant,
+                        cliente_id=cliente,
+                        banco_id=banco,
+                        data=dado['data'],
+                        descricao=descricao,
+                        valor=dado['valor']
+                    ))
+                    conciliados += 1
+        else:
 
-            # Verifica se já existe uma movimentação com a mesma data, descrição e valor
-            if MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
-                                                                      data=dado['data'],
-                                                                      descricao=descricao,
-                                                                      valor=dado['valor']).exists():
-                a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
-                                                                           data=dado['data'],
-                                                                           descricao=descricao,
-                                                                           valor=dado['valor'])
+            for idx, regra in enumerate(regras):
+                A.add_word(str(regra.descricao).upper(), (idx, regra))
+            A.make_automaton()  # Compila o autômato para otimizar a pesquisa
 
-                continue  # Pula para o próximo dado se já existir uma movimentação igual
+            # Processamento das transações
+            for dado in dados:
+                descricao = dado['descricao'].upper()
 
-            matched = False  # Indicador de correspondência
+                # Verifica se já existe uma movimentação com a mesma data, descrição e valor
+                if MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
+                                                                          data=dado['data'],
+                                                                          descricao=descricao,
+                                                                          valor=dado['valor']).exists():
+                    a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
+                                                                               data=dado['data'],
+                                                                               descricao=descricao,
+                                                                               valor=dado['valor'])
 
-            # Itera pelas correspondências usando o autômato
-            for _, (_, regra) in A.iter(descricao):
-                movimentacoes_to_create.append(MovimentacoesCliente(
-                    tenant_id=tenant,
-                    cliente_id=cliente,
-                    banco_id=banco,
-                    data=dado['data'],
-                    descricao=descricao,
-                    detalhe='Sem Detalhe',
-                    valor=dado['valor'],
-                    categoria=regra.categoria,
-                    subcategoria=regra.subcategoria,
-                    centrodecusto=regra.centrodecusto
-                ))
-                matched = True  # Marca como correspondido
-                conciliados += 1  # Incrementa o contador de movimentações conciliadas
-                break  # Sai do loop após a primeira correspondência
+                    continue  # Pula para o próximo dado se já existir uma movimentação igual
 
-            if not matched:  # Se nenhuma correspondência foi encontrada
-                transicoes_to_create.append(TransicaoCliente(
-                    tenant_id=tenant,
-                    cliente_id=cliente,
-                    banco_id=banco,
-                    data=dado['data'],
-                    descricao=descricao,
-                    valor=dado['valor']
-                ))
+                matched = False  # Indicador de correspondência
+
+                # Itera pelas correspondências usando o autômato
+                for _, (_, regra) in A.iter(descricao):
+                    movimentacoes_to_create.append(MovimentacoesCliente(
+                        tenant_id=tenant,
+                        cliente_id=cliente,
+                        banco_id=banco,
+                        data=dado['data'],
+                        descricao=descricao,
+                        detalhe='Sem Detalhe',
+                        valor=dado['valor'],
+                        categoria=regra.categoria,
+                        subcategoria=regra.subcategoria,
+                        centrodecusto=regra.centrodecusto
+                    ))
+                    matched = True  # Marca como correspondido
+
+                    break  # Sai do loop após a primeira correspondência
+
+                if not matched:  # Se nenhuma correspondência foi encontrada
+                    transicoes_to_create.append(TransicaoCliente(
+                        tenant_id=tenant,
+                        cliente_id=cliente,
+                        banco_id=banco,
+                        data=dado['data'],
+                        descricao=descricao,
+                        valor=dado['valor']
+                    ))
+                    conciliados += 1  # Incrementa o contador de movimentações conciliadas
 
         # Inserção em batch das movimentações no banco de dados
         if movimentacoes_to_create:
