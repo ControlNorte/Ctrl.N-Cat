@@ -622,7 +622,7 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
 
     # Ler o arquivo Excel usando pandas
     df = pd.read_excel(arquivo_importacao_cliente)
-
+    print("Até aqui 0")
     # Converter DataFrame para lista de dicionários
     registros = df.to_dict(orient='records')
 

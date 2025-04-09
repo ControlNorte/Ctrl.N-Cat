@@ -569,7 +569,7 @@ def subcategoria(request):
             tenant=request.tenant,
             dadoscliente=dadoscliente
         )
-        print(f'Erro: {importar}')
+
 
     if not file:
         if request.method == 'POST':
