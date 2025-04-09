@@ -636,11 +636,10 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant):
     for nome_categoria in categorias_maes:
         if not CategoriaMae.objects.filter(nome=nome_categoria).exists():
             categorias_nao_encontradas.append(nome_categoria)
+            retorno = f'Categorias Mãe inexistentes: {categorias_nao_encontradas}'
+        return retorno
 
-    if categorias_nao_encontradas:
-        print("Categorias Mãe inexistentes:")
-        for c in categorias_nao_encontradas:
-            print("-", c)
+
 
     print("tem todas")
 
