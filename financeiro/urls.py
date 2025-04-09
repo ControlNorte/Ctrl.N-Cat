@@ -3,7 +3,7 @@ from django.urls import path, re_path
 from . import views
 from .views import *
 from .api_pluggy import handle_item_data, recice_webhook
-from .teste import download_modelo_importacao_cadastro_subcategoria
+from .teste import download_modelo_importacao_cadastro_subcategoria, download_modelo_importacao_cadastro_centrodecusto
 
 # from django.contrib.auth import views as auth_view
 
@@ -55,6 +55,6 @@ urlpatterns = [
     path('api/item-data/', handle_item_data, name='handle_item_data'),
     path('recive-webhook/', recice_webhook, name='recive_webhook'),
 
-    path('download_modelo_importacao/', download_modelo_importacao_cadastro_subcategoria, name='download_modelo_importacao_cadastro_subcategoria'),
-
+    path('download_modelo_importacao_sb/', download_modelo_importacao_cadastro_subcategoria, name='download_modelo_importacao_cadastro_subcategoria'),
+    path('download_modelo_importacao_cc/', download_modelo_importacao_cadastro_centrodecusto, name='download_modelo_importacao_cadastro_centrodecusto'),
 ]
