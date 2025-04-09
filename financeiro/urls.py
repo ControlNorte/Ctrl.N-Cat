@@ -3,7 +3,7 @@ from django.urls import path, re_path
 from . import views
 from .views import *
 from .api_pluggy import handle_item_data, recice_webhook
-from teste import download_modelo_importacao_cadastro_subcategoria
+from .teste import download_modelo_importacao_cadastro_subcategoria
 
 # from django.contrib.auth import views as auth_view
 
