@@ -1,4 +1,5 @@
 import ahocorasick
+import pandas as pd
 from django import forms, template
 from django.db.models import Sum
 from django.http import HttpResponse, JsonResponse, FileResponse
@@ -610,3 +611,9 @@ def download_modelo_importacao_cadastro_subcategoria(request):
 
     # Retornar o arquivo como resposta para download
     return FileResponse(output, as_attachment=True, filename='Modelo de Importação Sub-Categorias.xlsx')
+
+
+def importar_subcategorias(arquivo_importacao_cliente, tenant):
+    arquivo_importacao_cliente = pd.read_excel(arquivo_importacao_cliente)
+    print(arquivo_importacao_cliente)
+    return

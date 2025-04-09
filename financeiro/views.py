@@ -557,27 +557,41 @@ def subcategoria(request):
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
-    if request.method == 'POST':
-        dados = request.POST.dict()
-        categoria = Categoria.objects.for_tenant(request.tenant).get(id=dados.get("categoria"), cliente=dadoscliente)
-        nome = dados.get("nome")
 
-        # Verificação se já existe uma subcategoria com o mesmo cliente, categoria e nome
-        if SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente, categoria=categoria, nome=nome).exists():
-            messages.error(request, "Sub-categoria já cadastrada")
-        else:
-            subcategoria = SubCategoria.objects.create(tenant=request.tenant, cliente=dadoscliente, categoria=categoria, nome=nome)
-            subcategoria.save()
+    file = ""
+    importar = ""
+    form = UploadFileForm(request.POST, request.FILES)
+    if form.is_valid():
+        form.save()
+        file = request.FILES['file']
+        importar = importar_subcategorias(arquivo_importacao_cliente=file, tenant=request.tenant)
+        print(f'Erro: {importar}')
+
+    if not file:
+        if request.method == 'POST':
+            dados = request.POST.dict()
+            categoria = Categoria.objects.for_tenant(request.tenant).get(id=dados.get("categoria"), cliente=dadoscliente)
+            nome = dados.get("nome")
+
+            # Verificação se já existe uma subcategoria com o mesmo cliente, categoria e nome
+            if SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente, categoria=categoria, nome=nome).exists():
+                messages.error(request, "Sub-categoria já cadastrada")
+            else:
+                subcategoria = SubCategoria.objects.create(tenant=request.tenant, cliente=dadoscliente, categoria=categoria, nome=nome)
+                subcategoria.save()
 
     categoriasmae = CategoriaMae.objects.all().order_by('nome')
     categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
+
     context = {
         'dadoscliente': dadoscliente,
         'categorias': categorias,
         'categoriasmae': categoriasmae,
-        'subcategorias': subcategorias
+        'subcategorias': subcategorias,
+        'importar': importar,
     }
+
     return render(request, 'cadastros/subcategoria.html', context)
 
 
