@@ -163,10 +163,12 @@ def handle_item_data(request):
         regras = Regra.objects.for_tenant(tenant).filter(cliente_id=cliente).select_related('categoria',
                                                                                                  'subcategoria',
                                                                                                  'centrodecusto')
-        for idx, regra in enumerate(regras):
-            A.add_word(str(regra.descricao).upper(),
-                       (idx, regra))  # Adiciona as descrições das regras no autômato
-        A.make_automaton()  # Compila o autômato para otimizar a pesquisa
+        if regras.exists():
+            for idx, regra in enumerate(regras):
+                A.add_word(str(regra.descricao).upper(), (idx, regra))
+            A.make_automaton() # Compila o autômato para otimizar a pesquisa
+        else:
+            A = None
 
         movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
         transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
