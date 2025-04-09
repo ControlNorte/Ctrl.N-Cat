@@ -582,9 +582,7 @@ def download_modelo_importacao_cadastro_subcategoria(request):
         if field in fields:
             fields.remove(field)
 
-    addfields = ['categoria mãe']
-
-    fields = fields.append(addfields)
+    fields.insert(0, 'nova_coluna')
 
     # Escrever os nomes dos campos na primeira linha
     for col_num, field in enumerate(fields, 1):
