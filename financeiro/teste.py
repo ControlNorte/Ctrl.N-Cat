@@ -687,7 +687,7 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
         except:
             print(f"Categoria não encontrada: {categoria}")
 
-    retorno = f'Importação concluidas! Foram criadas {categorias_criadas} Categorias e {sub_categorias_criadas} Sub-Categorias'
+    retorno = f'Importações concluidas! Foram criadas {categorias_criadas} Categorias e {sub_categorias_criadas} Sub-Categorias'
 
     return retorno
 
@@ -702,7 +702,7 @@ def download_modelo_importacao_cadastro_centrodecusto(request):
     fields = [field.name for field in CentroDeCusto._meta.fields]
 
     # Verificando se o campo existe antes de remover
-    for field in ['id', 'tenant', 'cliente', 'nome']:
+    for field in ['id', 'tenant', 'cliente', 'nome', 'ativo']:
         if field in fields:
             fields.remove(field)
 
@@ -731,3 +731,45 @@ def download_modelo_importacao_cadastro_centrodecusto(request):
 
     # Retornar o arquivo como resposta para download
     return FileResponse(output, as_attachment=True, filename='Modelo de Importação Centro de Custo.xlsx')
+
+
+def importar_centrodecustos(arquivo_importacao_cliente, tenant, dadoscliente):
+
+    if not arquivo_importacao_cliente:
+        return print("Erro: Nenhum arquivo foi selecionado.")  # Retorna erro se nenhum arquivo foi selecionado
+
+    retorno = ''
+
+    # Ler o arquivo Excel usando pandas
+    df = pd.read_excel(arquivo_importacao_cliente)
+
+    # Converter DataFrame para lista de dicionários
+    registros = df.to_dict(orient='records')
+
+    # Retira as Categorias Mae para verificar se estão corretas
+    centros_de_custos = [item['Centro De Custo'].strip().upper() for item in registros]
+
+    centros_de_custo_nao_encontradas = []
+    centro_de_custo_criados = 0
+
+    for centros_de_custo in centros_de_custos:
+        if not CentroDeCusto.objects.filter(nome=centros_de_custo).exists():
+            centros_de_custo_nao_encontradas.append(centros_de_custo)
+
+    for centros_de_custo in centros_de_custo_nao_encontradas:
+        try:
+            novocentrodecusto = CentroDeCusto.objects.create(
+                tenant=tenant,
+                cliente=dadoscliente,
+                nome=centros_de_custo,
+                ativo=True
+            )
+            novocentrodecusto.save()
+            centro_de_custo_criados += 1
+        except:
+            print(f"Erro ao importar o Centro de Custo {centros_de_custo}")
+
+
+    retorno = f'Importações concluidas! Foram criados {centro_de_custo_criados}'
+
+    return retorno

@@ -635,7 +635,7 @@ def centrocusto(request):
     if form.is_valid():
         form.save()
         file = request.FILES['file']
-        importar = importar_subcategorias(
+        importar = importar_centrodecustos(
             arquivo_importacao_cliente=file,
             tenant=request.tenant,
             dadoscliente=dadoscliente
