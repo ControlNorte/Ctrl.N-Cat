@@ -590,6 +590,7 @@ def subcategoria(request):
         'categoriasmae': categoriasmae,
         'subcategorias': subcategorias,
         'importar': importar,
+        'form': form,
     }
 
     return render(request, 'cadastros/subcategoria.html', context)
