@@ -632,19 +632,16 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
     categoriasmae_nao_encontradas = []
 
     for nome_categoriamae in categorias_maes:
-        print(nome_categoriamae)
+
         if not CategoriaMae.objects.filter(nome=nome_categoriamae).exists():
 
             categoriasmae_nao_encontradas.append(nome_categoriamae)
             retorno = "Categorias Mãe inexistentes:\n" + "\n".join(f" {nome}, " for nome in categoriasmae_nao_encontradas)
             return retorno
 
-    print(categoriasmae_nao_encontradas)
-    print("Até aqui 1")
     # Retira as Categorias para verificar se precisam ser criadas ou não
     categorias = [item['Categoria'].strip().upper() for item in registros]
-    print("Até aqui 2")
-    print(categorias)
+
     categorias_nao_encontradas = []
 
     for categoria in categorias:
@@ -652,17 +649,38 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
             categorias_nao_encontradas.append(categoria)
 
     for categoria_mae, categoria in zip(categorias_maes, categorias_nao_encontradas):
-        # try:
-        categoria_mae_obj = CategoriaMae.objects.get(nome=categoria_mae)
-        novacategoria = Categoria.objects.create(
-            tenant=tenant,
-            cliente=dadoscliente,
-            categoriamae=categoria_mae_obj,
-            nome=categoria
-        )
-        novacategoria.save()
-        # except:
-        print(f"Categoria Mãe não encontrada: {categoria_mae}")
+        try:
+            categoria_mae_obj = CategoriaMae.objects.get(nome=categoria_mae)
+            novacategoria = Categoria.objects.create(
+                tenant=tenant,
+                cliente=dadoscliente,
+                categoriamae=categoria_mae_obj,
+                nome=categoria
+            )
+            novacategoria.save()
+        except:
+            print(f"Categoria Mãe não encontrada: {categoria_mae}")
 
+    # Retira as Categorias para verificar se precisam ser criadas ou não
+    sub_categorias = [item['Sub Categoria'].strip().upper() for item in registros]
+
+    sub_categorias_nao_encontradas = []
+
+    for sub_categoria in sub_categorias:
+        if not SubCategoria.objects.filter(nome=sub_categoria).exists():
+            sub_categorias_nao_encontradas.append(sub_categoria)
+
+    for categoria, sub_categoria in zip(categorias, sub_categorias):
+        try:
+            categoria_obj = Categoria.objects.get(nome=categoria)
+            nova_sub_categoria = Categoria.objects.create(
+                tenant=tenant,
+                cliente=dadoscliente,
+                categoria=categoria_obj,
+                nome=sub_categoria
+            )
+            nova_sub_categoria.save()
+        except:
+            print(f"Categoria não encontrada: {categoria}")
 
     return
