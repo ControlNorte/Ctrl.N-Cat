@@ -133,6 +133,7 @@ def handle_item_data(request):
 
         print(f'accountID: {accountId}')
         print(f'X-API-KEY: {api_key}')
+        print(f'X-API-KEY: {accessToken}')
         print(f'de: {from_date}')
         print(f'Hoje: {to_date}')
 
