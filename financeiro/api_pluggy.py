@@ -115,8 +115,9 @@ def handle_item_data(request):
         url = "https://api.pluggy.ai/transactions"
 
         to_date = date.today()
+        print(f'Hoje: {to_date}')
         from_date = to_date - timedelta(days=31)
-
+        print(f'de: {from_date}')
         params = {"accountId": accountId,
                   "from": from_date,
                   "to": to_date,
@@ -134,7 +135,7 @@ def handle_item_data(request):
 
         results = (response.json())
         results = results['results']
-        print(results)
+
         dados = []
 
         tenant = Tenant.objects.get(nome=tenant)
