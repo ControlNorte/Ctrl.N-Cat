@@ -635,7 +635,7 @@ def centrocusto(request):
     if form.is_valid():
         form.save()
         file = request.FILES['file']
-        importar = importar_regras(
+        importar = importar_centrodecustos(
             arquivo_importacao_cliente=file,
             tenant=request.tenant,
             dadoscliente=dadoscliente
@@ -733,7 +733,7 @@ def regra(request):
     if form.is_valid():
         form.save()
         file = request.FILES['file']
-        importar = importar_centrodecustos(
+        importar = importar_regras(
             arquivo_importacao_cliente=file,
             tenant=request.tenant,
             dadoscliente=dadoscliente
