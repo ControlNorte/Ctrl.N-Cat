@@ -132,12 +132,6 @@ def handle_item_data(request):
             "X-API-KEY": api_key
         }
 
-        print(f'accountID: {accountId}')
-        print(f'X-API-KEY: {api_key}')
-        print(f'X-API-KEY: {accessToken}')
-        print(f'de: {from_date}')
-        print(f'Hoje: {to_date}')
-
         response = requests.get(url, headers=headers)
         results_json = response.json()
 
@@ -151,7 +145,6 @@ def handle_item_data(request):
             params.update({"page": paginaAtual})
             query_string = urlencode(params)
             paged_url = f"{url}?{query_string}"
-            print(params)
 
             response = requests.get(paged_url, headers=headers)
             page_data = response.json()
