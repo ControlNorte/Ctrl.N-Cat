@@ -645,7 +645,7 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
     categorias_nao_encontradas = []
     categorias_criadas = 0
     for categoria in categorias:
-        if not Categoria.objects.filter(nome=categoria).exists():
+        if not Categoria.objects.filter(nome=categoria, cliente=dadoscliente).exists():
             categorias_nao_encontradas.append(categoria)
 
 
@@ -670,7 +670,7 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
     sub_categorias_criadas = 0
 
     for sub_categoria in sub_categorias:
-        if not SubCategoria.objects.filter(nome=sub_categoria).exists():
+        if not SubCategoria.objects.filter(nome=sub_categoria, cliente=dadoscliente).exists():
             sub_categorias_nao_encontradas.append(sub_categoria)
 
     for categoria, sub_categoria in zip(categorias, sub_categorias_nao_encontradas):
@@ -753,7 +753,7 @@ def importar_centrodecustos(arquivo_importacao_cliente, tenant, dadoscliente):
     centro_de_custo_criados = 0
 
     for centros_de_custo in centros_de_custos:
-        if not CentroDeCusto.objects.filter(nome=centros_de_custo).exists():
+        if not CentroDeCusto.objects.filter(nome=centros_de_custo, cliente=dadoscliente).exists():
             centros_de_custo_nao_encontradas.append(centros_de_custo)
 
     for centros_de_custo in centros_de_custo_nao_encontradas:
@@ -839,19 +839,19 @@ def importar_regras(arquivo_importacao_cliente, tenant, dadoscliente):
     regras_criadas = 0
 
     for nome_categoria in categorias:
-        if not Categoria.objects.filter(nome=nome_categoria).exists():
+        if not Categoria.objects.filter(nome=nome_categoria, cliente=dadoscliente).exists():
             categorias_nao_encontradas.append(nome_categoria)
             retorno = "Categorias inexistentes:\n" + "\n".join(f" {nome}, " for nome in categorias_nao_encontradas)
             return retorno
 
     for sub_categoria in sub_categorias:
-        if not SubCategoria.objects.filter(nome=sub_categoria).exists():
+        if not SubCategoria.objects.filter(nome=sub_categoria, cliente=dadoscliente).exists():
             subcategorias_nao_encontradas.append(sub_categoria)
             retorno = "Sub_Categorias inexistentes:\n" + "\n".join(f" {nome}, " for nome in subcategorias_nao_encontradas)
             return retorno
 
     for centrodecusto in centrodecustos:
-        if not CentroDeCusto.objects.filter(nome=centrodecusto).exists():
+        if not CentroDeCusto.objects.filter(nome=centrodecusto, cliente=dadoscliente).exists():
             centrodecustos_nao_encontradas.append(centrodecusto)
             retorno = "Centro de Custo inexistentes:\n" + "\n".join(f" {nome}, " for nome in centrodecustos_nao_encontradas)
             return retorno
