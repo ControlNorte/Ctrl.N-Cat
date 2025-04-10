@@ -726,40 +726,61 @@ def regra(request):
         return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
-    if request.method == 'POST':
-        dados = request.POST.dict()
-        
-        # Verifica se já existe um cadastro com os mesmos dados
-        existe_regra = Regra.objects.for_tenant(request.tenant).filter(
-            cliente=dadoscliente,
-            categoria_id=dados.get("categoria"),
-            subcategoria_id=dados.get("subcategoria"),
-            centrodecusto_id=dados.get("centrodecusto"),
-            descricao=dados.get("descricao"),
-        ).exists()
 
-        if existe_regra:
-            messages.error(request, "Centro de Custo já cadastrado")
-            
-        else:
-            # Cria o novo registro
-            regras = Regra.objects.create(tenant=request.tenant,
+    file = ""
+    importar = ""
+    form = UploadFileForm(request.POST, request.FILES)
+    if form.is_valid():
+        form.save()
+        file = request.FILES['file']
+        importar = importar_centrodecustos(
+            arquivo_importacao_cliente=file,
+            tenant=request.tenant,
+            dadoscliente=dadoscliente
+        )
+
+    if not file:
+
+        if request.method == 'POST':
+            dados = request.POST.dict()
+
+            # Verifica se já existe um cadastro com os mesmos dados
+            existe_regra = Regra.objects.for_tenant(request.tenant).filter(
                 cliente=dadoscliente,
-                categoria=Categoria.objects.get(id=dados.get("categoria"), cliente=dadoscliente),
-                subcategoria=SubCategoria.objects.get(id=dados.get("subcategoria"), cliente=dadoscliente),
-                centrodecusto=CentroDeCusto.objects.get(id=dados.get("centrodecusto"), cliente=dadoscliente),
+                categoria_id=dados.get("categoria"),
+                subcategoria_id=dados.get("subcategoria"),
+                centrodecusto_id=dados.get("centrodecusto"),
                 descricao=dados.get("descricao"),
-                ativo=dados.get("ativo")
-            )
-            regras.save()
+            ).exists()
+
+            if existe_regra:
+                messages.error(request, "Centro de Custo já cadastrado")
+
+            else:
+                # Cria o novo registro
+                regras = Regra.objects.create(tenant=request.tenant,
+                    cliente=dadoscliente,
+                    categoria=Categoria.objects.get(id=dados.get("categoria"), cliente=dadoscliente),
+                    subcategoria=SubCategoria.objects.get(id=dados.get("subcategoria"), cliente=dadoscliente),
+                    centrodecusto=CentroDeCusto.objects.get(id=dados.get("centrodecusto"), cliente=dadoscliente),
+                    descricao=dados.get("descricao"),
+                    ativo=dados.get("ativo")
+                )
+                regras.save()
 
     categorias = Categoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     subcategorias = SubCategoria.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     centrodecustos = CentroDeCusto.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('nome')
     regras = Regra.objects.for_tenant(request.tenant).filter(cliente=dadoscliente).order_by('categoria')
 
-    context = {'dadoscliente': dadoscliente, 'categorias': categorias, 'subcategorias': subcategorias,
-               'centrodecustos': centrodecustos, 'regras': regras}
+    context = {'dadoscliente': dadoscliente,
+               'categorias': categorias,
+               'subcategorias': subcategorias,
+               'centrodecustos': centrodecustos,
+               'regras': regras,
+               'importar': importar,
+               'form': form,
+               }
     return render(request, 'cadastros/regra.html', context)
 
 
