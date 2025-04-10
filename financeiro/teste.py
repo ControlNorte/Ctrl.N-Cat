@@ -847,13 +847,13 @@ def importar_regras(arquivo_importacao_cliente, tenant, dadoscliente):
     for sub_categoria in sub_categorias:
         if not SubCategoria.objects.filter(nome=sub_categoria).exists():
             subcategorias_nao_encontradas.append(sub_categoria)
-            retorno = "Sub_Categorias inexistentes:\n" + "\n".join(f" {nome}, " for nome in categorias_nao_encontradas)
+            retorno = "Sub_Categorias inexistentes:\n" + "\n".join(f" {nome}, " for nome in subcategorias_nao_encontradas)
             return retorno
 
     for centrodecusto in centrodecustos:
         if not CentroDeCusto.objects.filter(nome=centrodecusto).exists():
             centrodecustos_nao_encontradas.append(centrodecusto)
-            retorno = "Centro de Custo inexistentes:\n" + "\n".join(f" {nome}, " for nome in categorias_nao_encontradas)
+            retorno = "Centro de Custo inexistentes:\n" + "\n".join(f" {nome}, " for nome in centrodecustos_nao_encontradas)
             return retorno
 
     for categoria, sub_categoria, centrodecusto, descricao in zip(categorias, sub_categorias, centrodecustos, descricoes):
