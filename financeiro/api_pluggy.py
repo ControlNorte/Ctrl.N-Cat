@@ -121,6 +121,7 @@ def handle_item_data(request):
         params = {"accountId": accountId,
                   "from": from_date,
                   "to": to_date,
+                  "pageSize": 500,
                   }
 
         query_string = urlencode(params)
@@ -137,11 +138,31 @@ def handle_item_data(request):
         print(f'de: {from_date}')
         print(f'Hoje: {to_date}')
 
-
         response = requests.get(url, headers=headers)
+        results_json = response.json()
 
-        results = (response.json())
-        results = results['results']
+        # Inicializa com os dados da primeira página
+        all_transactions = results_json.get('results', [])
+        totalPages = results_json.get('totalPages', 1)
+        paginaAtual = 2  # Começa da 2ª página
+
+        # Loop para buscar as próximas páginas
+        while paginaAtual <= totalPages:
+            params.update({"page": paginaAtual})
+            query_string = urlencode(params)
+            paged_url = f"{url}?{query_string}"
+            print(params)
+
+            response = requests.get(paged_url, headers=headers)
+            page_data = response.json()
+
+            transactions = page_data.get('results', [])
+            all_transactions.extend(transactions)
+
+            paginaAtual += 1
+
+        print(all_transactions)
+        results = all_transactions['results']
 
         dados = []
 
