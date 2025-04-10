@@ -154,8 +154,7 @@ def handle_item_data(request):
 
             paginaAtual += 1
 
-        print(all_transactions)
-        results = all_transactions['results']
+        results = all_transactions
 
         dados = []
 
