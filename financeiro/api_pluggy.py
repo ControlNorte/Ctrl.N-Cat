@@ -456,10 +456,9 @@ def process_webhook(webhook):
             "accept": "application/json",
             "X-API-KEY": access_token['apiKey']
         }
-
+        print(access_token['apiKey'])
         response = requests.get(url, headers=headers)
         results_json = response.json()
-        print(results_json)
 
         # Separar os componentes da URL
         parsed_url = urlparse(url)
@@ -468,8 +467,8 @@ def process_webhook(webhook):
 
         # Inicializa com os dados da primeira página
         all_transactions = results_json.get('results', [])
-        print(all_transactions)
         totalPages = results_json.get('totalPages', 1)
+        print(totalPages)
         paginaAtual = 2  # Começa da 2ª página
 
         # Loop para buscar as próximas páginas
@@ -478,7 +477,6 @@ def process_webhook(webhook):
             existing_params.update(params)
             query_string = urlencode(existing_params, doseq=True)
             paged_url = parsed_url._replace(query=query_string).geturl()
-            print(paged_url)
 
             response = requests.get(paged_url, headers=headers)
             page_data = response.json()
@@ -489,7 +487,7 @@ def process_webhook(webhook):
             paginaAtual += 1
 
         results = all_transactions
-        print(results)
+
         dados = []
 
         tenant = Tenant.objects.get(nome=tenant)
