@@ -450,20 +450,23 @@ def process_webhook(webhook):
         cliente = bancos.cliente
         tenant = bancos.tenant
 
-        url = webhook['createdTransactionsLink']
+        url = "https://api.pluggy.ai/transactions"
+
+        params = {"accountId": accountId,
+                  "pageSize": 500,
+                  "createdAtFrom": webhook["transactionsCreatedAtFrom"],
+                  }
+
+        query_string = urlencode(params)
+        url = f"{url}?{query_string}"
 
         headers = {
             "accept": "application/json",
-            "X-API-KEY": access_token['apiKey']
+            "X-API-KEY": api_key
         }
-        print(access_token['apiKey'])
+
         response = requests.get(url, headers=headers)
         results_json = response.json()
-
-        # Separar os componentes da URL
-        parsed_url = urlparse(url)
-        # Juntar os parâmetros existentes com os novos
-        existing_params = parse_qs(parsed_url.query)
 
         # Inicializa com os dados da primeira página
         all_transactions = results_json.get('results', [])
@@ -473,12 +476,12 @@ def process_webhook(webhook):
 
         # Loop para buscar as próximas páginas
         while paginaAtual <= totalPages:
-            params = {"page": paginaAtual, "pageSize": 500,}
-            existing_params.update(params)
-            query_string = urlencode(existing_params, doseq=True)
-            paged_url = parsed_url._replace(query=query_string).geturl()
+            params.update({"page": paginaAtual})
+            query_string = urlencode(params)
+            paged_url = f"{url}?{query_string}"
 
             response = requests.get(paged_url, headers=headers)
+
             page_data = response.json()
 
             transactions = page_data.get('results', [])
