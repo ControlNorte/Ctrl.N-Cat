@@ -115,9 +115,9 @@ def handle_item_data(request):
         url = "https://api.pluggy.ai/transactions"
 
         to_date = date.today()
-        print(f'Hoje: {to_date}')
+
         from_date = to_date - timedelta(days=31)
-        print(f'de: {from_date}')
+
         params = {"accountId": accountId,
                   "from": from_date,
                   "to": to_date,
@@ -130,6 +130,12 @@ def handle_item_data(request):
             "accept": "application/json",
             "X-API-KEY": api_key
         }
+
+        print(f'accountID: {accountId}')
+        print(f'X-API-KEY: {api_key}')
+        print(f'de: {from_date}')
+        print(f'Hoje: {to_date}')
+
 
         response = requests.get(url, headers=headers)
 
