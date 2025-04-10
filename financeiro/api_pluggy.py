@@ -1,7 +1,7 @@
 import datetime
 import time as tm
 from datetime import *
-from urllib.parse import urlencode, urlparse, parse_qs, urlunparse
+from urllib.parse import urlencode, urlparse, parse_qs
 
 import ahocorasick
 import json
@@ -465,11 +465,6 @@ def process_webhook(webhook):
         parsed_url = urlparse(url)
         # Juntar os parâmetros existentes com os novos
         existing_params = parse_qs(parsed_url.query)
-
-        # Reconstruir a query string
-        query_string = urlencode(existing_params, doseq=True)
-        # Remontar a URL final
-        url = parsed_url._replace(query=query_string).geturl()
 
         # Inicializa com os dados da primeira página
         all_transactions = results_json.get('results', [])
