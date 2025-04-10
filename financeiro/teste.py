@@ -674,18 +674,18 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
             sub_categorias_nao_encontradas.append(sub_categoria)
 
     for categoria, sub_categoria in zip(categorias, sub_categorias_nao_encontradas):
-        try:
-            categoria_obj = Categoria.objects.get(nome=categoria)
-            nova_sub_categoria = SubCategoria.objects.create(
-                tenant=tenant,
-                cliente=dadoscliente,
-                categoria=categoria_obj,
-                nome=sub_categoria
-            )
-            nova_sub_categoria.save()
-            sub_categorias_criadas += 1
-        except:
-            print(f"Categoria não encontrada: {categoria}")
+        # try:
+        categoria_obj = Categoria.objects.get(nome=categoria)
+        nova_sub_categoria = SubCategoria.objects.create(
+            tenant=tenant,
+            cliente=dadoscliente,
+            categoria=categoria_obj,
+            nome=sub_categoria
+        )
+        nova_sub_categoria.save()
+        sub_categorias_criadas += 1
+        # except:
+        #     print(f"Categoria não encontrada: {categoria}")
 
     retorno = f'Importações concluidas! Foram criadas {categorias_criadas} Categorias e {sub_categorias_criadas} Sub-Categorias'
 
