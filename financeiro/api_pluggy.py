@@ -134,7 +134,7 @@ def handle_item_data(request):
 
         results = (response.json())
         results = results['results']
-
+        print(results)
         dados = []
 
         tenant = Tenant.objects.get(nome=tenant)
