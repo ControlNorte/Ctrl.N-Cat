@@ -812,3 +812,69 @@ def download_modelo_importacao_cadastro_regras(request):
 
     # Retornar o arquivo como resposta para download
     return FileResponse(output, as_attachment=True, filename='Modelo de Importação Regra.xlsx')
+
+
+def importar_regras(arquivo_importacao_cliente, tenant, dadoscliente):
+
+    if not arquivo_importacao_cliente:
+        return print("Erro: Nenhum arquivo foi selecionado.")  # Retorna erro se nenhum arquivo foi selecionado
+
+    retorno = ''
+
+    # Ler o arquivo Excel usando pandas
+    df = pd.read_excel(arquivo_importacao_cliente)
+
+    # Converter DataFrame para lista de dicionários
+    registros = df.to_dict(orient='records')
+
+    # Retira as Categorias Mae para verificar se estão corretas
+    categorias = [item['Categoria'].strip().upper() for item in registros]
+    sub_categorias = [item['Subcategoria'].strip().upper() for item in registros]
+    centrodecustos = [item['Centrodecusto'].strip().upper() for item in registros]
+    descricoes = [item['Descricao'].strip().upper() for item in registros]
+
+    categorias_nao_encontradas = []
+    subcategorias_nao_encontradas = []
+    centrodecustos_nao_encontradas = []
+    regras_criadas = 0
+
+    for nome_categoria in categorias:
+        if not Categoria.objects.filter(nome=nome_categoria).exists():
+            categorias_nao_encontradas.append(nome_categoria)
+            retorno = "Categorias inexistentes:\n" + "\n".join(f" {nome}, " for nome in categorias_nao_encontradas)
+            return retorno
+
+    for sub_categoria in sub_categorias:
+        if not SubCategoria.objects.filter(nome=sub_categoria).exists():
+            subcategorias_nao_encontradas.append(sub_categoria)
+            retorno = "Sub_Categorias inexistentes:\n" + "\n".join(f" {nome}, " for nome in categorias_nao_encontradas)
+            return retorno
+
+    for centrodecusto in centrodecustos:
+        if not CentroDeCusto.objects.filter(nome=centrodecusto).exists():
+            centrodecustos_nao_encontradas.append(centrodecusto)
+            retorno = "Centro de Custo inexistentes:\n" + "\n".join(f" {nome}, " for nome in categorias_nao_encontradas)
+            return retorno
+
+    for categoria, sub_categoria, centrodecusto, descricao in zip(categorias, sub_categorias, centrodecustos, descricoes):
+        try:
+            categoria_obj = Categoria.objects.get(nome=categoria)
+            subcategoria_obj = SubCategoria.objects.get(nome=sub_categoria)
+            centrodecusto_obj = CentroDeCusto.objects.get(nome=centrodecusto)
+            nova_regra = Regra.objects.create(
+                tenant=tenant,
+                cliente=dadoscliente,
+                categoria=categoria_obj,
+                subcategoria=subcategoria_obj,
+                centrodecusto=centrodecusto_obj,
+                descricao=descricao,
+                ativo=True,
+            )
+            nova_regra.save()
+            regras_criadas += 1
+        except:
+            print(f"Erro ao importar o Regras referente a descrição {descricao}")
+
+    retorno = f'Importações concluidas! Foram criadas {regras_criadas}'
+
+    return retorno
