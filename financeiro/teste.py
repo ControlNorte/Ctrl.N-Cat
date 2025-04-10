@@ -675,7 +675,7 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
 
     for categoria, sub_categoria in zip(categorias, sub_categorias_nao_encontradas):
         # try:
-        categoria_obj = Categoria.objects.get(nome=categoria)
+        categoria_obj = Categoria.objects.get(nome=categoria, cliente=dadoscliente)
         nova_sub_categoria = SubCategoria.objects.create(
             tenant=tenant,
             cliente=dadoscliente,
@@ -858,9 +858,9 @@ def importar_regras(arquivo_importacao_cliente, tenant, dadoscliente):
 
     for categoria, sub_categoria, centrodecusto, descricao in zip(categorias, sub_categorias, centrodecustos, descricoes):
         try:
-            categoria_obj = Categoria.objects.get(nome=categoria)
-            subcategoria_obj = SubCategoria.objects.get(nome=sub_categoria)
-            centrodecusto_obj = CentroDeCusto.objects.get(nome=centrodecusto)
+            categoria_obj = Categoria.objects.get(nome=categoria, cliente=dadoscliente)
+            subcategoria_obj = SubCategoria.objects.get(nome=sub_categoria, cliente=dadoscliente)
+            centrodecusto_obj = CentroDeCusto.objects.get(nome=centrodecusto, cliente=dadoscliente)
             nova_regra = Regra.objects.create(
                 tenant=tenant,
                 cliente=dadoscliente,
