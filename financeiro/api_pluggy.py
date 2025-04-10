@@ -215,10 +215,18 @@ def handle_item_data(request):
                 descricao = dado['descricao'].upper()
 
                 # Verifica se já existe uma movimentação com a mesma data, descrição e valor
-                if MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
-                                                                                  data=dado['data'],
-                                                                                  descricao=descricao,
-                                                                                  valor=dado['valor']).exists():
+                if (MovimentacoesCliente.objects.for_tenant(tenant).filter(
+                        cliente_id=cliente,
+                        banco_id=banco,
+                        data=dado['data'],
+                        descricao=descricao,
+                        valor=dado['valor']).exists()
+                        or
+                        TransicaoCliente.objects.filter(cliente_id=cliente,
+                        banco_id=banco,
+                        data=dado['data'],
+                        descricao=descricao,
+                        valor=dado['valor']).exists()):
                     a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
                                                                                        data=dado['data'],
                                                                                        descricao=descricao,
