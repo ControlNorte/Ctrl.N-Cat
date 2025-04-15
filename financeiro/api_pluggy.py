@@ -169,6 +169,7 @@ def handle_item_data(request):
                 descricao = result['description']
                 valor = result['amount']
                 data = result['date']
+                print(data)
                 data = datetime.strptime(data, '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%Y-%m-%d')
 
                 registro = {
