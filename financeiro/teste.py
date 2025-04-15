@@ -653,18 +653,19 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
 
 
     for categoria_mae, categoria in zip(categorias_maes, categorias_nao_encontradas):
-        try:
-            categoria_mae_obj = CategoriaMae.objects.get(nome=categoria_mae)
-            novacategoria = Categoria.objects.create(
-                tenant=tenant,
-                cliente=dadoscliente,
-                categoriamae=categoria_mae_obj,
-                nome=categoria
-            )
-            novacategoria.save()
-            categorias_criadas += 1
-        except:
-            print(f"Categoria Mãe não encontrada: {categoria_mae}")
+        if not Categoria.objects.filter(nome=categoria, cliente=dadoscliente).exists():
+            try:
+                categoria_mae_obj = CategoriaMae.objects.get(nome=categoria_mae)
+                novacategoria = Categoria.objects.create(
+                    tenant=tenant,
+                    cliente=dadoscliente,
+                    categoriamae=categoria_mae_obj,
+                    nome=categoria
+                )
+                novacategoria.save()
+                categorias_criadas += 1
+            except:
+                print(f"Categoria Mãe não encontrada: {categoria_mae}")
 
     # Retira as Categorias para verificar se precisam ser criadas ou não
     sub_categorias = [item['Sub Categoria'].strip().upper() for item in registros]
@@ -677,18 +678,19 @@ def importar_subcategorias(arquivo_importacao_cliente, tenant, dadoscliente):
             sub_categorias_nao_encontradas.append(sub_categoria)
 
     for categoria, sub_categoria in zip(categorias, sub_categorias_nao_encontradas):
-        try:
-            categoria_obj = Categoria.objects.get(nome=categoria, cliente=dadoscliente)
-            nova_sub_categoria = SubCategoria.objects.create(
-                tenant=tenant,
-                cliente=dadoscliente,
-                categoria=categoria_obj,
-                nome=sub_categoria
-            )
-            nova_sub_categoria.save()
-            sub_categorias_criadas += 1
-        except:
-            print(f"Categoria não encontrada: {categoria}")
+        if not SubCategoria.objects.filter(nome=sub_categoria, cliente=dadoscliente).exists():
+            try:
+                categoria_obj = Categoria.objects.get(nome=categoria, cliente=dadoscliente)
+                nova_sub_categoria = SubCategoria.objects.create(
+                    tenant=tenant,
+                    cliente=dadoscliente,
+                    categoria=categoria_obj,
+                    nome=sub_categoria
+                )
+                nova_sub_categoria.save()
+                sub_categorias_criadas += 1
+            except:
+                print(f"Categoria não encontrada: {categoria}")
 
     retorno = f'Importações concluidas! Foram criadas {categorias_criadas} Categorias e {sub_categorias_criadas} Sub-Categorias'
 
