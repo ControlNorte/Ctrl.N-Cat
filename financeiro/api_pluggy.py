@@ -212,6 +212,7 @@ def handle_item_data(request):
                     continue
 
                 descricao = dado['descricao'].upper()
+                descricao = descricao[:100]
                 matched = False
 
                 if not matched:  # Se nenhuma correspondência foi encontrada
@@ -233,6 +234,7 @@ def handle_item_data(request):
             # Processamento das transações
             for dado in dados:
                 descricao = dado['descricao'].upper()
+                descricao = descricao[:100]
 
                 # Verifica se já existe uma movimentação com a mesma data, descrição e valor
                 if (MovimentacoesCliente.objects.for_tenant(tenant).filter(
@@ -548,6 +550,7 @@ def process_webhook(webhook):
                     continue
 
                 descricao = dado['descricao'].upper()
+                descricao = descricao[:100]
                 matched = False
 
                 if not matched:  # Se nenhuma correspondência foi encontrada
@@ -569,6 +572,7 @@ def process_webhook(webhook):
             # Processamento das transações
             for dado in dados:
                 descricao = dado['descricao'].upper()
+                descricao = descricao[:100]
 
                 # Verifica se já existe uma movimentação com a mesma data, descrição e valor
                 if (MovimentacoesCliente.objects.for_tenant(tenant).filter(

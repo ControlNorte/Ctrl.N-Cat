@@ -98,6 +98,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
 
         for dado in dados:
             descricao = dado['descricao'].upper()
+            descricao = descricao[:100]
             matched = False
 
             if not matched:  # Se nenhuma correspondência foi encontrada
@@ -119,6 +120,7 @@ def importar_arquivo_excel(arquivo_upload, cliente, banco, request):
         # Processamento das transações
         for dado in dados:
             descricao = dado['descricao'].upper()
+            descricao = descricao[:100]
 
             # Verifica se já existe uma movimentação com a mesma data, descrição e valor
             if MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
@@ -570,6 +572,7 @@ def transf(request):
         return JsonResponse({'success': True})
 
     return JsonResponse({'success': False})
+
 
 def download_modelo_importacao_cadastro_subcategoria(request):
     # Criar um arquivo Excel em memória
