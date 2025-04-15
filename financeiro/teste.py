@@ -1,3 +1,5 @@
+from datetime import date
+
 import ahocorasick
 import pandas as pd
 from django import forms, template
@@ -883,3 +885,204 @@ def importar_regras(arquivo_importacao_cliente, tenant, dadoscliente):
     retorno = f'Importações concluidas! Foram criadas {regras_criadas}'
 
     return retorno
+
+
+def aplicar_regras_em_transicoes(request, banco, cliente, tenant):
+    if request.method == 'POST':
+
+
+        results = TransicaoCliente.objects.filter(banco=banco, cliente=cliente, tenant=tenant)
+
+        dados = []
+
+        tenant = Tenant.objects.get(nome=tenant)
+        tenant = tenant.id
+        cliente = cadastro_de_cliente.objects.get(razao_social=cliente)
+        cliente = cliente.id
+        bancos = BancosCliente.objects.get(id=banco)
+        banco = bancos.id
+
+        for result in results:
+            descricao = result.descricao
+            valor = result.valor
+            data = result.data
+            data = datetime.strptime(data, '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%Y-%m-%d')
+
+            registro = {
+                'data': data,
+                'descricao': descricao,
+                'valor': valor
+            }
+
+            dados.append(registro)
+
+        movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
+        transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
+        conciliados = 0  # Contador para o número de movimentações conciliadas
+
+        # Criar o autômato Aho-Corasick
+        A = ahocorasick.Automaton()
+        regras = Regra.objects.for_tenant(tenant).filter(cliente_id=cliente).select_related('categoria',
+                                                                                            'subcategoria',
+                                                                                            'centrodecusto')
+        if not regras.exists():
+
+            for dado in dados:
+
+                if (MovimentacoesCliente.objects.for_tenant(tenant).filter(
+                        cliente_id=cliente,
+                        banco_id=banco,
+                        data=dado['data'],
+                        descricao=descricao,
+                        valor=dado['valor']).exists()
+                        or
+                        TransicaoCliente.objects.filter(cliente_id=cliente,
+                                                        banco_id=banco,
+                                                        data=dado['data'],
+                                                        descricao=descricao,
+                                                        valor=dado['valor']).exists()):
+                    a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
+                                                                               data=dado['data'],
+                                                                               descricao=descricao,
+                                                                               valor=dado['valor'])
+
+                    continue
+
+                descricao = dado['descricao'].upper()
+                descricao = descricao[:100]
+                matched = False
+
+                if not matched:  # Se nenhuma correspondência foi encontrada
+                    transicoes_to_create.append(TransicaoCliente(
+                        tenant_id=tenant,
+                        cliente_id=cliente,
+                        banco_id=banco,
+                        data=dado['data'],
+                        descricao=descricao,
+                        valor=dado['valor']
+                    ))
+                    conciliados += 1
+        else:
+
+            for idx, regra in enumerate(regras):
+                A.add_word(str(regra.descricao).upper(), (idx, regra))
+            A.make_automaton()  # Compila o autômato para otimizar a pesquisa
+
+            # Processamento das transações
+            for dado in dados:
+                descricao = dado['descricao'].upper()
+                descricao = descricao[:100]
+
+                # Verifica se já existe uma movimentação com a mesma data, descrição e valor
+                if (MovimentacoesCliente.objects.for_tenant(tenant).filter(
+                        cliente_id=cliente,
+                        banco_id=banco,
+                        data=dado['data'],
+                        descricao=descricao,
+                        valor=dado['valor']).exists()
+                        or
+                        TransicaoCliente.objects.filter(cliente_id=cliente,
+                                                        banco_id=banco,
+                                                        data=dado['data'],
+                                                        descricao=descricao,
+                                                        valor=dado['valor']).exists()):
+                    a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
+                                                                               data=dado['data'],
+                                                                               descricao=descricao,
+                                                                               valor=dado['valor'])
+
+                    continue  # Pula para o próximo dado se já existir uma movimentação igual
+
+                matched = False  # Indicador de correspondência
+
+                # Itera pelas correspondências usando o autômato
+                for _, (_, regra) in A.iter(descricao):
+                    movimentacoes_to_create.append(MovimentacoesCliente(
+                        tenant_id=tenant,
+                        cliente_id=cliente,
+                        banco_id=banco,
+                        data=dado['data'],
+                        descricao=descricao,
+                        detalhe='Sem Detalhe',
+                        valor=dado['valor'],
+                        categoria=regra.categoria,
+                        subcategoria=regra.subcategoria,
+                        centrodecusto=regra.centrodecusto
+                    ))
+                    matched = True  # Marca como correspondido
+
+                    break  # Sai do loop após a primeira correspondência
+
+                if not matched:  # Se nenhuma correspondência foi encontrada
+                    transicoes_to_create.append(TransicaoCliente(
+                        tenant_id=tenant,
+                        cliente_id=cliente,
+                        banco_id=banco,
+                        data=dado['data'],
+                        descricao=descricao,
+                        valor=dado['valor']
+                    ))
+                    conciliados += 1  # Incrementa o contador de movimentações conciliadas
+
+        # Inserção em batch das movimentações no banco de dados
+        if movimentacoes_to_create:
+            MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
+
+        # Inserção em batch das transições no banco de dados
+        if transicoes_to_create:
+            TransicaoCliente.objects.bulk_create(transicoes_to_create)
+
+        # Atualização do saldo baseado nas novas movimentações
+        if movimentacoes_to_create:
+            datainicial = min(
+                mov.data if isinstance(mov.data, date) else datetime.strptime(mov.data, "%Y-%m-%d").date()
+                for mov in movimentacoes_to_create
+            )
+
+            datafinal = MovimentacoesCliente.objects.for_tenant(tenant).filter(
+                cliente_id=cliente, banco_id=banco).order_by('-data').first()
+
+            datafinal = datafinal.data + timedelta(days=31) if datafinal else datetime.strptime(
+                datainicial, "%Y-%m-%d") + timedelta(days=31)  # Determina a maior data entre as movimentações
+
+            while datainicial <= datafinal:
+                # Calcula o saldo inicial e final do dia
+                saldo_inicial = Saldo.objects.for_tenant(tenant).get(
+                    cliente_id=cliente, banco_id=banco, data=datainicial - timedelta(days=1))
+
+                saldo_inicial = saldo_inicial.saldofinal if saldo_inicial else 0  # Obtém o saldo final do dia anterior
+
+                saldo_movimentacoes = \
+                    MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
+                                                                           data=datainicial).aggregate(
+                        total_movimentacoes=Sum('valor'))['total_movimentacoes'] or 0
+
+                saldo_final = saldo_inicial + saldo_movimentacoes
+
+                with connection.cursor() as cursor:
+                    insert_query = """
+                                                INSERT INTO financeiro_saldo (tenant_id, cliente_id, banco_id, data, saldoinicial, saldofinal)
+                                                VALUES (%s, %s, %s, %s, %s, %s)
+                                                ON CONFLICT(cliente_id, banco_id, data)
+                                                DO UPDATE SET saldoinicial = EXCLUDED.saldoinicial, saldofinal = EXCLUDED.saldofinal;
+                                            """
+
+                    cursor.execute(insert_query, [
+                        tenant,
+                        cliente,
+                        banco,
+                        datainicial,
+                        saldo_inicial,
+                        saldo_final
+                    ])
+
+                datainicial += timedelta(days=1)  # Incrementa o dia
+
+        print(
+            f'Banco cadastrado com seucesso! Importamos {conciliados} movimentações para te ajudar!.')  # Retorna uma mensagem de sucesso
+        return JsonResponse(
+            {'message': f'Banco cadastrado com seucesso! Importamos {conciliados} movimentações para te ajudar!'},
+            status=200)
+    else:
+        return JsonResponse({'status': 'erro', 'mensagem': 'Método não permitido'}, status=405)
+

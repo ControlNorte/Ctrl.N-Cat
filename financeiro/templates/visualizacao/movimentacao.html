@@ -166,12 +166,7 @@ Financeiro | {{ dadoscliente }}
                                 </button>
                             </div>
                         </form>
-                        <form method="post">
-                            <input type="hidden" name="tipo" value="api">
-                            <button>
-                                API
-                            </button>
-                        </form>
+                        <button id="aplicarRegrasBtn">Aplicar Regras</button>
                         <hr>
                         <br>
                         {% if transicoes %}
@@ -691,6 +686,44 @@ Financeiro | {{ dadoscliente }}
     descricaoInput.addEventListener('input', function() {
         this.setAttribute('value', this.value);
     });
+
+    document.getElementById('aplicarRegrasBtn').addEventListener('click', () => {
+        const banco = 'itau';
+        const cliente = 'joao';
+        const tenant = 'empresa123';
+
+        fetch(`/aplicar-regras/${banco}/${cliente}/${tenant}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),  // Django exige CSRF para POST
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.mensagem);
+        })
+        .catch(error => {
+            console.error('Erro ao aplicar regras:', error);
+        });
+    });
+
+    // Função para pegar o token CSRF do cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Verifica se o cookie começa com o nome procurado
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
 </script>
 </main>
 {% endblock %}

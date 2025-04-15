@@ -3,7 +3,7 @@ from django.urls import path, re_path
 from . import views
 from .views import *
 from .api_pluggy import handle_item_data, recice_webhook
-from .teste import download_modelo_importacao_cadastro_subcategoria, download_modelo_importacao_cadastro_centrodecusto, download_modelo_importacao_cadastro_regras
+from .teste import download_modelo_importacao_cadastro_subcategoria, download_modelo_importacao_cadastro_centrodecusto, download_modelo_importacao_cadastro_regras, aplicar_regras_em_transicoes
 
 # from django.contrib.auth import views as auth_view
 
@@ -58,4 +58,6 @@ urlpatterns = [
     path('download_modelo_importacao_sb/', download_modelo_importacao_cadastro_subcategoria, name='download_modelo_importacao_cadastro_subcategoria'),
     path('download_modelo_importacao_cc/', download_modelo_importacao_cadastro_centrodecusto, name='download_modelo_importacao_cadastro_centrodecusto'),
     path('download_modelo_importacao_r/', download_modelo_importacao_cadastro_regras, name='download_modelo_importacao_cadastro_regras'),
+
+    path('aplicar-regras/<str:banco>/<str:cliente>/<str:tenant>/', aplicar_regras_em_transicoes, name='aplicar_regras')
 ]
