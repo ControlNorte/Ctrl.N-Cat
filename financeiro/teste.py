@@ -897,7 +897,6 @@ def aplicar_regras_em_transicoes(request, banco, cliente, tenant):
             descricao = result.descricao
             valor = result.valor
             data = result.data
-            data = datetime.strptime(data, '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%Y-%m-%d')
 
             registro = {
                 'data': data,
