@@ -240,6 +240,7 @@ def movimentacao(request, banco):
         'format_date': format_date,
         'format_currency': format_currency,
         'bancodestinos': bancodestinos,
+        'tenant': request.tenant,
 
     }
 

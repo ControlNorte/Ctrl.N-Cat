@@ -688,9 +688,9 @@ Financeiro | {{ dadoscliente }}
     });
 
     document.getElementById('aplicarRegrasBtn').addEventListener('click', () => {
-        const banco = 'itau';
-        const cliente = 'joao';
-        const tenant = 'empresa123';
+        const banco = {{ banco }};
+        const cliente = {{ dadoscliente }};
+        const tenant = {{ tenant }};
 
         fetch(`/aplicar-regras/${banco}/${cliente}/${tenant}/`, {
             method: 'POST',
