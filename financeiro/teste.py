@@ -893,13 +893,6 @@ def aplicar_regras_em_transicoes(request, banco, cliente, tenant):
 
         dados = []
 
-        tenant = Tenant.objects.get(nome=tenant)
-        tenant = tenant.id
-        cliente = cadastro_de_cliente.objects.get(razao_social=cliente)
-        cliente = cliente.id
-        bancos = BancosCliente.objects.get(id=banco)
-        banco = bancos.id
-
         for result in results:
             descricao = result.descricao
             valor = result.valor
