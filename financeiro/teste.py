@@ -889,8 +889,6 @@ def importar_regras(arquivo_importacao_cliente, tenant, dadoscliente):
 
 def aplicar_regras_em_transicoes(request, banco, cliente, tenant):
     if request.method == 'POST':
-
-
         results = TransicaoCliente.objects.filter(banco=banco, cliente=cliente, tenant=tenant)
 
         dados = []

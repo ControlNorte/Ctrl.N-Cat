@@ -692,6 +692,8 @@ Financeiro | {{ dadoscliente }}
         const cliente = {{ dadoscliente }};
         const tenant = {{ tenant }};
 
+        console.log("Botão clicado");
+
         fetch(`/aplicar-regras/${banco}/${cliente}/${tenant}/`, {
             method: 'POST',
             headers: {
