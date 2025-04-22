@@ -3,7 +3,7 @@ from datetime import date
 import ahocorasick
 import pandas as pd
 from django import forms, template
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.shortcuts import redirect
 import openpyxl
@@ -907,7 +907,7 @@ def aplicar_regras_em_transicoes(request, banco, cliente, tenant):
             dados.append(registro)
         print(dados)
         movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
-        transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
+        transicoes_to_delete = []  # Lista para armazenar as transições que serão criadas
         conciliados = 0  # Contador para o número de movimentações conciliadas
 
         # Criar o autômato Aho-Corasick
@@ -924,13 +924,7 @@ def aplicar_regras_em_transicoes(request, banco, cliente, tenant):
                         banco_id=banco,
                         data=dado['data'],
                         descricao=descricao,
-                        valor=dado['valor']).exists()
-                        or
-                        TransicaoCliente.objects.filter(cliente_id=cliente,
-                                                        banco_id=banco,
-                                                        data=dado['data'],
-                                                        descricao=descricao,
-                                                        valor=dado['valor']).exists()):
+                        valor=dado['valor']).exists()):
                     a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
                                                                                data=dado['data'],
                                                                                descricao=descricao,
@@ -938,20 +932,6 @@ def aplicar_regras_em_transicoes(request, banco, cliente, tenant):
 
                     continue
 
-                descricao = dado['descricao'].upper()
-                descricao = descricao[:100]
-                matched = False
-
-                if not matched:  # Se nenhuma correspondência foi encontrada
-                    transicoes_to_create.append(TransicaoCliente(
-                        tenant_id=tenant,
-                        cliente_id=cliente,
-                        banco_id=banco,
-                        data=dado['data'],
-                        descricao=descricao,
-                        valor=dado['valor']
-                    ))
-                    conciliados += 1
         else:
 
             for idx, regra in enumerate(regras):
@@ -969,13 +949,7 @@ def aplicar_regras_em_transicoes(request, banco, cliente, tenant):
                         banco_id=banco,
                         data=dado['data'],
                         descricao=descricao,
-                        valor=dado['valor']).exists()
-                        or
-                        TransicaoCliente.objects.filter(cliente_id=cliente,
-                                                        banco_id=banco,
-                                                        data=dado['data'],
-                                                        descricao=descricao,
-                                                        valor=dado['valor']).exists()):
+                        valor=dado['valor']).exists()):
                     a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
                                                                                data=dado['data'],
                                                                                descricao=descricao,
@@ -1003,24 +977,44 @@ def aplicar_regras_em_transicoes(request, banco, cliente, tenant):
 
                     break  # Sai do loop após a primeira correspondência
 
-                if not matched:  # Se nenhuma correspondência foi encontrada
-                    transicoes_to_create.append(TransicaoCliente(
-                        tenant_id=tenant,
+                if matched:
+                    transicoes = TransicaoCliente.objects.for_tenant(tenant).filter(
                         cliente_id=cliente,
                         banco_id=banco,
                         data=dado['data'],
                         descricao=descricao,
                         valor=dado['valor']
-                    ))
-                    conciliados += 1  # Incrementa o contador de movimentações conciliadas
+                    )
+
+                    # Adiciona os objetos encontrados à lista
+                    transicoes_to_delete.extend(transicoes)
+
+                    conciliados += 1
 
         # Inserção em batch das movimentações no banco de dados
         if movimentacoes_to_create:
             MovimentacoesCliente.objects.bulk_create(movimentacoes_to_create)
 
         # Inserção em batch das transições no banco de dados
-        if transicoes_to_create:
-            TransicaoCliente.objects.bulk_create(transicoes_to_create)
+        if transicoes_to_delete:
+            batch_size = 100  # Tamanho do lote — pode ajustar conforme necessário
+            total = len(transicoes_to_delete)
+
+            for i in range(0, total, batch_size):
+                lote = transicoes_to_delete[i:i + batch_size]
+                condicoes = Q()
+
+                for t in lote:
+                    condicoes |= Q(
+                        cliente_id=t.cliente_id,
+                        banco_id=t.banco_id,
+                        data=t.data,
+                        descricao=t.descricao,
+                        valor=t.valor
+                    )
+
+                with transaction.atomic():
+                    TransicaoCliente.objects.for_tenant(tenant).filter(condicoes).delete()
 
         # Atualização do saldo baseado nas novas movimentações
         if movimentacoes_to_create:
