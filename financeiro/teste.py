@@ -903,9 +903,9 @@ def aplicar_regras_em_transicoes(request, banco, cliente, tenant):
                 'descricao': descricao,
                 'valor': valor
             }
-
+            print(registro)
             dados.append(registro)
-
+        print(dados)
         movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
         transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
         conciliados = 0  # Contador para o número de movimentações conciliadas
