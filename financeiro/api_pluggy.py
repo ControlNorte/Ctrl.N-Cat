@@ -383,7 +383,9 @@ def process_webhook(webhook):
         return print(webhook)
 
     webhook = json.loads(webhook)
+    print(webhook)
     event = webhook['event']
+    print(event)
 
     payload = {
         "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
@@ -492,7 +494,7 @@ def process_webhook(webhook):
             paginaAtual += 1
 
         results = all_transactions
-
+        print(results)
         dados = []
 
         tenant = Tenant.objects.get(nome=tenant)
