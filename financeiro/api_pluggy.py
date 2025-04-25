@@ -475,7 +475,7 @@ def process_webhook(webhook):
         # Inicializa com os dados da primeira página
         all_transactions = results_json.get('results', [])
         totalPages = results_json.get('totalPages', 1)
-        print(totalPages)
+        print(all_transactions)
         paginaAtual = 2  # Começa da 2ª página
 
         # Loop para buscar as próximas páginas
