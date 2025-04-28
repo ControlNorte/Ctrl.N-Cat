@@ -406,18 +406,6 @@ def process_webhook(webhook):
         api_key = response.text
         api_key = json.loads(api_key)
         api_key = api_key['apiKey']
-        print(api_key)
-
-        headers = {
-            "accept": "application/json",
-            "content-type": "application/json",
-            "X-API-KEY": api_key
-        }
-
-        response = requests.post(url, json=payload, headers=headers)
-
-        access_token = response.text
-        access_token = json.loads(access_token)
 
         # Requisitando dados da conta
         accountId = webhook['accountId']
@@ -473,7 +461,6 @@ def process_webhook(webhook):
 
         response = requests.get(url, headers=headers)
         results_json = response.json()
-        print(results_json)
         # Inicializa com os dados da primeira página
         all_transactions = results_json.get('results', [])
         totalPages = results_json.get('totalPages', 1)
@@ -496,7 +483,6 @@ def process_webhook(webhook):
             paginaAtual += 1
 
         results = all_transactions
-        print(results)
         dados = []
 
         tenant = Tenant.objects.get(nome=tenant)
