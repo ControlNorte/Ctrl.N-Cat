@@ -1,6 +1,7 @@
 import datetime
 import time as tm
 from datetime import *
+from time import process_time_ns
 from urllib.parse import urlencode, urlparse, parse_qs
 
 import ahocorasick
@@ -383,9 +384,7 @@ def process_webhook(webhook):
         return print(webhook)
 
     webhook = json.loads(webhook)
-    print(webhook)
     event = webhook['event']
-    print(event)
 
     payload = {
         "clientId": "8e0a0ef7-71f4-4049-ac54-bab15e6c7bb9",
@@ -405,6 +404,7 @@ def process_webhook(webhook):
         response = requests.post(url, json=payload, headers=headers)
 
         api_key = response.text
+        print(api_key)
 
         headers = {
             "accept": "application/json",
