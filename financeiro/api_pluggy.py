@@ -471,7 +471,7 @@ def process_webhook(webhook):
 
         response = requests.get(url, headers=headers)
         results_json = response.json()
-
+        print(results_json)
         # Inicializa com os dados da primeira página
         all_transactions = results_json.get('results', [])
         totalPages = results_json.get('totalPages', 1)
