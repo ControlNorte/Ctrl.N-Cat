@@ -404,6 +404,8 @@ def process_webhook(webhook):
         response = requests.post(url, json=payload, headers=headers)
 
         api_key = response.text
+        api_key = json.loads(api_key)
+        api_key = api_key['apiKey']
         print(api_key)
 
         headers = {
@@ -424,7 +426,7 @@ def process_webhook(webhook):
 
         headers = {
             "accept": "application/json",
-            "X-API-KEY": access_token['apiKey']
+            "X-API-KEY": api_key
         }
 
         response = requests.get(url, headers=headers)
