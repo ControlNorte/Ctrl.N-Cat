@@ -9,6 +9,8 @@ import json
 import re
 import requests
 import threading
+
+from dateutil.utils import today
 from django.db import connection
 from django.db.models import Sum
 from django.http import JsonResponse
@@ -491,13 +493,11 @@ def process_webhook(webhook):
         banco = bancos.id
 
         for result in results:
-            if result['status'] == 'POSTED':
+            data = result['date']
+            data = datetime.strptime(data, '%Y-%m-%dT%H:%M:%S.%fZ')  # mantém como datetime
+            if result['status'] == 'POSTED' and data >= datetime.now() - timedelta(days=30):
                 descricao = result['description']
                 valor = result['amount']
-                data = result['date']
-                data = datetime.strptime(data, '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%Y-%m-%d')
-
-                # print(valor)
 
                 registro = {
                     'data': data,
@@ -506,6 +506,8 @@ def process_webhook(webhook):
                 }
 
                 dados.append(registro)
+            else:
+                continue
 
         movimentacoes_to_create = []  # Lista para armazenar as movimentações que serão criadas
         transicoes_to_create = []  # Lista para armazenar as transições que serão criadas
