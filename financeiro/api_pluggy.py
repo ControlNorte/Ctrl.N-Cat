@@ -445,7 +445,6 @@ def process_webhook(webhook):
         tenant = bancos.tenant
 
         url = "https://api.pluggy.ai/transactions"
-        print(webhook["transactionsCreatedAtFrom"])
         params = {"accountId": accountId,
                   "pageSize": 500,
                   "createdAtFrom": webhook["transactionsCreatedAtFrom"],
@@ -458,8 +457,6 @@ def process_webhook(webhook):
             "accept": "application/json",
             "X-API-KEY": api_key
         }
-        print(api_key)
-        print(params)
 
 
         response = requests.get(url, headers=headers)
