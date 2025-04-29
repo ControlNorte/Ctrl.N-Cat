@@ -482,7 +482,7 @@ def process_webhook(webhook):
             all_transactions.extend(transactions)
 
             paginaAtual += 1
-
+        print(all_transactions)
         results = all_transactions
         dados = []
 
