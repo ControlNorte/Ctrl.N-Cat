@@ -18,6 +18,8 @@ from django.views.decorators.csrf import csrf_exempt
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
+from decimal import Decimal
+from django.utils.dateparse import parse_date
 
 from hpinicial.models import Tenant
 from .models import BancosCliente, cadastro_de_cliente, Regra, MovimentacoesCliente, TransicaoCliente, Saldo
@@ -194,20 +196,32 @@ def handle_item_data(request):
         if not regras.exists():
 
             for dado in dados:
+                descricao_normalizada = descricao.strip().lower()
+                valor_normalizado = Decimal(str(dado['valor'])).quantize(Decimal('0.01'))
+                data_normalizada = parse_date(str(dado['data']))
 
-                if (MovimentacoesCliente.objects.for_tenant(tenant).filter(
+                if (
+                    MovimentacoesCliente.objects.for_tenant(tenant)
+                    .filter(
                         cliente_id=cliente,
                         banco_id=banco,
-                        data=dado['data'],
-                        descricao=descricao,
-                        valor=dado['valor']).exists()
-                        or
-                        TransicaoCliente.objects.filter(cliente_id=cliente,
-                                                        banco_id=banco,
-                                                        data=dado['data'],
-                                                        descricao=descricao,
-                                                        valor=dado['valor']).exists()):
-                    print(f"Movimentação já conciliada: data: {dado["data"]}descrição: {descricao}, valor: {dado["valor"]}")
+                        data=data_normalizada,
+                        descricao__iexact=descricao_normalizada,
+                        valor=valor_normalizado,
+                    )
+                    .exists()
+                    or
+                    TransicaoCliente.objects
+                    .filter(
+                        cliente_id=cliente,
+                        banco_id=banco,
+                        data=data_normalizada,
+                        descricao__iexact=descricao_normalizada,
+                        valor=valor_normalizado,
+                    )
+                    .exists()
+                ):
+                    print(f'Movimentação já conciliada: data: {dado["data"]}, descrição: {descricao}, valor: {dado["valor"]}')
 
 
                     continue
@@ -237,24 +251,35 @@ def handle_item_data(request):
                 descricao = dado['descricao'].upper()
                 descricao = descricao[:100]
 
-                # Verifica se já existe uma movimentação com a mesma data, descrição e valor
-                if (MovimentacoesCliente.objects.for_tenant(tenant).filter(
-                        cliente_id=cliente,
-                        banco_id=banco,
-                        data=dado['data'],
-                        descricao=descricao,
-                        valor=dado['valor']).exists()
+                descricao_normalizada = descricao.strip().lower()
+                valor_normalizado = Decimal(str(dado['valor'])).quantize(Decimal('0.01'))
+                data_normalizada = parse_date(str(dado['data']))
+
+                if (
+                        MovimentacoesCliente.objects.for_tenant(tenant)
+                                .filter(
+                            cliente_id=cliente,
+                            banco_id=banco,
+                            data=data_normalizada,
+                            descricao__iexact=descricao_normalizada,
+                            valor=valor_normalizado,
+                        )
+                                .exists()
                         or
-                        TransicaoCliente.objects.filter(cliente_id=cliente,
-                                                        banco_id=banco,
-                                                        data=dado['data'],
-                                                        descricao=descricao,
-                                                        valor=dado['valor']).exists()):
+                        TransicaoCliente.objects
+                                .filter(
+                            cliente_id=cliente,
+                            banco_id=banco,
+                            data=data_normalizada,
+                            descricao__iexact=descricao_normalizada,
+                            valor=valor_normalizado,
+                        )
+                                .exists()
+                ):
+                    print(
+                        f'Movimentação já conciliada: data: {dado["data"]}, descrição: {descricao}, valor: {dado["valor"]}')
 
-                    print(f"Movimentação já conciliada: data: {dado["data"]}descrição: {descricao}, valor: {dado["valor"]}")
-
-
-                    continue  # Pula para o próximo dado se já existir uma movimentação igual
+                    continue
 
                 matched = False  # Indicador de correspondência
 
@@ -518,21 +543,33 @@ def process_webhook(webhook):
         if not regras.exists():
 
             for dado in dados:
-                if (MovimentacoesCliente.objects.for_tenant(tenant).filter(
-                        cliente_id=cliente,
-                        banco_id=banco,
-                        data=dado['data'],
-                        descricao=descricao,
-                        valor=dado['valor']).exists()
+                descricao_normalizada = descricao.strip().lower()
+                valor_normalizado = Decimal(str(dado['valor'])).quantize(Decimal('0.01'))
+                data_normalizada = parse_date(str(dado['data']))
+
+                if (
+                        MovimentacoesCliente.objects.for_tenant(tenant)
+                                .filter(
+                            cliente_id=cliente,
+                            banco_id=banco,
+                            data=data_normalizada,
+                            descricao__iexact=descricao_normalizada,
+                            valor=valor_normalizado,
+                        )
+                                .exists()
                         or
-                        TransicaoCliente.objects.filter(cliente_id=cliente,
-                                                        banco_id=banco,
-                                                        data=dado['data'],
-                                                        descricao=descricao,
-                                                        valor=dado['valor']).exists()):
-
-                    print(f"Movimentação já conciliada: data: {dado["data"]}descrição: {descricao}, valor: {dado["valor"]}")
-
+                        TransicaoCliente.objects
+                                .filter(
+                            cliente_id=cliente,
+                            banco_id=banco,
+                            data=data_normalizada,
+                            descricao__iexact=descricao_normalizada,
+                            valor=valor_normalizado,
+                        )
+                                .exists()
+                ):
+                    print(
+                        f'Movimentação já conciliada: data: {dado["data"]}, descrição: {descricao}, valor: {dado["valor"]}')
 
                     continue
 
@@ -561,23 +598,35 @@ def process_webhook(webhook):
                 descricao = dado['descricao'].upper()
                 descricao = descricao[:100]
 
-                # Verifica se já existe uma movimentação com a mesma data, descrição e valor
-                if (MovimentacoesCliente.objects.for_tenant(tenant).filter(
-                        cliente_id=cliente,
-                        banco_id=banco,
-                        data=dado['data'],
-                        descricao=descricao,
-                        valor=dado['valor']).exists()
+                descricao_normalizada = descricao.strip().lower()
+                valor_normalizado = Decimal(str(dado['valor'])).quantize(Decimal('0.01'))
+                data_normalizada = parse_date(str(dado['data']))
+
+                if (
+                        MovimentacoesCliente.objects.for_tenant(tenant)
+                                .filter(
+                            cliente_id=cliente,
+                            banco_id=banco,
+                            data=data_normalizada,
+                            descricao__iexact=descricao_normalizada,
+                            valor=valor_normalizado,
+                        )
+                                .exists()
                         or
-                        TransicaoCliente.objects.filter(cliente_id=cliente,
-                                                        banco_id=banco,
-                                                        data=dado['data'],
-                                                        descricao=descricao,
-                                                        valor=dado['valor']).exists()):
+                        TransicaoCliente.objects
+                                .filter(
+                            cliente_id=cliente,
+                            banco_id=banco,
+                            data=data_normalizada,
+                            descricao__iexact=descricao_normalizada,
+                            valor=valor_normalizado,
+                        )
+                                .exists()
+                ):
+                    print(
+                        f'Movimentação já conciliada: data: {dado["data"]}, descrição: {descricao}, valor: {dado["valor"]}')
 
-                    print(f"Movimentação já conciliada: data: {dado["data"]}descrição: {descricao}, valor: {dado["valor"]}")
-
-                    continue  # Pula para o próximo dado se já existir uma movimentação igual
+                    continue
 
                 matched = False  # Indicador de correspondência
 
