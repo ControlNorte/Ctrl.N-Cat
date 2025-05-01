@@ -71,7 +71,7 @@ class MovimentacoesCliente(models.Model):
     subcategoria = models.ForeignKey(SubCategoria, null=True, on_delete=models.SET_NULL)
     centrodecusto = models.ForeignKey(CentroDeCusto, null=True, on_delete=models.SET_NULL)
     cliente = models.ForeignKey(cadastro_de_cliente, on_delete=models.CASCADE)
-    banco = models.ForeignKey(BancosCliente, null=True, on_delete=models.SET_NULL)
+    banco = models.ForeignKey(BancosCliente, null=True, on_delete=models.CASCADE)
     data = models.DateField()
     descricao = models.CharField(max_length=100, blank='Sem Descrição')
     detalhe = models.CharField(max_length=100, null=True, blank=True)
@@ -83,7 +83,7 @@ class MovimentacoesCliente(models.Model):
 class TransicaoCliente(models.Model):
     tenant = models.ForeignKey(Tenant, null=True, on_delete=models.CASCADE)
     cliente = models.ForeignKey(cadastro_de_cliente, on_delete=models.CASCADE)
-    banco = models.ForeignKey(BancosCliente, null=True, on_delete=models.SET_NULL)
+    banco = models.ForeignKey(BancosCliente, null=True, on_delete=models.CASCADE)
     data = models.DateField()
     descricao = models.CharField(max_length=100, blank='Sem Descrição')
     valor = models.DecimalField(max_digits=10, decimal_places=2)
