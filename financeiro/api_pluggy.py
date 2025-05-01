@@ -249,10 +249,10 @@ def handle_item_data(request):
 
             # Processamento das transações
             for dado in dados:
-                descricao = dado['descricao'].upper()
-                descricao = descricao[:100]
 
-                descricao_normalizada = descricao.strip().lower()
+                descricao_raw = dado['descricao']
+                descricao_upper = descricao_raw.upper()[:100]
+                descricao_normalizada = descricao_raw.strip().lower()
                 valor_normalizado = Decimal(str(dado['valor'])).quantize(Decimal('0.01'))
                 data_normalizada = parse_date(str(dado['data']))
 
@@ -286,15 +286,14 @@ def handle_item_data(request):
 
                 # Itera pelas correspondências usando o autômato
                 for _, (_, regra) in A.iter(descricao):
-
                     movimentacoes_to_create.append(MovimentacoesCliente(
                         tenant_id=tenant,
                         cliente_id=cliente,
                         banco_id=banco,
-                        data=dado['data'],
-                        descricao=descricao,
+                        data=data_normalizada,
+                        descricao=descricao_upper,
                         detalhe='Sem Detalhe',
-                        valor=dado['valor'],
+                        valor=valor_normalizado,
                         categoria=regra.categoria,
                         subcategoria=regra.subcategoria,
                         centrodecusto=regra.centrodecusto
@@ -308,9 +307,9 @@ def handle_item_data(request):
                         tenant_id=tenant,
                         cliente_id=cliente,
                         banco_id=banco,
-                        data=dado['data'],
-                        descricao=descricao,
-                        valor=dado['valor']
+                        data=data_normalizada,
+                        descricao=descricao_upper,
+                        valor=valor_normalizado
                     ))
                     conciliados += 1  # Incrementa o contador de movimentações conciliadas
 
