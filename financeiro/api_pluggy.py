@@ -207,10 +207,8 @@ def handle_item_data(request):
                                                         data=dado['data'],
                                                         descricao=descricao,
                                                         valor=dado['valor']).exists()):
-                    a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
-                                                                               data=dado['data'],
-                                                                               descricao=descricao,
-                                                                               valor=dado['valor'])
+                    print(f"Movimentação já conciliada: data: {dado["data"]}descrição: {descricao}, valor: {dado["valor"]}")
+
 
                     continue
 
@@ -252,10 +250,9 @@ def handle_item_data(request):
                                                         data=dado['data'],
                                                         descricao=descricao,
                                                         valor=dado['valor']).exists()):
-                    a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
-                                                                                       data=dado['data'],
-                                                                                       descricao=descricao,
-                                                                                       valor=dado['valor'])
+
+                    print(f"Movimentação já conciliada: data: {dado["data"]}descrição: {descricao}, valor: {dado["valor"]}")
+
 
                     continue  # Pula para o próximo dado se já existir uma movimentação igual
 
@@ -426,7 +423,7 @@ def process_webhook(webhook):
         if dados_banco['type'] == "BANK":
             transferNumber = dados_banco['bankData']['transferNumber']
         else:
-            return print("Não é conta bancária")
+            return print(dados_banco['type'])
 
         timeout = 10
         start_time = tm.time()
@@ -482,7 +479,7 @@ def process_webhook(webhook):
             all_transactions.extend(transactions)
 
             paginaAtual += 1
-        print(all_transactions)
+
         results = all_transactions
         dados = []
 
@@ -533,10 +530,9 @@ def process_webhook(webhook):
                                                         data=dado['data'],
                                                         descricao=descricao,
                                                         valor=dado['valor']).exists()):
-                    a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
-                                                                               data=dado['data'],
-                                                                               descricao=descricao,
-                                                                               valor=dado['valor'])
+
+                    print(f"Movimentação já conciliada: data: {dado["data"]}descrição: {descricao}, valor: {dado["valor"]}")
+
 
                     continue
 
@@ -578,10 +574,8 @@ def process_webhook(webhook):
                                                         data=dado['data'],
                                                         descricao=descricao,
                                                         valor=dado['valor']).exists()):
-                    a = MovimentacoesCliente.objects.for_tenant(tenant).filter(cliente_id=cliente, banco_id=banco,
-                                                                               data=dado['data'],
-                                                                               descricao=descricao,
-                                                                               valor=dado['valor'])
+
+                    print(f"Movimentação já conciliada: data: {dado["data"]}descrição: {descricao}, valor: {dado["valor"]}")
 
                     continue  # Pula para o próximo dado se já existir uma movimentação igual
 
