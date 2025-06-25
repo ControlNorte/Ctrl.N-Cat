@@ -32,7 +32,7 @@ else:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["controlnorte-producao.up.railway.app", 'localhost', '127.0.0.1:8000']
+ALLOWED_HOSTS = ["controlnorte-producao.up.railway.app", 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -93,13 +93,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ControlNorte.wsgi.application'
 
 
+DATABASE_URL = os.getenv('DATABASE_URL')
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=1800)
+    }
+
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'railway',
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
             'USER': 'postgres',
             'PASSWORD': 'mdcOQHlvdMKsOBUxIBQJgeuDcugbAhjh',
             'HOST': 'postgres.railway.internal',
@@ -107,12 +113,6 @@ DATABASES = {
         }
 }
 
-
-DATABASE_URL = os.getenv('DATABASE_URL')
-if DATABASE_URL:
-    DATABASES = {
-        'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=1800)
-    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -176,3 +176,4 @@ CRISPY_TEMPLATE_PACK = 'bootstrap5'
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
 LOGOUT_REDIRECT_URL = '/'
+

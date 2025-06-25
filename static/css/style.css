@@ -82,3 +82,40 @@ tr:hover {border-bottom: 1px solid #ccc}
     color: #5A0564; /* Cor do link quando clicado */
 }
 
+.tabela-extrato {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    color: #333;
+}
+
+.tabela-extrato thead th {
+    background-color: #ffffff;
+    color: #000000;
+    font-weight: bold;
+    font-size: 13px;
+    border: 1px solid #dcdcdc;
+    padding: 10px 8px;
+}
+
+.tabela-extrato td {
+    border: 1px solid #dcdcdc;
+    padding: 10px 8px;
+    text-align: left;
+}
+
+.tabela-extrato tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.tabela-extrato tr:hover {
+    background-color: #f1f1f1;
+}
+
+.tabela-extrato td.valor {
+    color: #4a0072;
+    font-weight: bold;
+}
+

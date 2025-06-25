@@ -51,12 +51,16 @@ def cadastrarcliente(request):
     if not file:
         if request.method == 'POST':
             dados = request.POST.dict()
+
+            ramo_id = dados.get('ramo')
+            ramo = Ramo.objects.filter(id=ramo_id).first() if ramo_id else None
+
             novocliente = cadastro_de_cliente.objects.create(razao_social=dados.get('razao'), cnpj=dados.get('cnpj'),
                                                             logadouro=dados.get('logadouro'),bairro=dados.get('bairro'),
                                                             número=dados.get('número'), cidade=dados.get('cidade'),
                                                             estado=dados.get('estado'), pessoa_de_contato=dados.get('pessoa'),
                                                             telefone=dados.get('telefone'), email_contato=dados.get('email'),
-                                                            ramo=Ramo.objects.get(id=dados.get('ramo')), ativo=dados.get('ativo'),
+                                                            ramo=ramo,
                                                             bancos_utilizados=dados.get('bancos'),
                                                             servicos_contratados=dados.get('servicos'),
                                                             responsavel_conciliacao=dados.get('conciliacao'),

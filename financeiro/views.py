@@ -8,22 +8,33 @@ from django.views.decorators.csrf import csrf_exempt
 from .exibicoes import *
 from .teste import *
 
+from django.http import HttpResponse
+from openpyxl import load_workbook
+from openpyxl.styles import PatternFill, Font, Alignment
+import pandas as pd
+import io
+
+
 
 @login_required
 def financeiro_view(request):
     ### HOMEPAGE FINANCEIRO ###
-    if request.tenant:
-        clientes = cadastro_de_cliente.objects.for_tenant(request.tenant).filter(ativo=True).order_by('razao_social')
 
-    else:
-        clientes = "Sem Clientes Cadastrados"
+    print(request.tenant)
+    #if request.tenant:
+    clientes = cadastro_de_cliente.objects.for_tenant(request.tenant).filter(ativo=True).order_by('razao_social')
+
+    #else:
+    
+        #clientes = []
+        #dadoscliente = None
 
     context = {
         'object_list': clientes,
+        #'dadoscliente': dadoscliente,
     }
 
     return render(request, 'visualizacao/homepagefinanceiro.html', context)
-
 
 def financeirocliente(request, pk):
     ### TELA DE RESUMO DOS DADOS FINANCEIRO DO CLIENTE ###
@@ -72,6 +83,105 @@ def caixa(request):
 
 
 @csrf_exempt
+
+def export_to_excel(request, tenant, cliente):
+    from .models import MovimentacoesCliente  # Certifique-se de ajustar para o nome correto do model
+
+    dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=cliente)
+    movimentacoes = MovimentacoesCliente.objects.for_tenant(request.tenant).filter(cliente=dadoscliente)
+
+    df_hist = pd.DataFrame(list(movimentacoes.values(
+        'descricao',
+        'detalhe',
+        'valor',
+        'banco__banco',
+        'centrodecusto__nome',
+        'categoria__nome',
+        'subcategoria__nome',
+        'data',
+    )))
+
+    if df_hist.empty:
+        return HttpResponse("Sem dados para exportar", content_type="text/plain")
+
+    df_hist.rename(columns={
+        'descricao': 'Descrição',
+        'detalhe': 'Detalhe',
+        'valor': 'Valor categoria/centro de custo',
+        'banco__banco': 'Conta',
+        'centrodecusto__nome': 'Centro de Custo',
+        'categoria__nome': 'Categoria',
+        'subcategoria__nome': 'Subcategoria',
+        'data': 'Data de pagamento'
+    }, inplace=True)
+
+    df_hist['Descrição_normalizada'] = df_hist['Descrição'].astype(str).str.lower().str.strip()
+    df_hist['Categoria_normalizada'] = df_hist['Categoria'].astype(str).str.lower().str.strip()
+    descricoes_ambiguas = df_hist.groupby('Descrição_normalizada')['Categoria_normalizada']\
+        .nunique().loc[lambda x: x > 1].index.tolist()
+
+    colunas_template = [
+        'Tipo de transação', 'Nome do contato', 'Descrição', 'Categoria', 'Valor',
+        'Vencimento', 'Previsto para', 'Competência', 'Centro de custo',
+        'Favorito', 'Tipo de contato', 'Referência', 'Conta',
+        'Data pag/rec/transferência', 'Anotação', 'Status_Sugestao'
+    ]
+
+    linhas_convertidas = []
+    for row in df_hist.itertuples(index=False):
+        valor = getattr(row, 'Valor categoria/centro de custo', 0)
+        descricao = str(getattr(row, 'Descrição', '')).strip()
+        descricao_norm = descricao.lower()
+
+        nova_linha = {
+            'Tipo de transação': 'Pagamento' if valor < 0 else 'Recebimento',
+            'Nome do contato': 'Cliente',
+            'Descrição': descricao,
+            'Categoria': getattr(row, 'Categoria', ''),
+            'Valor': abs(valor),
+            'Vencimento': '',
+            'Previsto para': '',
+            'Competência': '',
+            'Centro de custo': getattr(row, 'Centro de Custo', ''),
+            'Favorito': 'Não',
+            'Tipo de contato': 'Fornecedor',
+            'Referência': getattr(row, 'Detalhe', ''),
+            'Conta': getattr(row, 'Conta', ''),
+            'Data pag/rec/transferência': getattr(row, 'Data de pagamento', ''),
+            'Anotação': '',
+            'Status_Sugestao': 'Requer Revisão' if descricao_norm in descricoes_ambiguas else 'Sugerido'
+        }
+        linhas_convertidas.append(nova_linha)
+
+    df_convertido = pd.DataFrame(linhas_convertidas, columns=colunas_template)
+
+    # Criação do Excel com formatação
+    output = io.BytesIO()
+    writer = pd.ExcelWriter(output, engine='openpyxl')
+    df_convertido.to_excel(writer, index=False, sheet_name='Exportação')
+    writer.close()
+
+    wb = load_workbook(filename=output)
+    ws = wb.active
+
+    azul = PatternFill(start_color="538DD5", end_color="538DD5", fill_type="solid")
+    for cell in ws[1]:
+        cell.fill = azul
+        cell.font = Font(bold=True)
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+
+    # Enviar como resposta HTTP
+    final_output = io.BytesIO()
+    wb.save(final_output)
+    final_output.seek(0)
+
+    response = HttpResponse(
+        final_output,
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=exportacao_pagose_recebidos.xlsx'
+    return response
+
 def movimentacao(request, banco):
     ### EXIBE AS MOVIMENTAÇÕES DOS CLIENTES FILTADAS POR BANCO E CADASTRAR MOVIMENTAÇÕES ###
 

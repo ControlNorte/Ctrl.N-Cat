@@ -33,15 +33,6 @@ Financeiro | {{ dadoscliente }}
                     <div class="flex flex-nowrap justify-center gap-2">
                             <div class="h-64 w-2/5 bg-violet-100 hover:bg-violet-300 font-semibold text-lg text-violet-700 text-center">
                                 <a href="{% url 'financeiro:dre' %}">DRE Resumida</a>
-                                <table class="w-11/12">
-                                    {% for key,values in dreresumo.items %}
-                                    <tr>
-                                       <td class="chave">{{ key }}</td>
-                                        <td class="valor">R$</td>
-                                       <td class="valor"> {{ values }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </table>
                             </div>
                             <div class="h-64 w-3/5 bg-violet-100 hover:bg-violet-300 font-semibold text-lg text-violet-700 text-center">
                                 <a href="{% url 'financeiro:dashboard' %}"><div>Dashboard Financeiro</div></a>

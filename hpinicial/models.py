@@ -16,4 +16,4 @@ class Tenant(models.Model):
 
 class Usuario(AbstractUser):
     tenant = models.ForeignKey(Tenant, null=True, on_delete=models.CASCADE)
-    cpf = models.CharField(max_length=11)
+    cnpj_empresa = models.CharField(max_length=18)
