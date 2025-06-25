@@ -28,4 +28,5 @@ class Cadastrodeclientes(forms.ModelForm):
                   'observacoes': forms.Textarea(attrs={'class': 'form-control'}),
                   'sugestoes': forms.Textarea(attrs={'class': 'form-control'}),
                   'historico': forms.Textarea(attrs={'class': 'form-control'}),
+                  
         }
