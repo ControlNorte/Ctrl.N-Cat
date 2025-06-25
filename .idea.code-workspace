@@ -1,0 +1,25 @@
+{
+	"folders": [
+		{
+			"path": "../Control.Norte/.idea"
+		},
+		{
+			"path": "../Control.Norte/cliente"
+		},
+		{
+			"path": "../Control.Norte/ControlNorte"
+		},
+		{
+			"path": "../Control.Norte/financeiro"
+		},
+		{
+			"path": "../Control.Norte/hpinicial"
+		},
+		{
+			"path": "../Control.Norte/static"
+		},
+		{
+			"path": "../Control.Norte/templates"
+		}
+	]
+}
