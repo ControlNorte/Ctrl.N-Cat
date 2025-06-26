@@ -177,6 +177,9 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
 LOGOUT_REDIRECT_URL = '/'
 
+import django
+from django.contrib.auth import get_user_model
+
 try:
     django.setup()
     User = get_user_model()
