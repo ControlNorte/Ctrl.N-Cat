@@ -66,7 +66,7 @@ def caixa(request):
     pk = request.session.get('dadoscliente')
 
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
@@ -186,7 +186,7 @@ def movimentacao(request, banco):
 
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     bancos = BancosCliente.objects.for_tenant(request.tenant).filter(ativo='True', cliente=dadoscliente).order_by('banco')
@@ -359,7 +359,7 @@ def movimentacao(request, banco):
 def dre(request):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     cdcseleted = ''
@@ -414,7 +414,7 @@ def dre(request):
 def dashboard(request):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     context = {'dadoscliente': dadoscliente}
@@ -424,7 +424,7 @@ def dashboard(request):
 def orcamento(request):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     context = {'dadoscliente': dadoscliente}
@@ -434,7 +434,7 @@ def orcamento(request):
 def cadastrarorcamento(request):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     context = {'dadoscliente': dadoscliente}
@@ -444,7 +444,7 @@ def cadastrarorcamento(request):
 def contas(request):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     pesquisas = ''
     id = ''
@@ -534,7 +534,7 @@ def contas(request):
 def maisopicoes(request):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     context = {'dadoscliente': dadoscliente}
@@ -544,7 +544,7 @@ def maisopicoes(request):
 def banco(request):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     if request.method == 'POST':
@@ -563,7 +563,7 @@ def banco(request):
 def bancosaldo(request, id):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     banco = BancosCliente.objects.for_tenant(request.tenant).get(cliente=dadoscliente, id=id)
@@ -590,7 +590,7 @@ def bancosaldo(request, id):
 def editarbanco(request, id):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     bancoeditado = BancosCliente.objects.for_tenant(request.tenant).get(cliente=dadoscliente, id=id)
@@ -615,7 +615,7 @@ def editarbanco(request, id):
 def categoria(request):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     if request.method == 'POST':
@@ -643,7 +643,7 @@ def categoria(request):
 def editarcategoria(request, id):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     categoriaeditada = Categoria.objects.for_tenant(request.tenant).get(cliente=dadoscliente, id=id)
@@ -664,7 +664,7 @@ def editarcategoria(request, id):
 def subcategoria(request):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
@@ -713,7 +713,7 @@ def subcategoria(request):
 def editarsubcategoria(request, id):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     subcategoriaeditada = SubCategoria.objects.for_tenant(request.tenant).get(cliente=dadoscliente, id=id)
@@ -735,7 +735,7 @@ def editarsubcategoria(request, id):
 def centrocusto(request):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
@@ -777,7 +777,7 @@ def centrocusto(request):
 def editarcentrocusto(request, id):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     centrocustoeditado = CentroDeCusto.objects.for_tenant(request.tenant).get(cliente=dadoscliente, id=id)
@@ -796,7 +796,7 @@ def editarcentrocusto(request, id):
 def editarregra(request, id):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')
+        return redirect('/')
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     regraeditada = Regra.objects.for_tenant(request.tenant).get(cliente=dadoscliente, id=id)
@@ -833,7 +833,7 @@ def editarregra(request, id):
 def regra(request):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
@@ -918,7 +918,7 @@ def get_movimentacao(request, id):
 def edit_movimentacao(request):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     if request.method == 'POST':
@@ -981,7 +981,7 @@ def edit_movimentacao(request):
 def delete_movimentacao(request, id):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
     if request.method == 'POST':

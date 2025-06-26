@@ -365,13 +365,13 @@ def export_to_excel(request, tenant, cliente):
 def salvar_movimentacao(request):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
     bancoatual = request.session.get('bancoatual')
     if not bancoatual:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     bancoatual = BancosCliente.objects.for_tenant(request.tenant).get(pk=bancoatual)
 
@@ -441,13 +441,13 @@ def deletar_movimentacao(request):
 def salvar_regra_usando_movimentacao(request):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
     bancoatual = request.session.get('bancoatual')
     if not bancoatual:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     bancoatual = BancosCliente.objects.for_tenant(request.tenant).get(pk=bancoatual)
 
@@ -512,13 +512,13 @@ def salvar_regra_usando_movimentacao(request):
 def transf(request):
     pk = request.session.get('dadoscliente')
     if not pk:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     dadoscliente = cadastro_de_cliente.objects.for_tenant(request.tenant).get(pk=pk)
 
     bancoatual = request.session.get('bancoatual')
     if not bancoatual:
-        return redirect('alguma_view_de_erro')  # Redireciona se dadoscliente não estiver disponível
+        return redirect('/')  # Redireciona se dadoscliente não estiver disponível
 
     bancoatual = BancosCliente.objects.for_tenant(request.tenant).get(pk=bancoatual)
 
