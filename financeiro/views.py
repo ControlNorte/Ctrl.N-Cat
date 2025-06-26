@@ -15,7 +15,6 @@ import pandas as pd
 import io
 
 
-
 @login_required
 def financeiro_view(request):
     ### HOMEPAGE FINANCEIRO ###
