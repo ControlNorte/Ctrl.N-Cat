@@ -7,7 +7,6 @@ import plotly.express as px
 import io
 import base64
 import plotly.graph_objects as go
-import psycopg2
 from sqlalchemy import create_engine
 
 # EXTRATO NO HTML: movimentacao.html

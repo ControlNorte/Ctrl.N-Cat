@@ -12,7 +12,6 @@ from sqlalchemy.orm import sessionmaker
 import dask.dataframe as dd
 from datetime import datetime, timedelta
 from django.db import transaction, connection
-import psycopg2
 import logging
 
 
