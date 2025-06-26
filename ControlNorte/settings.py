@@ -177,3 +177,15 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
 LOGOUT_REDIRECT_URL = '/'
 
+try:
+    django.setup()
+    User = get_user_model()
+    if not User.objects.filter(username="ctrl.norte@gmail.com").exists():
+        User.objects.create_superuser(
+            username="ctrl.norte@gmail.com",
+            email="ctrl.norte@gmail.com",
+            password="admin123"
+        )
+        print("✅ Superusuário criado com sucesso.")
+except Exception as e:
+    print(f"⚠️ Erro ao criar superusuário: {e}")
